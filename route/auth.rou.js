@@ -9,6 +9,11 @@ router.post('/login', (req,res) => {
     AuthController.login(req, res);
 })
 
+//REGISTER
+router.post('/register', async(req,res) => {
+    AuthController.register(req, res);
+})
+
 
 // //SIGNUP [1. SEND OTP]
 // router.post('/su_send_otp', async(req,res) => {
@@ -60,12 +65,6 @@ router.post('/login', (req,res) => {
 //     Security.returnResponse(res, req, response);
 //     return;
 // })
-
-
-//REGISTER
-router.post('/register', async(req,res) => {
-    AuthController.login(req, res);
-})
 
 
 // //FORGOT PASSWORD [1. SEND OTP]
