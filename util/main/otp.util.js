@@ -96,6 +96,5 @@ const deleteOtp = async (receiving_medium) => {
 module.exports = {
     sendOtp,
     verifyOtp,
-    storeOtp,
     deleteOtp,
 };

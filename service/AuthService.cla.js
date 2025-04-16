@@ -1,6 +1,8 @@
 const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const BaseService = require(SERVICES + 'BaseService.cla');
-const { verifyPassword, }  = require(MAIN_UTILS + 'security.util');
+const { verifyPassword, selEncrypt }  = require(MAIN_UTILS + 'security.util');
+const { sendOtp, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
+const { sendEmail, subjectTemplate, messageTemplate }  = require(MAIN_UTILS + 'messaging.util');
 
 // const Fetch = require(CONTROLLERS + 'Fetch.cla');
 
@@ -8,98 +10,98 @@ class AuthService extends BaseService{
 
     // LOGIN
     static async login(req, res) {
-        try{
-            const {login_id , password} = req.body;
-
-            //get user data
-            const user = await AuthRepository.getUserByLoginId(res, login_id);
-            if(user){ 
-                const dbPassword = user.password;
-                const userStatus = user.status;
-
-                if(verifyPassword(password, dbPassword)){
-                    if(userStatus === 'suspended'){
-                        this.triggerError("Your account has been suspended", []);
-                    }else{
-                        // const data = await Fetch.neededData(user.id);
-                        const data = true; // Placeholder for actual data fetching
-                        if(data){
-                            this.sendResponse(res, user, "Login successful");
-                            //set auth [with jwt and cookies]
-                            //or token depending on settings
-                        }
-                    }
-                }
-            }else{
-                this.triggerError("Incorrect login details", []);
+        try {
+            const { login_id, password } = req.body;
+    
+            // Get user data by login ID
+            const user = await AuthRepository.getUserByLoginId(login_id); // Removed 'res' unless necessary
+            if (!user) {
+                return this.triggerError("Incorrect login details", []);
             }
-            
-        }catch(error){
-            this.handleException(res, error);
+    
+            const { password: dbPassword, status: userStatus } = user;
+    
+            // Verify password (async if using bcrypt.compare)
+            const isPasswordValid = verifyPassword(password, dbPassword);
+            if (!isPasswordValid) {
+                return this.triggerError("Incorrect login details", []);
+            }
+    
+            // Check account status
+            if (userStatus === 'suspended') {
+                return this.triggerError("Your account has been suspended", []);
+            }
+    
+            // Fetch needed data
+            // const data = await Fetch.neededData(user.id);
+            const data = user; // Placeholder
+
+            this.sendResponse(res, data, "Login successful");
+    
+        } catch (error) {
+            return this.handleException(res, error);
         }
     }
+    
 
     // REGISTER
     static async register(req, res) {
         let result;
-        try{
-            const { veri_type, receiving_medium, code, first_name, email } = req.body;
-
-            if(reg_type === 'multi'){
-                //verify code [CHECK]
-                const verify = await Otp.verifyOtp({receiving_medium, use_case:'register', code}, 'used');
-                if(verify === true){
-                    //add email_veri or mobile_veri to request body
-                    if(veri_type === 'email'){
+        try {
+            const { veri_type, receiving_medium, code, first_name, email, reg_type } = req.body;
+    
+            // Handle multi-step verification if applicable
+            if (reg_type === 'multi') {
+                const verifyOtp = await sendOtp({ receiving_medium, use_case: 'register', code }, 'used');
+                
+                if (verifyOtp === true) {
+                    // Mark verification based on type
+                    if (veri_type === 'email') {
                         req.body.email_verification = true;
-                    }else{
+                    } else {
                         req.body.mobile_number_verification = true;
                     }
-                }else if(verify === 'expired'){
-                    this.triggerError("Request timeout, try again", []);
-                }
-            }   
-            
-            //insert
-            result = await AuthRepository.createUser(res, req.body);
-            
-            if(result){
-                if(reg_type === 'multi'){
-                    //delete otp [CHECK]
-                    await Otp.deleteOtp(Security.sel_encry(receiving_medium, 'general'));
-                }
-
-
-                // const data = await Fetch.neededData(result.id);
-                const data = true; // Placeholder for actual data fetching
-
-                if(data){
-                    this.sendResponse(res, result, "Account successfully created");
-
-                    //set auth [with jwt and cookies]
-                    const token = await Token.setToken(response.id);
-                    //Cookie.setCookies(req, res, 'token', token)
-                    res.cookie("_menatreyd", token);
-                    
-                    //unset id key
-                    delete response['id']
-
-                    //send email
-                    // const messageData = {
-                    //     name: first_name,
-                    //     receiver : email,
-                    //     subject : Messaging.subjectTemplate('welcome'),
-                    //     message: Messaging.messageTemplate('welcome', 'email')
-                    // }
-                    // Messaging.sendEmail(messageData)
+                } else if (verifyOtp === 'expired') {
+                    return this.triggerError("Request timeout, try again", []);
+                } else {
+                    return this.triggerError("Invalid or used verification code", []);
                 }
             }
-        }catch(error){
-            this.handleException(res, error);
+    
+            // Create user
+            result = await AuthRepository.createUser(res, req.body);
+            if (!result) {
+                return this.triggerError("Account creation failed", []);
+            }
+    
+            // Clean up OTP if multi
+            if (reg_type === 'multi') {
+                await deleteOtp(selEncrypt(receiving_medium, 'general'));
+            }
+    
+            // Fetch user-related data
+            // const data = await Fetch.neededData(result.id);
+            const data = user; // Placeholder
+    
+            // Send success response
+            this.sendResponse(res, data, "Account successfully created");
+    
+            // // Send welcome email
+            // const messageData = {
+            //     name: first_name,
+            //     receiver: email,
+            //     subject: subjectTemplate('welcome'),
+            //     message: messageTemplate('welcome', 'email')
+            // };
+            // await sendEmail(messageData);
+    
+        } catch (error) {
+            return this.handleException(res, error);
         }
     }
     
     
+
     // // [SEND OTP]
     // async sendOtp() {
     //     this.response['message'] = "Request for otp failed";
