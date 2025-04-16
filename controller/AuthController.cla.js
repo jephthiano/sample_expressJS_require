@@ -28,7 +28,7 @@ class AuthController extends BaseController{
                 this.triggerValidationError(data);
             }
 
-            // await AuthService.register(req, res);
+            await AuthService.register(req, res);
         } catch (error) {
             this.handleException(res, error);
         }

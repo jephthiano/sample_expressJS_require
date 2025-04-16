@@ -15,6 +15,14 @@ class AuthRepository extends BaseRepository{
             this.handleException(res, error);
         }
     }
+
+    static async createUser(res, data) {
+        try{
+            return await UserSch.create(data);
+        }catch(error){
+            this.handleException(res, error);
+        }
+    }
 }
 
 module.exports = AuthRepository;

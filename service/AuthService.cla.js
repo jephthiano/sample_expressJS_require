@@ -22,8 +22,9 @@ class AuthService extends BaseService{
                         this.triggerError("Your account has been suspended", []);
                     }else{
                         // const data = await Fetch.neededData(user.id);
+                        const data = true; // Placeholder for actual data fetching
                         if(data){
-                            this.sendResponse(res, user, "Success");
+                            this.sendResponse(res, user, "Login successful");
                             //set auth [with jwt and cookies]
                             //or token depending on settings
                         }
@@ -37,6 +38,67 @@ class AuthService extends BaseService{
             this.handleException(res, error);
         }
     }
+
+    // REGISTER
+    static async register(req, res) {
+        let result;
+        try{
+            const { veri_type, receiving_medium, code, first_name, email } = req.body;
+
+            if(reg_type === 'multi'){
+                //verify code [CHECK]
+                const verify = await Otp.verifyOtp({receiving_medium, use_case:'register', code}, 'used');
+                if(verify === true){
+                    //add email_veri or mobile_veri to request body
+                    if(veri_type === 'email'){
+                        req.body.email_verification = true;
+                    }else{
+                        req.body.mobile_number_verification = true;
+                    }
+                }else if(verify === 'expired'){
+                    this.triggerError("Request timeout, try again", []);
+                }
+            }   
+            
+            //insert
+            result = await AuthRepository.createUser(res, req.body);
+            
+            if(result){
+                if(reg_type === 'multi'){
+                    //delete otp [CHECK]
+                    await Otp.deleteOtp(Security.sel_encry(receiving_medium, 'general'));
+                }
+
+
+                // const data = await Fetch.neededData(result.id);
+                const data = true; // Placeholder for actual data fetching
+
+                if(data){
+                    this.sendResponse(res, result, "Account successfully created");
+
+                    //set auth [with jwt and cookies]
+                    const token = await Token.setToken(response.id);
+                    //Cookie.setCookies(req, res, 'token', token)
+                    res.cookie("_menatreyd", token);
+                    
+                    //unset id key
+                    delete response['id']
+
+                    //send email
+                    // const messageData = {
+                    //     name: first_name,
+                    //     receiver : email,
+                    //     subject : Messaging.subjectTemplate('welcome'),
+                    //     message: Messaging.messageTemplate('welcome', 'email')
+                    // }
+                    // Messaging.sendEmail(messageData)
+                }
+            }
+        }catch(error){
+            this.handleException(res, error);
+        }
+    }
+    
     
     // // [SEND OTP]
     // async sendOtp() {
@@ -88,77 +150,6 @@ class AuthService extends BaseService{
     //     }
 
     //     return this.response;
-    // }
-
-    // // REGISTER
-    // async register(regType) {
-    //     // return this.sendResponse(res, newUser, "User created successfully", true, [], 201);
-        
-    //     this.response['message'] = "Account creation failed";
-    //     try{
-    //         let result;
-            
-    //         //IF IT MULTI FORM
-    //         if(regType === 'multi'){
-    //             const {receiving_medium, veri_type, code} = this.input;
-    //             //verify code
-    //             const verify = await Otp.verifyOtp({receiving_medium, use_case:'register', code}, 'used');
-    //             if(verify === true){
-    //                 //add email_veri or mobile_veri
-    //                 if(veri_type === 'email'){
-    //                     this.input.email_verification = true;
-    //                 }else{
-    //                     this.input.mobile_number_verification = true;
-    //                 }
-
-    //                 result = await UserSch.create(this.input);
-                    
-    //                 //delete otp
-    //                 await Otp.deleteOtp(Security.sel_encry(receiving_medium, 'general'));
-    //             }else if(verify === 'expired'){
-    //                 this.response['message'] = "Request timeout, try again";
-    //             }
-    //         }else{
-    //             result = await UserSch.create(this.input);
-    //         }
-
-
-    //         if(result){
-    //             const data = await Fetch.neededData(result.id);
-                
-    //             if(data){
-    //                 //set response
-    //                 this.response['status'] = true;
-    //                 this.response['message'] = "Success";
-    //                 this.response['message_detail'] = "Account successfully created";
-    //                 this.response['response_data'] = data;
-                    
-    //                 //send email
-    //                 const messageData = {
-    //                     name: this.input.first_name,
-    //                     receiver : this.input.email,
-    //                     subject : Messaging.subjectTemplate('welcome'),
-    //                     message: Messaging.messageTemplate('welcome', 'email')
-    //                 }
-    //                 Messaging.sendEmail(messageData)
-    //             }
-    //         }
-
-    //     }catch(err){
-    //         AuthService.logError('Register [AUTHService CLASS]', err);
-    //     }
-
-    //     return this.response;
-
-    // if (response.status) {
-    //     //set auth [with jwt and cookies]
-    //     const token = await Token.setToken(response.id);
-    //     //Cookie.setCookies(req, res, 'token', token)
-    //     res.cookie("_menatreyd", token);
-        
-    //     //unset id key
-    //     delete response['id']
-    // }
     // }
 
     // //FORGOT PASSWORD [RESET PASSWORD]

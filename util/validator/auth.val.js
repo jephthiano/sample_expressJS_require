@@ -64,7 +64,7 @@ const login = async (inputs) => {
 // User Registration
 const register = async (inputs) => {
     const errors = {};
-    const { veri_type, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
+    const { reg_type, veri_type, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
     const [email_exists, mobile_exists, username_exists] = await Promise.all([
         findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
@@ -73,7 +73,8 @@ const register = async (inputs) => {
     ]);
 
     // Handle email and mobile number based on veri_type
-    if (veri_type === 'multi') {
+    if (reg_type === 'multi') {
+        //for multi registration
         if (!mobile_number || isEmptyString(mobile_number)) {
             errors.mobile_number = "mobile number is required";
         } else if (!validateInput(mobile_number, 'mobile_number')) {
@@ -82,6 +83,7 @@ const register = async (inputs) => {
             errors.mobile_number = "mobile number already exists";
         }
     } else {
+        //for single registration
         if (!email || isEmptyString(email)) {
             errors.email = "email is required";
         } else if (!validateInput(email, 'email')) {
