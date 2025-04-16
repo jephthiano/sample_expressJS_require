@@ -62,41 +62,10 @@ router.post('/login', (req,res) => {
 // })
 
 
-// //REGISTER
-// router.post('/register', async(req,res) => {
-//     let regType = "multi";
-//     let response = General.initial_response('invalid_input');
-
-//     //validate inputs
-//     const error = await Validator.register(req.data.input, regType);
-
-//     //if there is no error
-//     if(!error.status){
-//         const {veri_type, receiving_medium} = req.data.input
-//         if(regType === "multi")
-//             //set email or mobile_number into input data
-//             veri_type === 'email' ? req.data.input['email'] = receiving_medium : req.data.input['mobile_number'] = receiving_medium ;
-        
-//         const AuthIns = new Auth(req, res);
-//         response = await AuthIns.register(regType);
-
-//         if (response.status) {
-//             //set auth [with jwt and cookies]
-//             const token = await Token.setToken(response.id);
-//             //Cookie.setCookies(req, res, 'token', token)
-//             res.cookie("_menatreyd", token);
-            
-//             //unset id key
-//             delete response['id']
-//         }
-//     }else{
-//         //set the error in response data
-//         response['error_data'] = error.data;
-//     }
-    
-//     Security.returnResponse(res, req, response);    
-//     return;
-// })
+//REGISTER
+router.post('/register', async(req,res) => {
+    AuthController.login(req, res);
+})
 
 
 // //FORGOT PASSWORD [1. SEND OTP]

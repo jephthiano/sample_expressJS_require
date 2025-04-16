@@ -20,7 +20,6 @@ class AuthService extends BaseService{
                 if(verifyPassword(password, dbPassword)){
                     if(userStatus === 'suspended'){
                         this.triggerError("Your account has been suspended", []);
-                        // this.sendResponse(res, {}, "Your account has been suspended",false, {}, 403);
                     }else{
                         // const data = await Fetch.neededData(user.id);
                         if(data){
@@ -32,7 +31,6 @@ class AuthService extends BaseService{
                 }
             }else{
                 this.triggerError("Incorrect login details", []);
-                // this.sendResponse(res, {}, "Incorrect login details", false, {}, 403);
             }
             
         }catch(error){
@@ -151,6 +149,16 @@ class AuthService extends BaseService{
     //     }
 
     //     return this.response;
+
+    // if (response.status) {
+    //     //set auth [with jwt and cookies]
+    //     const token = await Token.setToken(response.id);
+    //     //Cookie.setCookies(req, res, 'token', token)
+    //     res.cookie("_menatreyd", token);
+        
+    //     //unset id key
+    //     delete response['id']
+    // }
     // }
 
     // //FORGOT PASSWORD [RESET PASSWORD]

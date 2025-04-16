@@ -10,7 +10,6 @@ class AuthController extends BaseController{
         try {
             const { status, data } = await Validator.login(req.body);
             if (status) {
-                // will be caught as ValidationError by handleException
                 this.triggerValidationError(data);
             }
     
@@ -18,31 +17,6 @@ class AuthController extends BaseController{
         } catch (error) {
             this.handleException(res, error);
         }
-    
-
-
-
-        
-        // //if there is no error
-        // if(!error.status){
-
-        //     if (response.status) {
-        //         //set auth [with jwt and cookies]
-        //         const token = await Token.setToken(response.id);
-        //         //Cookie.setCookies(req, res, 'token', token)
-        //         res.cookie("_menatreyd", token)
-                
-        //         //unset id key
-        //         delete response['id'];
-        //     }
-
-        // }else{
-        //     //set the error in response data
-        //     response['error_data'] = error.data;
-        // }
-        
-        // Security.returnResponse(res, req, response);
-        // return;
     }
 
     // // [SEND OTP]
@@ -97,67 +71,100 @@ class AuthController extends BaseController{
     //     return this.response;
     // }
 
-    // // REGISTER
-    // async register(regType) {
-    //     // return this.sendResponse(res, newUser, "User created successfully", true, [], 201);
+    // REGISTER
+    async register(regType) {
+        let regType = "multi";
+
+    //validate inputs
+    const { status, data } = await Validator.register(req.body, regType);
+
+    try {
+        const { status, data } = await Validator.register(req.body, regType);
+        if (status) {
+            this.triggerValidationError(data);
+        }
+
+        await AuthService.register(req, res);
+    } catch (error) {
+        this.handleException(res, error);
+    }
+
+    //if there is no error
+    if(!error.status){
+        const {veri_type, receiving_medium} = req.data.input
+        if(regType === "multi")
+            //set email or mobile_number into input data
+            veri_type === 'email' ? req.data.input['email'] = receiving_medium : req.data.input['mobile_number'] = receiving_medium ;
         
-    //     this.response['message'] = "Account creation failed";
-    //     try{
-    //         let result;
+        const AuthIns = new Auth(req, res);
+        response = await AuthIns.register(regType);
+
+        
+    }else{
+        //set the error in response data
+        response['error_data'] = error.data;
+    }
+    
+    Security.returnResponse(res, req, response);    
+    return;
+        
+        this.response['message'] = "Account creation failed";
+        try{
+            let result;
             
-    //         //IF IT MULTI FORM
-    //         if(regType === 'multi'){
-    //             const {receiving_medium, veri_type, code} = this.input;
-    //             //verify code
-    //             const verify = await Otp.verifyOtp({receiving_medium, use_case:'register', code}, 'used');
-    //             if(verify === true){
-    //                 //add email_veri or mobile_veri
-    //                 if(veri_type === 'email'){
-    //                     this.input.email_verification = true;
-    //                 }else{
-    //                     this.input.mobile_number_verification = true;
-    //                 }
+            //IF IT MULTI FORM
+            if(regType === 'multi'){
+                const {receiving_medium, veri_type, code} = this.input;
+                //verify code
+                const verify = await Otp.verifyOtp({receiving_medium, use_case:'register', code}, 'used');
+                if(verify === true){
+                    //add email_veri or mobile_veri
+                    if(veri_type === 'email'){
+                        this.input.email_verification = true;
+                    }else{
+                        this.input.mobile_number_verification = true;
+                    }
 
-    //                 result = await UserSch.create(this.input);
+                    result = await UserSch.create(this.input);
                     
-    //                 //delete otp
-    //                 await Otp.deleteOtp(Security.sel_encry(receiving_medium, 'general'));
-    //             }else if(verify === 'expired'){
-    //                 this.response['message'] = "Request timeout, try again";
-    //             }
-    //         }else{
-    //             result = await UserSch.create(this.input);
-    //         }
+                    //delete otp
+                    await Otp.deleteOtp(Security.sel_encry(receiving_medium, 'general'));
+                }else if(verify === 'expired'){
+                    this.response['message'] = "Request timeout, try again";
+                }
+            }else{
+                result = await UserSch.create(this.input);
+            }
 
 
-    //         if(result){
-    //             const data = await Fetch.neededData(result.id);
+            if(result){
+                const data = await Fetch.neededData(result.id);
                 
-    //             if(data){
-    //                 //set response
-    //                 this.response['status'] = true;
-    //                 this.response['id'] = data.unique_id;
-    //                 this.response['message'] = "Success";
-    //                 this.response['message_detail'] = "Account successfully created";
-    //                 this.response['response_data'] = data;
+                if(data){
+                    //set response
+                    this.response['status'] = true;
+                    this.response['id'] = data.unique_id;
+                    this.response['message'] = "Success";
+                    this.response['message_detail'] = "Account successfully created";
+                    this.response['response_data'] = data;
                     
-    //                 //send email
-    //                 const messageData = {
-    //                     name: this.input.first_name,
-    //                     receiver : this.input.email,
-    //                     subject : Messaging.subjectTemplate('welcome'),
-    //                     message: Messaging.messageTemplate('welcome', 'email')
-    //                 }
-    //                 Messaging.sendEmail(messageData)
-    //             }
-    //         }
+                    //send email
+                    const messageData = {
+                        name: this.input.first_name,
+                        receiver : this.input.email,
+                        subject : Messaging.subjectTemplate('welcome'),
+                        message: Messaging.messageTemplate('welcome', 'email')
+                    }
+                    Messaging.sendEmail(messageData)
+                }
+            }
 
-    //     }catch(err){
-    //         Auth.logError('Register [AUTH CLASS]', err);
-    //     }
+        }catch(err){
+            Auth.logError('Register [AUTH CLASS]', err);
+        }
 
-    //     return this.response;
-    // }
+        return this.response;
+    }
 
     // //FORGOT PASSWORD [RESET PASSWORD]
     // async resetPassword() {

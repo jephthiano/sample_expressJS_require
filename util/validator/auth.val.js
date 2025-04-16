@@ -61,76 +61,76 @@ const login = async (inputs) => {
 //     return formatResponse(errors);
 // };
 
-// // User Registration
-// const register = async (inputs, regType) => {
-//     const errors = {};
-//     const { email, mobile_number, first_name, last_name, username, gender, password } = inputs;
+// User Registration
+const register = async (inputs, regType) => {
+    const errors = {};
+    const { email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
-//     const [email_exists, mobile_exists, username_exists] = await Promise.all([
-//         findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
-//         findSingleValue('User', 'mobile_number', selEncrypt(mobile_number, 'mobile_number'), 'mobile_number'),
-//         findSingleValue('User', 'username', selEncrypt(username, 'username'), 'username')
-//     ]);
+    const [email_exists, mobile_exists, username_exists] = await Promise.all([
+        findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
+        findSingleValue('User', 'mobile_number', selEncrypt(mobile_number, 'mobile_number'), 'mobile_number'),
+        findSingleValue('User', 'username', selEncrypt(username, 'username'), 'username')
+    ]);
 
-//     // Handle email and mobile number based on regType
-//     if (regType === 'multi') {
-//         if (!mobile_number || isEmptyString(mobile_number)) {
-//             errors.mobile_number = "Mobile number is required";
-//         } else if (!validateInput(mobile_number, 'mobile_number')) {
-//             errors.mobile_number = "Invalid mobile number";
-//         } else if (mobile_exists) {
-//             errors.mobile_number = "Mobile number already exists";
-//         }
-//     } else {
-//         if (!email || isEmptyString(email)) {
-//             errors.email = "Email is required";
-//         } else if (!validateInput(email, 'email')) {
-//             errors.email = "Invalid email";
-//         } else if (email_exists) {
-//             errors.email = "Email already exists";
-//         }
+    // Handle email and mobile number based on regType
+    if (regType === 'multi') {
+        if (!mobile_number || isEmptyString(mobile_number)) {
+            errors.mobile_number = "Mobile number is required";
+        } else if (!validateInput(mobile_number, 'mobile_number')) {
+            errors.mobile_number = "Invalid mobile number";
+        } else if (mobile_exists) {
+            errors.mobile_number = "Mobile number already exists";
+        }
+    } else {
+        if (!email || isEmptyString(email)) {
+            errors.email = "Email is required";
+        } else if (!validateInput(email, 'email')) {
+            errors.email = "Invalid email";
+        } else if (email_exists) {
+            errors.email = "Email already exists";
+        }
 
-//         if (!mobile_number || isEmptyString(mobile_number)) {
-//             errors.mobile_number = "Mobile number is required";
-//         } else if (!validateInput(mobile_number, 'mobile_number')) {
-//             errors.mobile_number = "Invalid mobile number";
-//         } else if (mobile_exists) {
-//             errors.mobile_number = "Mobile number already exists";
-//         }
-//     }
+        if (!mobile_number || isEmptyString(mobile_number)) {
+            errors.mobile_number = "Mobile number is required";
+        } else if (!validateInput(mobile_number, 'mobile_number')) {
+            errors.mobile_number = "Invalid mobile number";
+        } else if (mobile_exists) {
+            errors.mobile_number = "Mobile number already exists";
+        }
+    }
 
-//     if (!username || isEmptyString(username)) {
-//         errors.username = "Username is required";
-//     } else if (!validateInput(username, 'username')) {
-//         errors.username = "Username should be between 5 to 10 alphabets";
-//     } else if (username_exists) {
-//         errors.username = "Username already taken";
-//     }
+    if (!username || isEmptyString(username)) {
+        errors.username = "Username is required";
+    } else if (!validateInput(username, 'username')) {
+        errors.username = "Username should be between 5 to 10 alphabets";
+    } else if (username_exists) {
+        errors.username = "Username already taken";
+    }
 
-//     if (!first_name || isEmptyString(first_name)) {
-//         errors.first_name = "First name is required";
-//     } else if (!validateInput(first_name, 'name')) {
-//         errors.first_name = "Invalid first name";
-//     }
+    if (!first_name || isEmptyString(first_name)) {
+        errors.first_name = "First name is required";
+    } else if (!validateInput(first_name, 'name')) {
+        errors.first_name = "Invalid first name";
+    }
 
-//     if (!last_name || isEmptyString(last_name)) {
-//         errors.last_name = "Last name is required";
-//     } else if (!validateInput(last_name, 'name')) {
-//         errors.last_name = "Invalid last name";
-//     }
+    if (!last_name || isEmptyString(last_name)) {
+        errors.last_name = "Last name is required";
+    } else if (!validateInput(last_name, 'name')) {
+        errors.last_name = "Invalid last name";
+    }
 
-//     if (!gender || (gender !== 'male' && gender !== 'female')) {
-//         errors.gender = "Invalid gender";
-//     }
+    if (!gender || (gender !== 'male' && gender !== 'female')) {
+        errors.gender = "Invalid gender";
+    }
 
-//     if (!password || isEmptyString(password)) {
-//         errors.password = "Password is required";
-//     } else if (!validatePassword(password)) {
-//         errors.password = "Password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
-//     }
+    if (!password || isEmptyString(password)) {
+        errors.password = "Password is required";
+    } else if (!validatePassword(password)) {
+        errors.password = "Password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
+    }
 
-//     return formatResponse(errors);
-// };
+    return formatResponse(errors);
+};
 
 // // Send OTP for password reset
 // const fpSendOtp = async (inputs) => {
