@@ -1,4 +1,4 @@
-const { mongoose } = require(CONFIGS + "database");
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const { hashPassword } = require(MAIN_UTILS + 'security.util');

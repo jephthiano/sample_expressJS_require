@@ -5,6 +5,7 @@ const path = require('path');
 module.exports = function () {
     global.__basedir = __dirname.replace('/config', ''); // Adjust based on actual path
     global.CONFIGS = path.join(__basedir, 'config/');
+    global.DTOS = path.join(__basedir, 'dto/');
     global.UTILS = path.join(__basedir, 'util/');
     global.CONTROLLERS = path.join(__basedir, 'controller/');
     global.ROUTES = path.join(__basedir, 'route/');

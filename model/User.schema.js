@@ -1,186 +1,172 @@
-const { mongoose } = require(CONFIGS + "database");
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const { hashPassword, selEncrypt, generateUniqueId } = require(MAIN_UTILS + 'security.util');
 
 const UserSchema = new Schema({
-    unique_id: { //for unique id
-        type : String,
-        unique : true,
-        trim : true 
+    unique_id: {
+        type: String,
+        unique: true,
+        trim: true,
     },
-    email: {  //user email
-        type : String,
-        unique : true,
-        required : [true, 'email is not specified'],
-        trim : true 
+    email: {
+        type: String,
+        unique: true,
+        required: [true, 'email is not specified'],
+        trim: true,
     },
-    mobile_number: { //user mobile number
-        type : String,
-        unique : true,
-        required : [true, 'mobile number is not specified'],
-        trim : true 
+    mobile_number: {
+        type: String,
+        unique: true,
+        required: [true, 'mobile number is not specified'],
+        trim: true,
     },
-    username: {  //user username
-        type : String,
-        unique : true,
-        required : [true, 'username is not specified'],
-        trim : true 
+    username: {
+        type: String,
+        unique: true,
+        required: [true, 'username is not specified'],
+        trim: true,
     },
-    first_name: { 
-        type : String,
-        required : [true, 'first name is not specified'],
-        trim : true 
+    first_name: {
+        type: String,
+        required: [true, 'first name is not specified'],
+        trim: true,
     },
-    last_name: { 
-        type : String,
-        required : [true, 'last name is not specified'],
-        trim : true 
+    last_name: {
+        type: String,
+        required: [true, 'last name is not specified'],
+        trim: true,
     },
-    password: { 
-        type : String,
-        required : [true, 'password is not specified'],
-        trim : true 
+    password: {
+        type: String,
+        required: [true, 'password is not specified'],
+        trim: true,
     },
     transaction_pin: {
         type: String,
         default: null,
-        trim : true 
+        trim: true,
     },
-    user_level: { 
-        type : Number,
-        enum : [1, 2, 3],
-        default : 1
+    user_level: {
+        type: Number,
+        enum: [1, 2, 3],
+        default: 1,
     },
-    gender: { 
-        type : String,
-        enum : ['male','female'],
-        required : [true, 'gender is not specified'],
+    gender: {
+        type: String,
+        enum: ['male', 'female'],
+        required: [true, 'gender is not specified'],
     },
-    dob: { 
-        type : String,
+    dob: {
+        type: String,
     },
-    address: { // address, city, state
-        type : Object,
+    address: {
+        type: Object,
     },
-    status: { 
-        type : String,
-        enum : ['active','suspended'],
-        default : 'active'
+    status: {
+        type: String,
+        enum: ['active', 'suspended'],
+        default: 'active',
     },
-    reg_date: { 
-        type : Date, 
-        default : Date.now()
+    reg_date: {
+        type: Date,
+        default: Date.now,
     },
-    email_verification: { 
-        type : Boolean,
-        default : false
+    email_verification: {
+        type: Boolean,
+        default: false,
     },
-    mobile_number_verification: { 
-        type : Boolean,
-        default : false
+    mobile_number_verification: {
+        type: Boolean,
+        default: false,
     },
     pin_status: {
-        type : Boolean,
-        default : false
+        type: Boolean,
+        default: false,
     },
-    token: { //for unique generated token
-        type : String,
-        default: null
+    token: {
+        type: String,
+        default: null,
     },
-    user_account:{
+    user_account: {
         type: Object,
-        default: null
+        default: null,
     },
-    user_settings:{
+    user_settings: {
         type: Object,
-        default: null
+        default: null,
     },
-    user_bank_account:{
+    user_bank_account: {
         type: Object,
-        default: null
+        default: null,
     },
-    user_kyc_data:{
+    user_kyc_data: {
         type: Object,
-        default: null
+        default: null,
     },
-    user_ext_data:{
+    user_ext_data: {
         type: Object,
-        default: null
-    }
+        default: null,
+    },
 });
 
-
-UserSchema.pre('save', function(next) {
-    //set unique id
+// ✅ Pre-save hook
+UserSchema.pre('save', async function (next) {
     this.unique_id = "user" + generateUniqueId(10);
 
-    //encrypt email
     if (this.isModified('email')) {
         this.email = selEncrypt(this.email.toLowerCase(), 'email');
     }
-
-    //encrypt mobile_number
     if (this.isModified('mobile_number')) {
         this.mobile_number = selEncrypt(this.mobile_number, 'mobile_number');
     }
-
-    //encrypt username
     if (this.isModified('username')) {
         this.username = selEncrypt(this.username.toLowerCase(), 'username');
     }
-
-    //encrypt first_name
     if (this.isModified('first_name')) {
         this.first_name = selEncrypt(this.first_name.toLowerCase(), 'first_name');
     }
-
-    //encrypt last_name
     if (this.isModified('last_name')) {
         this.last_name = selEncrypt(this.last_name.toLowerCase(), 'last_name');
     }
 
-    //hash password
     if (this.isModified('password')) {
-        this.password = hashPassword(this.password);
+        this.password = await hashPassword(this.password);
     }
 
-    // set user account
-    this.user_account = { balance: "0.00"};
-    
+    this.user_account = { balance: "0.00" };
     next();
 });
 
-UserSchema.pre('findByIdAndUpdate', function (next) {
-    //hash password
-    if (this.getUpdate().password) {
-        this.getUpdate().password = hashPassword(this.getUpdate().password)
+// ✅ Pre-update hooks
+UserSchema.pre('findOneAndUpdate', async function (next) {
+    const update = this.getUpdate();
+
+    if (update.password) {
+        update.password = await hashPassword(update.password);
     }
 
-    // //hash transaction pin
-    // if (this.getUpdate().transaction_pin) {
-    //     // this.getUpdate().transaction_pin = hashPassword(this.getUpdate().transaction_pin) 
-    //     this.getUpdate().transaction_pin = this.getUpdate().transaction_pin + "234";
+    // Encrypt email, mobile, etc. if present (optional)
+    if (update.email) update.email = selEncrypt(update.email.toLowerCase(), 'email');
+    if (update.mobile_number) update.mobile_number = selEncrypt(update.mobile_number, 'mobile_number');
+    if (update.username) update.username = selEncrypt(update.username.toLowerCase(), 'username');
+    if (update.first_name) update.first_name = selEncrypt(update.first_name.toLowerCase(), 'first_name');
+    if (update.last_name) update.last_name = selEncrypt(update.last_name.toLowerCase(), 'last_name');
 
-    // }
-
-    // //encrypt email
-    // if (this.getUpdate().email) {
-    //     this.getUpdate().email = selEncrypt(this.getUpdate().email.toLowerCase(), 'email')
-    // }
-    
+    this.setUpdate(update);
     next();
 });
 
-UserSchema.pre('findOneAndUpdate', function (next) {
-    //hash password
-    if (this.getUpdate().password) {
-        this.getUpdate().password = hashPassword(this.getUpdate().password)
+UserSchema.pre('findByIdAndUpdate', async function (next) {
+    const update = this.getUpdate();
+
+    if (update.password) {
+        update.password = await hashPassword(update.password);
     }
-    
+
+    this.setUpdate(update);
     next();
 });
 
 const User = mongoose.model('users', UserSchema);
-
 module.exports = User;

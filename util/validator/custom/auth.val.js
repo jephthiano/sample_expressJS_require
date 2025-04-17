@@ -1,5 +1,5 @@
 const { findSingleValue } = require(CONFIGS + "database");
-const UserSch = require(MODELS + 'User.schema');
+const User = require(MODELS + 'User.schema');
 const { isEmptyObject, isEmptyString }  = require(MAIN_UTILS + 'general.util');
 const { validateInput, selEncrypt, validatePassword }  = require(MAIN_UTILS + 'security.util');
 
@@ -31,7 +31,7 @@ const login = async (inputs) => {
 //     const { receiving_medium, veri_type } = inputs;
 //     const enc_rece = selEncrypt(receiving_medium, 'email');
 
-//     const data_exists = await UserSch.findOne(
+//     const data_exists = await User.findOne(
 //         { $or: [{ mobile_number: enc_rece }, { email: enc_rece }] },
 //         'first_name'
 //     );
@@ -140,7 +140,7 @@ const register = async (inputs) => {
 //     const { receiving_medium } = inputs;
 //     const enc_rece = selEncrypt(receiving_medium, 'email');
 
-//     const data_exists = await UserSch.findOne({ 
+//     const data_exists = await User.findOne({ 
 //         $or: [{ mobile_number: enc_rece }, { email: enc_rece }]
 //     }, 'first_name');
 

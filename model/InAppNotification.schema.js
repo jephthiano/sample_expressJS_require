@@ -1,4 +1,4 @@
-const { mongoose } = require(CONFIGS + "database");
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const InAppNotificationSchema = new Schema({

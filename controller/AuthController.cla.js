@@ -1,4 +1,6 @@
-const Validator = require(VALIDATORS + 'auth.val');
+const { register} = require(VALIDATORS + 'custom/auth.val');
+const { loginJoi } = require(VALIDATORS + 'joi/auth.joi');
+const { parseMessageToObject } = require(MAIN_UTILS + 'general.util');
 const BaseController = require(CONTROLLERS + 'BaseController.cla');
 const AuthService = require(SERVICES + 'AuthService.cla');
 
@@ -8,11 +10,11 @@ class AuthController extends BaseController{
     // LOGIN
     static async login(req, res) {
         try {
-            const { status, data } = await Validator.login(req.body);
-            if (status) {
-                this.triggerValidationError(data);
-            }
-    
+
+            // Validate inputs using Joi DTO
+            const { error, value } = loginJoi.validate(req.body, { abortEarly: false });
+            if (error) this.triggerValidationError(parseMessageToObject(error));
+
             await AuthService.login(req, res);
         } catch (error) {
             this.handleException(res, error);
@@ -23,10 +25,8 @@ class AuthController extends BaseController{
     static async register(req, res) {
         try {
             //validate inputs
-            const { status, data } = await Validator.register(req.body);
-            if (status) {
-                this.triggerValidationError(data);
-            }
+            const { status, data } = await register(req.body);
+            if (status) this.triggerValidationError(data);
 
             await AuthService.register(req, res);
         } catch (error) {

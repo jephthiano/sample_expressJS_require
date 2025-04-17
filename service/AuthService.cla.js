@@ -4,7 +4,7 @@ const { verifyPassword, selEncrypt }  = require(MAIN_UTILS + 'security.util');
 const { sendOtp, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail, subjectTemplate, messageTemplate }  = require(MAIN_UTILS + 'messaging.util');
 
-// const Fetch = require(CONTROLLERS + 'Fetch.cla');
+const Fetch = require(CONTROLLERS + 'FetchController.cla');
 
 class AuthService extends BaseService{
 
@@ -14,7 +14,7 @@ class AuthService extends BaseService{
             const { login_id, password } = req.body;
     
             // Get user data by login ID
-            const user = await AuthRepository.getUserByLoginId(login_id); // Removed 'res' unless necessary
+            const user = await AuthRepository.getUserByLoginId(res, login_id);
             if (!user) {
                 return this.triggerError("Incorrect login details", []);
             }
@@ -22,7 +22,7 @@ class AuthService extends BaseService{
             const { password: dbPassword, status: userStatus } = user;
     
             // Verify password (async if using bcrypt.compare)
-            const isPasswordValid = verifyPassword(password, dbPassword);
+            const  isPasswordValid = await verifyPassword(password, dbPassword);
             if (!isPasswordValid) {
                 return this.triggerError("Incorrect login details", []);
             }
@@ -33,8 +33,7 @@ class AuthService extends BaseService{
             }
     
             // Fetch needed data
-            // const data = await Fetch.neededData(user.id);
-            const data = user; // Placeholder
+            const data = await Fetch.neededData(user.id);
 
             this.sendResponse(res, data, "Login successful");
     
@@ -80,20 +79,19 @@ class AuthService extends BaseService{
             }
     
             // Fetch user-related data
-            // const data = await Fetch.neededData(result.id);
-            const data = user; // Placeholder
+            const data = await Fetch.neededData(result.id);
     
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            // // Send welcome email
-            // const messageData = {
-            //     name: first_name,
-            //     receiver: email,
-            //     subject: subjectTemplate('welcome'),
-            //     message: messageTemplate('welcome', 'email')
-            // };
-            // await sendEmail(messageData);
+            // Send welcome email
+            const messageData = {
+                name: first_name,
+                receiver: email,
+                subject: subjectTemplate('welcome'),
+                message: messageTemplate('welcome', 'email')
+            };
+            sendEmail(messageData);
     
         } catch (error) {
             return this.handleException(res, error);

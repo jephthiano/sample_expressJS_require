@@ -1,7 +1,6 @@
-const UserSch = require(MODELS + 'User.schema');
-const InAppNotiSch = require(MODELS + 'InAppNotification.schema');
-
-const General = require(MAIN_UTILS + 'general.cla');
+const User = require(MODELS + 'User.schema');
+const InAppNoti = require(MODELS + 'InAppNotification.schema');
+const { log } = require(MAIN_UTILS + 'logger.util');
 
 
 let response = {
@@ -14,21 +13,23 @@ let response = {
 
 class FetchController {
     static logInfo(data,type= 'Fetch'){
-        General.log(type, data, 'info')
+        log(type, data, 'info')
     }
 
     static logError(data, type= 'Fetch'){
-        General.log(type, data, 'error')
+        log(type, data, 'error')
     }
 
     static async neededData (id, header='', type ='fetch'){
         try{
             //get user data
             const selUserData = "-token -user_ext_data -password -transaction_pin -unique_id -_id -__v";
-            const userData = await UserSch.findOne({_id : id}, selUserData);
+            const userData = await User.findOne({_id : id}, selUserData);
+
+            return userData ? userData : null;
 
             // in-app notification
-            let InAppNoti = await InAppNotiSch.find({user_id : id}, "-__v -_id -user_id");
+            let InAppNoti = await InAppNoti.find({user_id : id}, "-__v -_id -user_id");
             if(userData){
                 let inAppNotification = InAppNoti ?? {};
 

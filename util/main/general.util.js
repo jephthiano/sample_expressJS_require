@@ -33,6 +33,16 @@ const isDateLapsed = (givenDate, duration = 0, checkDate = new Date()) => {
     return new Date(givenDate).getTime() + milliDuration < checkDate.getTime();
 };
 
+const parseMessageToObject = (error) => {
+    const errors = error.details.reduce((acc, err) => {
+        acc[err.path[0]] = err.message; // Assign each field's error message
+        return acc;
+    }, {});
+    
+    return errors; // Return the structured errors as an object
+};
+
+
 module.exports = {
     initialResponse,
     log,
@@ -46,4 +56,5 @@ module.exports = {
     isNumber,
     ucFirst,
     isDateLapsed,
+    parseMessageToObject,
 };

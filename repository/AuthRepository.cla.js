@@ -1,5 +1,6 @@
 const BaseRepository = require(REPOSITORIES + 'BaseRepository.cla');
 const User = require(MODELS + 'User.schema');
+const { createUserDTO } = require(DTOS + 'user.dto');
 const { selEncrypt, }  = require(MAIN_UTILS + 'security.util');
 
 class AuthRepository extends BaseRepository{
@@ -18,7 +19,9 @@ class AuthRepository extends BaseRepository{
 
     static async createUser(res, data) {
         try{
-            return await UserSch.create(data);
+            const userData = createUserDTO(data);
+            console.log(userData);
+            return await User.create(userData);
         }catch(error){
             this.handleException(res, error);
         }
