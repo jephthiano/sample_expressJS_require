@@ -57,12 +57,8 @@ const UserSchema = new Schema({
         enum: ['male', 'female'],
         required: [true, 'gender is not specified'],
     },
-    dob: {
-        type: String,
-    },
-    address: {
-        type: Object,
-    },
+    dob: String,
+    address: Object,
     status: {
         type: String,
         enum: ['active', 'suspended'],
@@ -72,101 +68,69 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    email_verification: {
-        type: Boolean,
-        default: false,
-    },
-    mobile_number_verification: {
-        type: Boolean,
-        default: false,
-    },
-    pin_status: {
-        type: Boolean,
-        default: false,
-    },
-    token: {
-        type: String,
-        default: null,
-    },
-    user_account: {
-        type: Object,
-        default: null,
-    },
-    user_settings: {
-        type: Object,
-        default: null,
-    },
-    user_bank_account: {
-        type: Object,
-        default: null,
-    },
-    user_kyc_data: {
-        type: Object,
-        default: null,
-    },
-    user_ext_data: {
-        type: Object,
-        default: null,
-    },
+    email_verification: Boolean,
+    mobile_number_verification: Boolean,
+    pin_status: Boolean,
+    token: String,
+    user_account: Object,
+    user_settings: Object,
+    user_bank_account: Object,
+    user_kyc_data: Object,
+    user_ext_data: Object,
 });
 
-// ✅ Pre-save hook
+// Reusable transformer for update objects
+async function transformUserUpdate(update) {
+    const target = update.$set || update;
+
+    if (target.password) {
+        target.password = await hashPassword(target.password);
+    }
+
+    if (target.email) target.email = selEncrypt(target.email.toLowerCase(), 'email');
+    if (target.mobile_number) target.mobile_number = selEncrypt(target.mobile_number, 'mobile_number');
+    if (target.username) target.username = selEncrypt(target.username.toLowerCase(), 'username');
+    if (target.first_name) target.first_name = selEncrypt(target.first_name.toLowerCase(), 'first_name');
+    if (target.last_name) target.last_name = selEncrypt(target.last_name.toLowerCase(), 'last_name');
+
+    if (update.$set) update.$set = target;
+    else Object.assign(update, target);
+
+    return update;
+}
+
+
+// Pre-save
 UserSchema.pre('save', async function (next) {
     this.unique_id = "user" + generateUniqueId(10);
 
-    if (this.isModified('email')) {
-        this.email = selEncrypt(this.email.toLowerCase(), 'email');
-    }
-    if (this.isModified('mobile_number')) {
-        this.mobile_number = selEncrypt(this.mobile_number, 'mobile_number');
-    }
-    if (this.isModified('username')) {
-        this.username = selEncrypt(this.username.toLowerCase(), 'username');
-    }
-    if (this.isModified('first_name')) {
-        this.first_name = selEncrypt(this.first_name.toLowerCase(), 'first_name');
-    }
-    if (this.isModified('last_name')) {
-        this.last_name = selEncrypt(this.last_name.toLowerCase(), 'last_name');
+    if (this.isModified('email')) this.email = selEncrypt(this.email.toLowerCase(), 'email');
+    if (this.isModified('mobile_number')) this.mobile_number = selEncrypt(this.mobile_number, 'mobile_number');
+    if (this.isModified('username')) this.username = selEncrypt(this.username.toLowerCase(), 'username');
+    if (this.isModified('first_name')) this.first_name = selEncrypt(this.first_name.toLowerCase(), 'first_name');
+    if (this.isModified('last_name')) this.last_name = selEncrypt(this.last_name.toLowerCase(), 'last_name');
+    if (this.isModified('password')) this.password = await hashPassword(this.password);
+
+    if (!this.user_account) {
+        this.user_account = { balance: "0.00" };
     }
 
-    if (this.isModified('password')) {
-        this.password = await hashPassword(this.password);
-    }
-
-    this.user_account = { balance: "0.00" };
     next();
 });
 
-// ✅ Pre-update hooks
-UserSchema.pre('findOneAndUpdate', async function (next) {
-    const update = this.getUpdate();
 
-    if (update.password) {
-        update.password = await hashPassword(update.password);
-    }
+// Update hooks
+const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'];
 
-    // Encrypt email, mobile, etc. if present (optional)
-    if (update.email) update.email = selEncrypt(update.email.toLowerCase(), 'email');
-    if (update.mobile_number) update.mobile_number = selEncrypt(update.mobile_number, 'mobile_number');
-    if (update.username) update.username = selEncrypt(update.username.toLowerCase(), 'username');
-    if (update.first_name) update.first_name = selEncrypt(update.first_name.toLowerCase(), 'first_name');
-    if (update.last_name) update.last_name = selEncrypt(update.last_name.toLowerCase(), 'last_name');
-
-    this.setUpdate(update);
-    next();
+updateHooks.forEach((hook) => {
+    UserSchema.pre(hook, async function (next) {
+        const update = this.getUpdate();
+        await transformUserUpdate(update);
+        this.setUpdate(update);
+        next();
+    });
 });
 
-UserSchema.pre('findByIdAndUpdate', async function (next) {
-    const update = this.getUpdate();
-
-    if (update.password) {
-        update.password = await hashPassword(update.password);
-    }
-
-    this.setUpdate(update);
-    next();
-});
 
 const User = mongoose.model('users', UserSchema);
 module.exports = User;

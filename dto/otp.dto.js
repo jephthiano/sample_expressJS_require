@@ -1,4 +1,4 @@
-function createOtpDTO(data, encType = 'email') {
+function createOtpDTO(data) {
 
     return {
         receiving_medium: data.receiving_medium?.trim().toLowerCase(),

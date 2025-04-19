@@ -124,12 +124,7 @@ class AuthService extends BaseService{
             this.sendResponse(res, data, "Account successfully created");
     
             // Send welcome email
-            const messageData = {
-                name: first_name,
-                receiver: email,
-                subject: subjectTemplate('welcome'),
-                message: messageTemplate('welcome', 'email')
-            };
+            const messageData = sendMessageDTO({ first_name, receiving_medium, email }, 'welcome');
             sendEmail(messageData);
     
         } catch (error) {

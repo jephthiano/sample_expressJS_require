@@ -1,8 +1,8 @@
-const OtpSch = require(MODELS + 'OtpToken.schema');
+const Otp = require(MODELS + 'OtpToken.schema');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { isDateLapsed }  = require(MAIN_UTILS + 'general.util');
 const { generateUniqueId, selEncrypt, }  = require(MAIN_UTILS + 'security.util');
-const { subjectTemplate, messageTemplate, sendEmail, sendWhatsappMessage }  = require(MAIN_UTILS + 'messaging.util');
+const { sendEmail, sendWhatsappMessage }  = require(MAIN_UTILS + 'messaging.util');
 const { createOtpDTO } = require(DTOS + 'otp.dto');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
@@ -13,13 +13,11 @@ const logError = (type, data) => log(type, data, 'error');
 const sendOtp = async (data) => {
     let response = false;
 
-    data.receiving_medium = selEncrypt(data.receiving_medium, 'email_phone');
     data.code = String(generateUniqueId(6));
 
     try {
         // Store OTP
-        const otpData = createOtpDTO(data, 'email');
-        if (await storeOtp(otpData)) {
+        if (await storeOtp(data)) {
             // Prepare message data
             const messageData = sendMessageDTO(data, 'otp_code');
 
@@ -31,7 +29,7 @@ const sendOtp = async (data) => {
             }
 
             // If sending fails, delete the OTP
-            if (!response) await deleteOtp(receiving_medium);
+            if (!response) await deleteOtp(data.receiving_medium);
         }
     } catch (err) {
         logError('Send OTP [OTP MODULE]', err);
@@ -47,7 +45,7 @@ const verifyOtp = async (data, status = 'new') => {
     try {
         const { receiving_medium: rece_me, use_case, code } = data;
         const receiving_medium = selEncrypt(rece_me, 'general');
-        const result = await OtpSch.findOne({ receiving_medium, use_case, status }, '-_id');
+        const result = await Otp.findOne({ receiving_medium, use_case, status }, '-_id');
 
         if (result) {
             const { code: db_code, reg_date } = result;
@@ -66,16 +64,19 @@ const verifyOtp = async (data, status = 'new') => {
 // STORE OTP
 const storeOtp = async (data) => {
     let result = null;
+
     try {
-        const { receiving_medium, code, use_case } = data;
-        result = await OtpSch.findOneAndUpdate(
-            { receiving_medium },
+        const otpData = createOtpDTO(data);
+        const { receiving_medium, code, use_case } = otpData;
+        result = await Otp.findOneAndUpdate(
+            { receiving_medium:
+                selEncrypt(receiving_medium, 'email_phone') },
             { code, use_case, status: 'new' },
             { new: true }
         );
 
         // Insert new OTP if update failed
-        if (!result) result = await OtpSch.create(data);
+        if (!result) result = await Otp.create(otpData);
     } catch (err) {
         logError('Store OTP [OTP MODULE]', err);
     }
@@ -85,7 +86,8 @@ const storeOtp = async (data) => {
 // DELETE OTP
 const deleteOtp = async (receiving_medium) => {
     try {
-        await OtpSch.deleteMany({ receiving_medium });
+        receiving_medium = selEncrypt(receiving_medium, 'email_phone');
+        await Otp.deleteMany({ receiving_medium });
     } catch (err) {
         logError('Delete OTP [OTP MODULE]', err);
     }
