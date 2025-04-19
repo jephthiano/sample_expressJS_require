@@ -1,4 +1,4 @@
-const { findSingleValue } = require(CONFIGS + "database");
+const { findSingleValue } = require(MAIN_UTILS + "database.util");
 const User = require(MODELS + 'User.schema');
 const { isEmptyObject, isEmptyString }  = require(MAIN_UTILS + 'general.util');
 const { validateInput, selEncrypt, validatePassword }  = require(MAIN_UTILS + 'security.util');

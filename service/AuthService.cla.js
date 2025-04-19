@@ -127,12 +127,13 @@ class AuthService extends BaseService{
             const data = await Fetch.neededData(result.id);
     
             // Send success response
-            return this.sendResponse(res, data, "Account successfully created");
+            this.sendResponse(res, data, "Account successfully created");
     
             // Send welcome email
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
             sendEmail(messageData);
     
+            return;
         } catch (error) {
             return this.handleException(res, error);
         }
@@ -160,15 +161,16 @@ class AuthService extends BaseService{
 
             //delete otp
             await deleteOtp(receiving_medium);
-
-            // Send success response
-            return this.sendResponse(res, data, "Account successfully created");
-
             
-            // // Send welcome email
-            // const messageData = sendMessageDTO({ first_name, receiving_medium: email }, '');
-            // sendEmail(messageData);
-    
+            // Send success response
+            this.sendResponse(res, data, "Account successfully created");
+            
+            // Send welcome email
+            const { first_name, email } = updatePassword;
+            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'reset_password');
+            sendEmail(messageData);
+
+            return;
         } catch (error) {
             return this.handleException(res, error);
         }

@@ -10,4 +10,11 @@ function createUserDTO(data) {
     };
 }
 
-module.exports = { createUserDTO };
+function updatePasswordDTO(data) {
+    return {
+        receiving_medium: data.email?.trim().toLowerCase(),
+        password: data.password,
+    };
+}
+
+module.exports = { createUserDTO, updatePasswordDTO };
