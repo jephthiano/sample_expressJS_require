@@ -66,17 +66,17 @@ const sendOtp = async (inputs, type) => {
     return formatResponse(errors);
 };
 
-// // Verify OTP
-// const verifyOtp = async (inputs) => {
-//     const errors = {};
-//     const { code } = inputs;
+// Verify OTP
+const verifyOtp = async (inputs) => {
+    const errors = {};
+    const { code } = inputs;
 
-//     if (!code || !validateInput(code, 'otp_code')) {
-//         errors.code = "Invalid OTP code";
-//     }
+    if (!code || !validateInput(code, 'otp_code')) {
+        errors.code = "Invalid OTP code";
+    }
 
-//     return formatResponse(errors);
-// };
+    return formatResponse(errors);
+};
 
 // User Registration
 const register = async (inputs) => {
@@ -151,25 +151,6 @@ const register = async (inputs) => {
     return formatResponse(errors);
 };
 
-// Send OTP for password reset
-const fpSendOtp = async (inputs) => {
-    const errors = {};
-    const { receiving_medium } = inputs;
-    const enc_rece = selEncrypt(receiving_medium, 'email');
-
-    const data_exists = await User.findOne({ 
-        $or: [{ mobile_number: enc_rece }, { email: enc_rece }]
-    }, 'first_name');
-
-    if (!receiving_medium || isEmptyString(receiving_medium)) {
-        errors.receiving_medium = "Email/mobile number is required";
-    } else if (!data_exists) {
-        errors.receiving_medium = "Email/mobile number does not exist";
-    }
-
-    return formatResponse(errors);
-};
-
 // // Reset Password
 // const resetPassword = (inputs) => {
 //     const errors = {};
@@ -186,7 +167,7 @@ const fpSendOtp = async (inputs) => {
 
 module.exports = { login, 
                     sendOtp, 
-                    // verifyOtp, 
+                    verifyOtp, 
                     register, 
                     // resetPassword
                 };

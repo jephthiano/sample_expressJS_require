@@ -1,5 +1,5 @@
-const { register} = require(VALIDATORS + 'custom/auth.val');
-const { loginJoi } = require(VALIDATORS + 'joi/auth.joi');
+const { register, sendOtp} = require(VALIDATORS + 'custom/auth.val');
+const { loginJoi, verifyOtpJoi } = require(VALIDATORS + 'joi/auth.joi');
 const { parseMessageToObject } = require(MAIN_UTILS + 'general.util');
 const BaseController = require(CONTROLLERS + 'BaseController.cla');
 const AuthService = require(SERVICES + 'AuthService.cla');
@@ -38,6 +38,23 @@ class AuthController extends BaseController{
         }
     }
 
+    // VERIFY OTP
+    static async verifyOtp(req, res, type) {
+        try {
+            if(type !== 'sign_up' || type !== 'forgot_password'){
+                this.triggerValidationError("Invalid Request", []);
+            }
+
+            // validate inputs
+            const { error } = verifyOtpJoi.validate(req.body, { abortEarly: false });
+            if (error) this.triggerValidationError(parseMessageToObject(error));
+            
+            await AuthService.verifyOtp(req, res, type);
+        } catch (error) {
+            this.handleException(res, error);
+        }
+    }
+
     // REGISTER
     static async register(req, res) {
         try {
@@ -51,38 +68,38 @@ class AuthController extends BaseController{
         }
     }
 
-    // // [VERIFY OTP]
-    // async verifyOtp() {
-    //     this.response['message'] = "Otp verification failed";
-    //     try{
-    //         const { code, receiving_medium, use_case } = this.input;
-    //         const verify = await Otp.verifyOtp({receiving_medium, use_case, code}, 'new');
+    // [VERIFY OTP]
+    async verifyOtpRemove() {
+        this.response['message'] = "Otp verification failed";
+        try{
+            const { code, receiving_medium, use_case } = this.input;
+            const verify = await Otp.verifyOtp({receiving_medium, use_case, code}, 'new');
 
-    //         const enc_medium = Security.sel_encry(receiving_medium, 'general');
-    //         if(verify === true){
-    //             //update otp collection to used
-    //             const result = await OtpSch.findOneAndUpdate(
-    //                 {receiving_medium : enc_medium, use_case},
-    //                 { status: 'used' },
-    //                 { new: true }
-    //             )
+            const enc_medium = Security.sel_encry(receiving_medium, 'general');
+            if(verify === true){
+                //update otp collection to used
+                const result = await OtpSch.findOneAndUpdate(
+                    {receiving_medium : enc_medium, use_case},
+                    { status: 'used' },
+                    { new: true }
+                )
                 
-    //             if(result){
-    //                 this.response['status'] = true;
-    //                 this.response['message'] = "Otp successfully verified";
-    //             }
-    //         }else if (verify === 'expired'){
-    //             this.response['message'] = "Otp code has expired";
-    //         }else{
-    //             this.response['message'] = "Incorrect otp code";
-    //         }
+                if(result){
+                    this.response['status'] = true;
+                    this.response['message'] = "Otp successfully verified";
+                }
+            }else if (verify === 'expired'){
+                this.response['message'] = "Otp code has expired";
+            }else{
+                this.response['message'] = "Incorrect otp code";
+            }
             
-    //     }catch(err){
-    //         Auth.logError('Verify Otp [AUTH CLASS]', err);
-    //     }
+        }catch(err){
+            Auth.logError('Verify Otp [AUTH CLASS]', err);
+        }
 
-    //     return this.response;
-    // }
+        return this.response;
+    }
 
     // //FORGOT PASSWORD [RESET PASSWORD]
     // async resetPassword() {

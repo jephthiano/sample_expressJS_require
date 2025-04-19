@@ -14,6 +14,11 @@ router.post('/send_otp/:type', async (req, res) => {
     AuthController.sendOtp(req, res, type);
 });
 
+router.post('/send_otp/:type', async (req, res) => {
+    const { type } = req.params;
+    AuthController.verifyOtp(req, res, type);
+});
+
 
 //REGISTER
 router.post('/register', async(req,res) => {

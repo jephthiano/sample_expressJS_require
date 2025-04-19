@@ -63,24 +63,26 @@ class AuthService extends BaseService{
         }
     }
 
-    // async sendremoveOtp() {
-    //     this.response['message'] = "Request for otp failed";
-    //     try{
-    //         const { receiving_medium, first_name, send_medium, use_case } = this.input;
-    //         const sent = await Otp.sendOtp({first_name, receiving_medium, use_case, send_medium});
-            
-    //         if(sent){
-    //             this.response['status'] = true;
-    //             this.response['message'] = "Otp sent";
-    //         }
+    // [VERIFY OTP]
+    static async verifyOtp(req, res, type) {
+        try {
+            const data = {};
+            data.receiving_medium = req.body;
+            data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
+            data.use_case = type;
+            data.first_name = 'user';
 
-    //     }catch(err){
-    //         AuthService.logError('Send Otp [AUTHService CLASS]', err);
-    //     }
+            const sent = await sendOtp({data});
 
-    //     return this.response;
-    // }
-    
+            if(!sent){
+                return this.triggerError("Request for otp failed", []);
+            }
+
+            this.sendResponse(res, [], "Otp successful sent");
+        } catch (error) {
+            return this.handleException(res, error);
+        }
+    }
 
     // REGISTER
     static async register(req, res) {
@@ -132,38 +134,6 @@ class AuthService extends BaseService{
         }
     }
 
-    // // [VERIFY OTP]
-    // async verifyOtp() {
-    //     this.response['message'] = "Otp verification failed";
-    //     try{
-    //         const { code, receiving_medium, use_case } = this.input;
-    //         const verify = await Otp.verifyOtp({receiving_medium, use_case, code}, 'new');
-
-    //         const enc_medium = Security.sel_encry(receiving_medium, 'general');
-    //         if(verify === true){
-    //             //update otp collection to used
-    //             const result = await OtpSch.findOneAndUpdate(
-    //                 {receiving_medium : enc_medium, use_case},
-    //                 { status: 'used' },
-    //                 { new: true }
-    //             )
-                
-    //             if(result){
-    //                 this.response['status'] = true;
-    //                 this.response['message'] = "Otp successfully verified";
-    //             }
-    //         }else if (verify === 'expired'){
-    //             this.response['message'] = "Otp code has expired";
-    //         }else{
-    //             this.response['message'] = "Incorrect otp code";
-    //         }
-            
-    //     }catch(err){
-    //         AuthService.logError('Verify Otp [AUTHService CLASS]', err);
-    //     }
-
-    //     return this.response;
-    // }
 
     // //FORGOT PASSWORD [RESET PASSWORD]
     // async resetPassword() {
