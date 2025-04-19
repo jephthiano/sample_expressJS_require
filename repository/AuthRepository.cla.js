@@ -1,13 +1,13 @@
 const BaseRepository = require(REPOSITORIES + 'BaseRepository.cla');
 const User = require(MODELS + 'User.schema');
-const { createUserDTO } = require(DTOS + 'user.dto');
+const { createUserDTO, updatePasswordDTO } = require(DTOS + 'user.dto');
 const { selEncrypt, }  = require(MAIN_UTILS + 'security.util');
 
 class AuthRepository extends BaseRepository{
     static async getUserByLoginId(res, loginId) {
         try{
 
-            const encLoginId = selEncrypt(loginId.toLowerCase(), 'general');
+            const encLoginId = selEncrypt(loginId.toLowerCase(), 'email_phone');
             const where = { $or: [{ mobile_number: encLoginId }, { email: encLoginId }] };
     
             // Return the user data
@@ -20,11 +20,26 @@ class AuthRepository extends BaseRepository{
     static async createUser(res, data) {
         try{
             const userData = createUserDTO(data);
-            console.log(userData);
             return await User.create(userData);
         }catch(error){
             this.handleException(res, error);
         }
+    }
+
+    static async updatePassword(data){
+        try{
+            data = updatePasswordDTO(data);
+            const { password, receiving_medium } = data;
+            const enc_medium = selEncrypt(receiving_medium, 'email_phone');
+            
+            return await UserSch.findOneAndUpdate(
+                {$or: [{ mobile_number: enc_medium }, { email: enc_medium }]},
+                { password },
+                { new: true }
+            )
+        }catch(error){
+            this.handleException(res, error);
+        }   
     }
 }
 

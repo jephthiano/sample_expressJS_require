@@ -151,23 +151,23 @@ const register = async (inputs) => {
     return formatResponse(errors);
 };
 
-// // Reset Password
-// const resetPassword = (inputs) => {
-//     const errors = {};
-//     const { password, confirm_password } = inputs;
+// Reset Password
+const resetPassword = (inputs) => {
+    const errors = {};
+    const { password, confirm_password } = inputs;
 
-//     if (!validatePassword(password)) {
-//         errors.password = "Password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
-//     } else if (password !== confirm_password) {
-//         errors.password = "Passwords do not match";
-//     }
+    if (!validatePassword(password)) {
+        errors.password = "Password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
+    } else if (password !== confirm_password) {
+        errors.password = "Passwords do not match";
+    }
 
-//     return formatResponse(errors);
-// };
+    return formatResponse(errors);
+};
 
 module.exports = { login, 
                     sendOtp, 
                     verifyOtp, 
                     register, 
-                    // resetPassword
+                    resetPassword
                 };
