@@ -25,29 +25,46 @@ const login = async (inputs) => {
     return formatResponse(errors);
 };
 
-// // Send OTP during signup
-// const suSendOtp = async (inputs) => {
-//     const errors = {};
-//     const { receiving_medium, veri_type } = inputs;
-//     const enc_rece = selEncrypt(receiving_medium, 'email');
+// signup or forgot_password otp validation
+const sendOtp = async (inputs, type) => {
+    const errors = {};
 
-//     const data_exists = await User.findOne(
-//         { $or: [{ mobile_number: enc_rece }, { email: enc_rece }] },
-//         'first_name'
-//     );
+    if (type === 'sign_up') {
+        const { receiving_medium, veri_type } = inputs;
+        const enc_rece = selEncrypt(receiving_medium, 'email');
 
-//     const resType = veri_type === 'email' ? 'email' : 'mobile number';
+        const data_exists = await User.findOne(
+            { $or: [{ mobile_number: enc_rece }, { email: enc_rece }] },
+            'first_name'
+        );
 
-//     if (!receiving_medium || isEmptyString(receiving_medium)) {
-//         errors.receiving_medium = "Field is required";
-//     } else if (data_exists) {
-//         errors.receiving_medium = `${resType} already taken`;
-//     } else if (!validateInput(receiving_medium, veri_type)) {
-//         errors.receiving_medium = `Invalid ${resType}`;
-//     }
+        const resType = veri_type === 'email' ? 'email' : 'mobile number';
 
-//     return formatResponse(errors);
-// };
+        if (!receiving_medium || isEmptyString(receiving_medium)) {
+            errors.receiving_medium = "Field is required";
+        } else if (data_exists) {
+            errors.receiving_medium = `${resType} already taken`;
+        } else if (!validateInput(receiving_medium, veri_type)) {
+            errors.receiving_medium = `Invalid ${resType}`;
+        }
+    } else {
+        const { receiving_medium } = inputs;
+        const enc_rece = selEncrypt(receiving_medium, 'email');
+
+        const data_exists = await User.findOne(
+            { $or: [{ mobile_number: enc_rece }, { email: enc_rece }] },
+            'first_name'
+        );
+
+        if (!receiving_medium || isEmptyString(receiving_medium)) {
+            errors.receiving_medium = "Email/mobile number is required";
+        } else if (!data_exists) {
+            errors.receiving_medium = "Email/mobile number does not exist";
+        }
+    }
+
+    return formatResponse(errors);
+};
 
 // // Verify OTP
 // const verifyOtp = async (inputs) => {
@@ -134,24 +151,24 @@ const register = async (inputs) => {
     return formatResponse(errors);
 };
 
-// // Send OTP for password reset
-// const fpSendOtp = async (inputs) => {
-//     const errors = {};
-//     const { receiving_medium } = inputs;
-//     const enc_rece = selEncrypt(receiving_medium, 'email');
+// Send OTP for password reset
+const fpSendOtp = async (inputs) => {
+    const errors = {};
+    const { receiving_medium } = inputs;
+    const enc_rece = selEncrypt(receiving_medium, 'email');
 
-//     const data_exists = await User.findOne({ 
-//         $or: [{ mobile_number: enc_rece }, { email: enc_rece }]
-//     }, 'first_name');
+    const data_exists = await User.findOne({ 
+        $or: [{ mobile_number: enc_rece }, { email: enc_rece }]
+    }, 'first_name');
 
-//     if (!receiving_medium || isEmptyString(receiving_medium)) {
-//         errors.receiving_medium = "Email/mobile number is required";
-//     } else if (!data_exists) {
-//         errors.receiving_medium = "Email/mobile number does not exist";
-//     }
+    if (!receiving_medium || isEmptyString(receiving_medium)) {
+        errors.receiving_medium = "Email/mobile number is required";
+    } else if (!data_exists) {
+        errors.receiving_medium = "Email/mobile number does not exist";
+    }
 
-//     return formatResponse(errors);
-// };
+    return formatResponse(errors);
+};
 
 // // Reset Password
 // const resetPassword = (inputs) => {
@@ -168,9 +185,8 @@ const register = async (inputs) => {
 // };
 
 module.exports = { login, 
-                    // suSendOtp, 
+                    sendOtp, 
                     // verifyOtp, 
                     register, 
-                    // fpSendOtp, 
                     // resetPassword
                 };

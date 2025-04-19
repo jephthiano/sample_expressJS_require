@@ -9,7 +9,7 @@ const key = process.env.ENC_KEY;
 const iv = process.env.ENC_IV;
 // const method = process.env.ENC_METHOD; // Encryption method
 const cost = 10;
-const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'mobile_number', 'token'];
+const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'mobile_number', 'token', 'email_phone'];
 
 const returnResponse = (res, data) => res.status(200).json({ data });
 

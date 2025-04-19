@@ -1,6 +1,6 @@
 const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const BaseService = require(SERVICES + 'BaseService.cla');
-const { verifyPassword, selEncrypt }  = require(MAIN_UTILS + 'security.util');
+const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
 const { sendOtp, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail, subjectTemplate, messageTemplate }  = require(MAIN_UTILS + 'messaging.util');
 
@@ -41,6 +41,45 @@ class AuthService extends BaseService{
             return this.handleException(res, error);
         }
     }
+
+    // [SEND OTP]
+    static async sendOtp(req, res, type) {
+        try {
+            const data = {};
+            data.receiving_medium = req.body;
+            data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
+            data.use_case = type;
+            data.first_name = 'user';
+
+            const sent = await sendOtp({data});
+
+            if(!sent){
+                return this.triggerError("Request for otp failed", []);
+            }
+
+            this.sendResponse(res, [], "Otp successful sent");
+        } catch (error) {
+            return this.handleException(res, error);
+        }
+    }
+
+    // async sendremoveOtp() {
+    //     this.response['message'] = "Request for otp failed";
+    //     try{
+    //         const { receiving_medium, first_name, send_medium, use_case } = this.input;
+    //         const sent = await Otp.sendOtp({first_name, receiving_medium, use_case, send_medium});
+            
+    //         if(sent){
+    //             this.response['status'] = true;
+    //             this.response['message'] = "Otp sent";
+    //         }
+
+    //     }catch(err){
+    //         AuthService.logError('Send Otp [AUTHService CLASS]', err);
+    //     }
+
+    //     return this.response;
+    // }
     
 
     // REGISTER
@@ -97,27 +136,6 @@ class AuthService extends BaseService{
             return this.handleException(res, error);
         }
     }
-    
-    
-
-    // // [SEND OTP]
-    // async sendOtp() {
-    //     this.response['message'] = "Request for otp failed";
-    //     try{
-    //         const { receiving_medium, first_name, send_medium, use_case } = this.input;
-    //         const sent = await Otp.sendOtp({first_name, receiving_medium, use_case, send_medium});
-            
-    //         if(sent){
-    //             this.response['status'] = true;
-    //             this.response['message'] = "Otp sent";
-    //         }
-
-    //     }catch(err){
-    //         AuthService.logError('Send Otp [AUTHService CLASS]', err);
-    //     }
-
-    //     return this.response;
-    // }
 
     // // [VERIFY OTP]
     // async verifyOtp() {

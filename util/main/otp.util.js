@@ -3,6 +3,8 @@ const { log } = require(MAIN_UTILS + 'logger.util');
 const { isDateLapsed }  = require(MAIN_UTILS + 'general.util');
 const { generateUniqueId, selEncrypt, }  = require(MAIN_UTILS + 'security.util');
 const { subjectTemplate, messageTemplate, sendEmail, sendWhatsappMessage }  = require(MAIN_UTILS + 'messaging.util');
+const { createOtpDTO } = require(DTOS + 'otp.dto');
+const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
@@ -10,25 +12,21 @@ const logError = (type, data) => log(type, data, 'error');
 // SEND OTP
 const sendOtp = async (data) => {
     let response = false;
-    const { first_name, receiving_medium: plain_medium, use_case, send_medium } = data;
-    const receiving_medium = selEncrypt(plain_medium, 'general');
-    const code = String(generateUniqueId(6));
+
+    data.receiving_medium = selEncrypt(data.receiving_medium, 'email_phone');
+    data.code = String(generateUniqueId(6));
 
     try {
         // Store OTP
-        if (await storeOtp({ receiving_medium, use_case, code })) {
+        const otpData = createOtpDTO(data, 'email');
+        if (await storeOtp(otpData)) {
             // Prepare message data
-            const messageData = {
-                name: first_name,
-                receiver: plain_medium,
-                subject: subjectTemplate('otp_code'),
-                message: messageTemplate('otp_code', send_medium, { code }),
-            };
+            const messageData = sendMessageDTO(data, 'otp_code');
 
             // Send via email or WhatsApp
             if (send_medium === 'email') {
                 response = await sendEmail(messageData);
-            } else if (send_medium === 'mobile_number') {
+            } else if (send_medium === 'whatsapp') {
                 response = await sendWhatsappMessage(messageData);
             }
 

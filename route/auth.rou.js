@@ -7,39 +7,18 @@ const AuthController = require(CONTROLLERS + 'AuthController.cla');
 //LOGIN
 router.post('/login', (req,res) => {
     AuthController.login(req, res);
-})
+});
+
+router.post('/send_otp/:type', async (req, res) => {
+    const { type } = req.params;
+    AuthController.sendOtp(req, res, type);
+});
+
 
 //REGISTER
 router.post('/register', async(req,res) => {
     AuthController.register(req, res);
-})
-
-
-// //SIGNUP [1. SEND OTP]
-// router.post('/su_send_otp', async(req,res) => {
-//     let response = General.initial_response('invalid_input');
-
-//     //validate inputs
-//     const error = await Validator.suSendOtp(req.data.input);
-
-//     //if there is no error
-//     if(!error.status){
-//         const { veri_type } = req.data.input; 
-//         //set send_medium and use_case in input data
-//         req.data.input['send_medium'] = (veri_type === 'email') ? veri_type : "mobile_number";
-//         req.data.input['first_name'] = "user";
-//         req.data.input['use_case'] = "register";
-        
-//         const AuthIns = new Auth(req, res);
-//         response = await AuthIns.sendOtp();
-//     }else{
-//         //set the error in response data
-//         response['error_data'] = error.data;
-//     }
-    
-//     Security.returnResponse(res, req, response);
-//     return;
-// })
+});
 
 
 // //SIGN UP [2. VERIFY OTP]

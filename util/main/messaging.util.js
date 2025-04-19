@@ -40,6 +40,18 @@ const sendWhatsappMessage = async (data) => {
     return false;
 };
 
+const sendSmsMessage = async (data) => {
+    console.log(data);
+    return false;
+};
+
+const sendPushNotification = async (data) => {
+    console.log(data);
+    return false;
+};
+
+
+
 const subjectTemplate = (type) => {
     const subjects = {
         welcome: 'WELCOME TO JEPH VTU',
@@ -129,6 +141,8 @@ const htmlEmailTemplate = (data) => {
 module.exports = {
     sendEmail,
     sendWhatsappMessage,
+    sendSmsMessage,
+    sendPushNotification,
     subjectTemplate,
     messageTemplate,
 };

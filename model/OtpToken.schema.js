@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const { hashPassword } = require(MAIN_UTILS + 'security.util');
+const { selEncrypt, hashPassword } = require(MAIN_UTILS + 'security.util');
 
 const OtpTokenSchema = new Schema({
     receiving_medium: { 
@@ -18,7 +18,7 @@ const OtpTokenSchema = new Schema({
     },
     use_case: { 
         type : String,
-        enum : ['register', 'forgot_password', 'verify_email', 'verify_mobile_number'],
+        enum : ['sign_up', 'forgot_password', 'verify_email', 'verify_mobile_number'],
         required : [true, 'use case is not specified'],
     },
     status: { 
@@ -36,6 +36,11 @@ OtpTokenSchema.pre('save', function(next) {
     //hash code
     if (this.isModified('code')) {
         this.code = hashPassword(this.code)
+    }
+
+    //encrypt medium
+    if (this.isModified('receiving_medium')) {
+        this.code = selEncrypt(this.receiving_medium)
     }
     next();
   });

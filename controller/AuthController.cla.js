@@ -21,6 +21,23 @@ class AuthController extends BaseController{
         }
     }
 
+    // SEND OTP
+    static async sendOtp(req, res, type) {
+        try {
+            if(type !== 'sign_up' || type !== 'forgot_password'){
+                this.triggerValidationError("Invalid Request", []);
+            }
+
+            // //validate inputs
+            const { status, data } = await sendOtp(req.body, type);
+            if (status) this.triggerValidationError(data);
+
+            await AuthService.sendOtp(req, res, type);
+        } catch (error) {
+            this.handleException(res, error);
+        }
+    }
+
     // REGISTER
     static async register(req, res) {
         try {
@@ -33,25 +50,6 @@ class AuthController extends BaseController{
             this.handleException(res, error);
         }
     }
-
-    // // [SEND OTP]
-    // async sendOtp() {
-    //     this.response['message'] = "Request for otp failed";
-    //     try{
-    //         const { receiving_medium, first_name, send_medium, use_case } = this.input;
-    //         const sent = await Otp.sendOtp({first_name, receiving_medium, use_case, send_medium});
-            
-    //         if(sent){
-    //             this.response['status'] = true;
-    //             this.response['message'] = "Otp sent";
-    //         }
-
-    //     }catch(err){
-    //         Auth.logError('Send Otp [AUTH CLASS]', err);
-    //     }
-
-    //     return this.response;
-    // }
 
     // // [VERIFY OTP]
     // async verifyOtp() {
