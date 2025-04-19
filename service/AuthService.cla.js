@@ -1,7 +1,7 @@
 const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const BaseService = require(SERVICES + 'BaseService.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
-const { sendOtp, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
+const { sendOtp, verifyOtp, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail, subjectTemplate, messageTemplate }  = require(MAIN_UTILS + 'messaging.util');
 
 const Fetch = require(CONTROLLERS + 'FetchController.cla');
@@ -46,7 +46,7 @@ class AuthService extends BaseService{
     static async sendOtp(req, res, type) {
         try {
             const data = {};
-            data.receiving_medium = req.body;
+            data.receiving_medium = req.body.receiving_medium;
             data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
             data.use_case = type;
             data.first_name = 'user';
@@ -66,13 +66,18 @@ class AuthService extends BaseService{
     // [VERIFY OTP]
     static async verifyOtp(req, res, type) {
         try {
+
+            //use case
+            //
             const data = {};
-            data.receiving_medium = req.body;
-            data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
             data.use_case = type;
+
+            // not reached
+            data.receiving_medium = req.body.receiving_medium;
+            data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
             data.first_name = 'user';
 
-            const sent = await sendOtp({data});
+            const verify = await verifyOtp({data});
 
             if(!sent){
                 return this.triggerError("Request for otp failed", []);
@@ -126,7 +131,7 @@ class AuthService extends BaseService{
             this.sendResponse(res, data, "Account successfully created");
     
             // Send welcome email
-            const messageData = sendMessageDTO({ first_name, receiving_medium, email }, 'welcome');
+            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
             sendEmail(messageData);
     
         } catch (error) {

@@ -25,30 +25,10 @@ router.post('/register', async(req,res) => {
     AuthController.register(req, res);
 });
 
-
-// //SIGN UP [2. VERIFY OTP]
-// router.post('/su_verify_otp', async(req,res) => {
-//     let response = General.initial_response('invalid_input');
-
-//     //validate inputs
-//     const error = await Validator.verifyOtp(req.data.input);
-
-//     //if there is no error
-//     if(!error.status){
-//         //set use_case in input data
-//         req.data.input['use_case'] = "register";
-
-//         const AuthIns = new Auth(req, res);
-//         response = await AuthIns.verifyOtp();
-        
-//     }else{
-//         //set the error in response data
-//         response['error_data'] = error.data;
-//     }
-    
-//     Security.returnResponse(res, req, response);
-//     return;
-// })
+//RESET PASSWORD
+router.post('/reset_password', async(req,res) => {
+    AuthController.register(req, res);
+});
 
 
 // //FORGOT PASSWORD [1. SEND OTP]

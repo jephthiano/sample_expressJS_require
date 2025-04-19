@@ -20,7 +20,7 @@ const sendEmail = async (data) => {
 
     const mailOptions = {
         from: process.env.EMAIL_ADDRESS,
-        to: data.receiver,
+        to: data.receiving_medium,
         subject: data.subject,
         text: data.message,
         html: htmlEmailTemplate(data),
@@ -111,7 +111,7 @@ const htmlEmailTemplate = (data) => {
                 </center>
 
                 <div class="j-text-color5">
-                    <p><b>Dear ${ucFirst(data.name)},</b></p>
+                    <p><b>Dear ${ucFirst(data.first_name)},</b></p>
                     <p>${data.message}</p>
                     <p>We appreciate your effort in being with us.</p>
                     <p>Best Regards.</p>
