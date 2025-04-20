@@ -36,7 +36,7 @@ const sendOtp = async (data) => {
         }
     } catch (err) {
         logError('Send OTP [OTP MODULE]', err);
-        response = false; // Indicating an internal error occurred during sending
+        response = 'error'; // Indicating an internal error occurred during sending
     }
 
     return response;
@@ -53,7 +53,7 @@ const verifyOtp = async (data, status = 'new') => {
         const encryptedMedium = selEncrypt(receiving_medium, 'general');
 
         // Look for the OTP record based on receiving medium, use case, and status
-        const otpRecord = await Otp.findOne({ receiving_medium: encryptedMedium, use_case, status }, '-_id');
+        const otpRecord = await Otp.findOne({ receiving_medium: encryptedMedium, use_case, status });
 
         if (otpRecord) {
             const { code: db_code, reg_date } = otpRecord;
@@ -75,7 +75,7 @@ const verifyOtp = async (data, status = 'new') => {
         }
     } catch (err) {
         logError('Verify OTP [OTP MODULE]', err);
-        response = false; // Indicating an internal error occurred during verification
+        response = 'error'; // Indicating an internal error occurred during verification
     }
 
     return response;
@@ -99,6 +99,7 @@ const storeOtp = async (data) => {
         if (!result) result = await Otp.create(otpData);
     } catch (err) {
         logError('Store OTP [OTP MODULE]', err);
+        return response = 'error'; // Indicating an internal error occurred during storing
     }
     return !!result;
 };
@@ -119,6 +120,7 @@ const updateOtpStatus = async (data) => {
 
     } catch (err) {
         logError('Update OTP [OTP MODULE]', err);
+        return 'error'
     }
 
     return !!result; //convert value into boolean 
@@ -128,9 +130,10 @@ const updateOtpStatus = async (data) => {
 const deleteOtp = async (receiving_medium) => {
     try {
         receiving_medium = selEncrypt(receiving_medium, 'email_phone');
-        await Otp.deleteMany({ receiving_medium });
+        return await Otp.deleteMany({ receiving_medium });
     } catch (err) {
         logError('Delete OTP [OTP MODULE]', err);
+        return false;
     }
 };
 

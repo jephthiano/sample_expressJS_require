@@ -97,18 +97,20 @@ class AuthService extends BaseService{
             // Handle multi-step verification if applicable
             if (reg_type === 'multi') {
                 const verifyOtp = await sendOtp({ receiving_medium, use_case: 'register', code }, 'used');
-                
-                if (verifyOtp === true) {
-                    // Mark verification based on type
-                    if (veri_type === 'email') {
-                        req.body.email_verification = true;
-                    } else {
-                        req.body.mobile_number_verification = true;
-                    }
-                } else if (verifyOtp === 'expired') {
-                    return this.triggerError("Request timeout, try again", []);
-                } else {
+                 
+                if(!verifyOtp) {
                     return this.triggerError("Invalid or used verification code", []);
+                }
+
+                if (verifyOtp === 'expired') {
+                    return this.triggerError("Request timeout, try again", []);
+                } 
+
+                // Mark verification based on type
+                if (veri_type === 'email') {
+                    req.body.email_verification = true;
+                } else {
+                    req.body.mobile_number_verification = true;
                 }
             }
     
