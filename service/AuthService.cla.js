@@ -1,7 +1,7 @@
 const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const BaseService = require(SERVICES + 'BaseService.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
-const { sendOtp, verifyOtp, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
+const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
 
 const Fetch = require(CONTROLLERS + 'FetchController.cla');
@@ -72,7 +72,7 @@ class AuthService extends BaseService{
                 use_case: type
             };
 
-            const verify = await verifyOtp({data});
+            const verify = await verifyOtpNew({data});
 
             if(!verify){
                 return this.triggerError("Incorrect otp code", []);
@@ -80,6 +80,10 @@ class AuthService extends BaseService{
 
             if(verify === 'expired'){
                 return this.triggerError("Otp code has expired", []);
+            }
+
+            if(verify === 'expired'){
+                return this.triggerError("Error occurred while running request", []);
             }
             
             return this.sendResponse(res, [], "Otp successful verified");
@@ -96,7 +100,7 @@ class AuthService extends BaseService{
     
             // Handle multi-step verification if applicable
             if (reg_type === 'multi') {
-                const verifyOtp = await sendOtp({ receiving_medium, use_case: 'register', code }, 'used');
+                const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
                  
                 if(!verifyOtp) {
                     return this.triggerError("Invalid or used verification code", []);
@@ -145,7 +149,7 @@ class AuthService extends BaseService{
     static async resetPassword(req, res) {
         try {
             const { code, receiving_medium } = req.body;
-            const verifyOtp = await verifyOtp({ receiving_medium, use_case: 'forgot_password', code }, 'used'); 
+            const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
     
             if(!verify){
                 return this.triggerError("Incorrect otp code", []);

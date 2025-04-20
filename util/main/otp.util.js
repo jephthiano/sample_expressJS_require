@@ -36,15 +36,16 @@ const sendOtp = async (data) => {
         }
     } catch (err) {
         logError('Send OTP [OTP MODULE]', err);
-        response = 'error'; // Indicating an internal error occurred during sending
+        response = false; // Indicating an internal error occurred during sending
     }
 
     return response;
 };
 
 // VERIFY OTP
-const verifyOtp = async (data, status = 'new') => {
+const verifyOtpNew = async (data) => {
     let response = false;
+    const status = 'new'; // Status to check against
 
     try {
         const { receiving_medium, use_case, code } = data;
@@ -61,16 +62,41 @@ const verifyOtp = async (data, status = 'new') => {
             // Verify if the provided code matches the stored one
             if (verifyPassword(code, db_code)) {
                 
-                // If the OTP status is 'new', update it to 'used'
-                if (status === 'new') {
-                    if (await updateOtpStatus({ receiving_medium, use_case, code })) {
-                        // Check if the OTP has expired (300 seconds = 5 minutes)
-                        response = isDateLapsed(reg_date, 300) ? 'expired' : true;
-                    }
-                } else {
-                    // For other status, simply check if it's expired
-                    response = isDateLapsed(reg_date, 300) ? 'expired' : true;
-                }
+                const updateOtpStatus = await updateOtpStatus({ receiving_medium, use_case, code });
+                if(!updateOtpStatus) {
+                    return 'error'; // Indicating an internal error occurred during verification
+                }   
+                
+                // Check if the OTP has expired (300 seconds = 5 minutes)
+                response = isDateLapsed(reg_date, 300) ? 'expired' : true;
+            }
+        }
+    } catch (err) {
+        logError('Verify OTP [OTP MODULE]', err);
+        response = 'error'; // Indicating an internal error occurred during verification
+    }
+
+    return response;
+};
+
+const verifyOtpUsed = async (data) => {
+    let response = false;
+
+    try {
+        const { receiving_medium, use_case, code } = data;
+        
+        // Encrypt the receiving medium using the general encryption method
+        const encryptedMedium = selEncrypt(receiving_medium, 'general');
+
+        // Look for the OTP record based on receiving medium, use case, and status
+        const otpRecord = await Otp.findOne({ receiving_medium: encryptedMedium, use_case, status: 'used' });
+
+        if (otpRecord) {
+            const { code: db_code, reg_date } = otpRecord;
+
+            // Verify if the provided code matches the stored one
+            if (verifyPassword(code, db_code)) {
+                response = isDateLapsed(reg_date, 300) ? 'expired' : true;
             }
         }
     } catch (err) {
@@ -99,7 +125,7 @@ const storeOtp = async (data) => {
         if (!result) result = await Otp.create(otpData);
     } catch (err) {
         logError('Store OTP [OTP MODULE]', err);
-        return response = 'error'; // Indicating an internal error occurred during storing
+         result = false; // Indicating an internal error occurred during storing
     }
     return !!result;
 };
@@ -112,7 +138,7 @@ const updateOtpStatus = async (data) => {
         const otpData = createOtpDTO(data);
         const { receiving_medium, code, use_case } = otpData;
         
-        const result = await Otp.findOneAndUpdate(
+        result = await Otp.findOneAndUpdate(
             { receiving_medium: selEncrypt(receiving_medium, 'email_phone') },
             { status: 'used' },
             { new: true }
@@ -120,7 +146,7 @@ const updateOtpStatus = async (data) => {
 
     } catch (err) {
         logError('Update OTP [OTP MODULE]', err);
-        return 'error'
+        result = false; // Indicating an internal error occurred during updating
     }
 
     return !!result; //convert value into boolean 
@@ -128,17 +154,21 @@ const updateOtpStatus = async (data) => {
 
 // DELETE OTP
 const deleteOtp = async (receiving_medium) => {
+    let result = null;
     try {
         receiving_medium = selEncrypt(receiving_medium, 'email_phone');
-        return await Otp.deleteMany({ receiving_medium });
+        result =  await Otp.deleteMany({ receiving_medium });
     } catch (err) {
         logError('Delete OTP [OTP MODULE]', err);
-        return false;
+        result =  null;
     }
+
+    return !!result; //convert value into boolean 
 };
 
 module.exports = {
     sendOtp,
-    verifyOtp,
+    verifyOtpNew,
+    verifyOtpUsed,
     deleteOtp,
 };
