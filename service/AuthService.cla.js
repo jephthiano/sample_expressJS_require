@@ -96,7 +96,8 @@ class AuthService extends BaseService{
     static async register(req, res) {
         let result;
         try {
-            const { veri_type, receiving_medium, code, first_name, email, reg_type } = req.body;
+            const reg_type = 'single';
+            const { veri_type, receiving_medium, code, first_name, email } = req.body;
     
             // Handle multi-step verification if applicable
             if (reg_type === 'multi') {

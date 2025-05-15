@@ -28,7 +28,7 @@ class AuthController extends BaseController{
                 this.triggerError("Invalid Request", []);
             }
 
-            // //validate inputs
+            //validate inputs
             const { status, data } = await sendOtp(req.body, type);
             if (status) this.triggerValidationError(data);
 
@@ -59,7 +59,7 @@ class AuthController extends BaseController{
     static async register(req, res) {
         try {
             //validate inputs
-            const { status, data } = await register(req.body);
+            const { status, data } = await register(req.body, 'single');
             if (status) this.triggerValidationError(data);
 
             await AuthService.register(req, res);

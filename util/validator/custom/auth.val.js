@@ -79,9 +79,9 @@ const verifyOtp = async (inputs) => {
 };
 
 // User Registration
-const register = async (inputs) => {
+const register = async (inputs, reg_type) => {
     const errors = {};
-    const { reg_type, veri_type, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
+    const {veri_type, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
     const [email_exists, mobile_exists, username_exists] = await Promise.all([
         findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),

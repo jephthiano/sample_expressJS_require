@@ -14,7 +14,7 @@ const loginJoi = Joi.object({
 });
 
 
-const verifyOtpDto = Joi.object({
+const verifyOtpJoi = Joi.object({
     code: Joi.string()
         .trim()
         .required()

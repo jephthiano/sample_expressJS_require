@@ -14,7 +14,7 @@ router.post('/send_otp/:type', async (req, res) => {
 });
 
 //VERIFY OTP
-router.post('/send_otp/:type', async (req, res) => {
+router.post('/verify_otp/:type', async (req, res) => {
     const { type } = req.params;
     AuthController.verifyOtp(req, res, type);
 });
