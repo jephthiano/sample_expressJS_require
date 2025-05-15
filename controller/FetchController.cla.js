@@ -26,7 +26,7 @@ class FetchController {
             const selUserData = "-token -user_ext_data -password -transaction_pin -unique_id -_id -__v";
             const userData = await User.findOne({_id : id}, selUserData);
 
-            return userData ? userData : null;
+            return userData ?? null;
 
             // in-app notification
             let InAppNoti = await InAppNoti.find({user_id : id}, "-__v -_id -user_id");

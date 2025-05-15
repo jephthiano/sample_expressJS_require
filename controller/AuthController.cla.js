@@ -62,7 +62,7 @@ class AuthController extends BaseController{
             const { status, data } = await register(req.body, 'single');
             if (status) this.triggerValidationError(data);
 
-            await AuthService.register(req, res);
+            return AuthService.register(req, res);
         } catch (error) {
             this.handleException(res, error);
         }
@@ -75,7 +75,7 @@ class AuthController extends BaseController{
             const { status, data } = await resetPassword(req.body);
             if (status) this.triggerValidationError(data);
 
-            await AuthService.resetPassword(req, res);
+            return AuthService.resetPassword(req, res);
         } catch (error) {
             this.handleException(res, error);
         }

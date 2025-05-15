@@ -136,7 +136,7 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            // Send welcome email
+            // Send welcome email [PASS TO QUEUE JOB]
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
             sendEmail(messageData);
     
@@ -152,11 +152,11 @@ class AuthService extends BaseService{
             const { code, receiving_medium } = req.body;
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
     
-            if(!verify){
+            if(!verifyOtp){
                 return this.triggerError("Incorrect otp code", []);
             }
 
-            if(verify === 'expired'){
+            if(verifyOtp === 'expired'){
                 return this.triggerError("Otp code has expired", []);
             }
 
@@ -172,7 +172,7 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
             
-            // Send welcome email
+            // Send password reset notification email
             const { first_name, email } = updatePassword;
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'reset_password');
             sendEmail(messageData);
