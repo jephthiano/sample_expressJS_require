@@ -29,7 +29,7 @@ class AuthService extends BaseService{
     
             // Check account status
             if (userStatus === 'suspended') {
-                return this.triggerError("Your account has been suspended", []);
+                return this.triggerError("Your account has been suspended, contact admin", []);
             }
     
             // Fetch needed data
@@ -95,8 +95,37 @@ class AuthService extends BaseService{
     // REGISTER
     static async register(req, res) {
         let result;
+        const reg_type = 'single';
         try {
-            const reg_type = 'single';
+            const { first_name, email } = req.body;
+
+            // Create user
+            const result = await AuthRepository.createUser(res, req.body);
+            if (!result) {
+                return this.triggerError("Account creation failed", []);
+            }
+    
+            // Fetch user-related data
+            const data = await Fetch.neededData(result.id);
+    
+            // Send success response
+            this.sendResponse(res, data, "Account successfully created");
+    
+            // Send welcome email [PASS TO QUEUE JOB]
+            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
+            sendEmail(messageData);
+    
+            return;
+        } catch (error) {
+            return this.handleException(res, error);
+        }
+    }
+
+    static async signup(req, res) {
+        let result;
+        const reg_type = 'multi';
+        
+        try {
             const { veri_type, receiving_medium, code, first_name, email } = req.body;
     
             // Handle multi-step verification if applicable

@@ -1,6 +1,6 @@
 const User = require(MODELS + 'User.schema');
-const InAppNoti = require(MODELS + 'InAppNotification.schema');
 const { log } = require(MAIN_UTILS + 'logger.util');
+const { setToken } = require(MAIN_UTILS + 'token.util');
 
 
 let response = {
@@ -20,28 +20,16 @@ class FetchController {
         log(type, data, 'error')
     }
 
-    static async neededData (id, header='', type ='fetch'){
+    static async neededData (id, token = null, type ='fetch'){
+        response = {};
         try{
             //get user data
             const selUserData = "-token -user_ext_data -password -transaction_pin -unique_id -_id -__v";
-            const userData = await User.findOne({_id : id}, selUserData);
+            const data = await User.findOne({_id : id}, selUserData);
+            token = token ?? setToken(id);
 
-            return userData ?? null;
-
-            // in-app notification
-            let InAppNoti = await InAppNoti.find({user_id : id}, "-__v -_id -user_id");
-            if(userData){
-                let inAppNotification = InAppNoti ?? {};
-
-                if(type === "fetch"){
-                    response = {userData, inAppNotification};
-                }else{
-                    const response_data = {userData, inAppNotification};
-                    
-                    response['status'] = true,
-                    response['message'] = 'Success';
-                    response['response_data'] = response_data;
-                }
+            if(token && data){
+                response = {token, data}
             }
         }catch(err){
             Fetch.logError('Fetch Needed Data', err);
