@@ -42,10 +42,10 @@ const UserSchema = new Schema({
         required: [true, 'password is not specified'],
         trim: true,
     },
-    transaction_pin: {
+    role: { 
         type: String,
-        default: null,
-        trim: true,
+        enum: ['user', 'admin'],
+        default: 'user',
     },
     user_level: {
         type: Number,
@@ -68,15 +68,15 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    email_verification: Boolean,
-    mobile_number_verification: Boolean,
-    pin_status: Boolean,
+    email_verified_at: {
+        type: Date,
+        default: null,
+    },
+    mobile_number_verified_at: {
+        type: Date,
+        default: null,
+    },
     token: String,
-    user_account: Object,
-    user_settings: Object,
-    user_bank_account: Object,
-    user_kyc_data: Object,
-    user_ext_data: Object,
 });
 
 // Reusable transformer for update objects

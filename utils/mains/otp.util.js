@@ -85,7 +85,6 @@ const verifyOtpUsed = async (data) => {
 
         if (otpRecord) {
             const { code: dbCode, reg_date } = otpRecord;
-
             // Verify if the provided code matches the stored one
             if (verifyPassword(code, dbCode)) {
                 response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;
@@ -96,6 +95,7 @@ const verifyOtpUsed = async (data) => {
         response = 'error'; // Indicating an internal error occurred during verification
     }
 
+    console.log('response', response);
     return response;
 };
 

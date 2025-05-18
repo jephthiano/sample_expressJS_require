@@ -1,4 +1,4 @@
-const { register, sendOtp, verifyOtp} = require(VALIDATORS + 'custom/auth.val');
+const { register, sendOtp, verifyOtp, signup, resetPassword} = require(VALIDATORS + 'custom/auth.val');
 const { loginJoi } = require(VALIDATORS + 'joi/auth.joi');
 const { parseMessageToObject } = require(MAIN_UTILS + 'general.util');
 const BaseController = require(CONTROLLERS + 'BaseController.cla');
@@ -16,6 +16,19 @@ class AuthController extends BaseController{
             if (error) this.triggerValidationError(parseMessageToObject(error));
 
             await AuthService.login(req, res);
+        } catch (error) {
+            this.handleException(res, error);
+        }
+    }
+
+    // REGISTER
+    static async register(req, res) {
+        try {
+            //validate inputs
+            const { status, data } = await register(req.body, 'single');
+            if (status) this.triggerValidationError(data);
+
+            return AuthService.register(req, res);
         } catch (error) {
             this.handleException(res, error);
         }
@@ -59,14 +72,14 @@ class AuthController extends BaseController{
         }
     }
 
-    // REGISTER
-    static async register(req, res) {
+    // SIGNUP
+    static async signup(req, res) {
         try {
             //validate inputs
-            const { status, data } = await register(req.body, 'single');
+            const { status, data } = await signup(req.body, 'multi');
             if (status) this.triggerValidationError(data);
 
-            return AuthService.register(req, res);
+            return AuthService.signup(req, res);
         } catch (error) {
             this.handleException(res, error);
         }

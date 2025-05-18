@@ -6,7 +6,6 @@ const { selEncrypt, }  = require(MAIN_UTILS + 'security.util');
 class AuthRepository extends BaseRepository{
     static async getUserByLoginId(res, loginId) {
         try{
-
             const encLoginId = selEncrypt(loginId.toLowerCase(), 'email_phone');
             const where = { $or: [{ mobile_number: encLoginId }, { email: encLoginId }] };
     
@@ -30,10 +29,10 @@ class AuthRepository extends BaseRepository{
         try{
             data = updatePasswordDTO(data);
             const { password, receiving_medium } = data;
-            const enc_medium = selEncrypt(receiving_medium, 'email_phone');
+            const encMedium = selEncrypt(receiving_medium, 'email_phone');
             
             return await UserSch.findOneAndUpdate(
-                {$or: [{ mobile_number: enc_medium }, { email: enc_medium }]},
+                {$or: [{ mobile_number: encMedium }, { email: encMedium }]},
                 { password },
                 { new: true }
             )
