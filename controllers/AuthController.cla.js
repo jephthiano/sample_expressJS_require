@@ -21,6 +21,19 @@ class AuthController extends BaseController{
         }
     }
 
+    // REGISTER
+    static async register(req, res) {
+        try {
+            //validate inputs
+            const { status, data } = await register(req.body, 'single');
+            if (status) this.triggerValidationError(data);
+
+            return AuthService.register(req, res);
+        } catch (error) {
+            this.handleException(res, error);
+        }
+    }
+
     // SEND OTP
     static async sendOtp(req, res) {
         const { type } = req.params;
@@ -59,14 +72,14 @@ class AuthController extends BaseController{
         }
     }
 
-    // REGISTER
-    static async register(req, res) {
+    // SIGNUP
+    static async signup(req, res) {
         try {
             //validate inputs
-            const { status, data } = await register(req.body, 'single');
+            const { status, data } = await signup(req.body, 'multi');
             if (status) this.triggerValidationError(data);
 
-            return AuthService.register(req, res);
+            return AuthService.signup(req, res);
         } catch (error) {
             this.handleException(res, error);
         }

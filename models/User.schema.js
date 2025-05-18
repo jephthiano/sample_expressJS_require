@@ -42,6 +42,11 @@ const UserSchema = new Schema({
         required: [true, 'password is not specified'],
         trim: true,
     },
+    role: { 
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user',
+    },
     transaction_pin: {
         type: String,
         default: null,

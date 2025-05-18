@@ -78,10 +78,70 @@ const verifyOtp = async (inputs) => {
     return formatResponse(errors);
 };
 
-// User Registration
-const register = async (inputs, reg_type) => {
+// Registration
+const register = async (inputs, regType) => {
     const errors = {};
-    const {veriType, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
+    const {email, mobile_number, first_name, last_name, username, gender, password } = inputs;
+
+    const [email_exists, mobile_exists, username_exists] = await Promise.all([
+        findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
+        findSingleValue('User', 'mobile_number', selEncrypt(mobile_number, 'mobile_number'), 'mobile_number'),
+        findSingleValue('User', 'username', selEncrypt(username, 'username'), 'username')
+    ]);
+    
+    if (!email || isEmptyString(email)) {
+        errors.email = "email is required";
+    } else if (!validateInput(email, 'email')) {
+        errors.email = "invalid email";
+    } else if (email_exists) {
+        errors.email = "email already exists";
+    }
+
+    if (!mobile_number || isEmptyString(mobile_number)) {
+        errors.mobile_number = "mobile number is required";
+    } else if (!validateInput(mobile_number, 'mobile_number')) {
+        errors.mobile_number = "invalid mobile number";
+    } else if (mobile_exists) {
+        errors.mobile_number = "mobile number already exists";
+    }
+
+    if (!username || isEmptyString(username)) {
+        errors.username = "username is required";
+    } else if (!validateInput(username, 'username')) {
+        errors.username = "username should be between 5 to 10 alphabets";
+    } else if (username_exists) {
+        errors.username = "username already taken";
+    }
+
+    if (!first_name || isEmptyString(first_name)) {
+        errors.first_name = "first name is required";
+    } else if (!validateInput(first_name, 'name')) {
+        errors.first_name = "invalid first name";
+    }
+
+    if (!last_name || isEmptyString(last_name)) {
+        errors.last_name = "last name is required";
+    } else if (!validateInput(last_name, 'name')) {
+        errors.last_name = "invalid last name";
+    }
+
+    if (!gender || (gender !== 'male' && gender !== 'female')) {
+        errors.gender = "invalid gender";
+    }
+
+    if (!password || isEmptyString(password)) {
+        errors.password = "password is required";
+    } else if (!validatePassword(password)) {
+        errors.password = "password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
+    }
+
+    return formatResponse(errors);
+};
+
+// signup
+const signup = async (inputs, regType) => {
+    const errors = {};
+    const {email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
     const [email_exists, mobile_exists, username_exists] = await Promise.all([
         findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
@@ -90,14 +150,20 @@ const register = async (inputs, reg_type) => {
     ]);
 
     // Handle email and mobile number based on veriType
-    if (reg_type === 'multi') {
-        //for multi registration
-        if (!mobile_number || isEmptyString(mobile_number)) {
-            errors.mobile_number = "mobile number is required";
-        } else if (!validateInput(mobile_number, 'mobile_number')) {
-            errors.mobile_number = "invalid mobile number";
-        } else if (mobile_exists) {
-            errors.mobile_number = "mobile number already exists";
+    if (regType === 'multi') {
+        const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
+
+        if(validateInput(receiving_medium, 'mobile_number')){
+            //for mobile_number as receiving medium
+            if (!receiving_medium || isEmptyString(receiving_medium)) {
+                errors.receiving_medium = "mobile number is required";
+            } else if (!validateInput(receiving_medium, 'mobile_number')) {
+                errors.receiving_medium = "invalid mobile number";
+            } else if (mobile_exists) {
+                errors.receiving_medium = "mobile number already exists";
+            }
+        }else{
+
         }
     } else {
         //for single registration
@@ -165,9 +231,10 @@ const resetPassword = (inputs) => {
     return formatResponse(errors);
 };
 
-module.exports = { login, 
+module.exports = {  login, 
+                    register, 
                     sendOtp, 
                     verifyOtp, 
-                    register, 
+                    signup,
                     resetPassword
                 };
