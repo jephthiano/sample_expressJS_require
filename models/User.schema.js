@@ -64,7 +64,7 @@ const UserSchema = new Schema({
         enum: ['active', 'suspended'],
         default: 'active',
     },
-    reg_date: {
+    created_at: {
         type: Date,
         default: Date.now,
     },
