@@ -44,19 +44,19 @@ const verifyOtpNew = async (data) => {
     try {
         const { receiving_medium, use_case, code } = data;
         const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
-
+        
         // Look for the OTP record based on receiving medium, use case, and status
         const otpRecord = await Otp.findOne({ 
             receiving_medium: encryptedMedium,
             use_case, 
             status: 'new'
         });
-
+        
         if (otpRecord) {
             const { code: dbCode, reg_date } = otpRecord;
-
+            
             // Verify if the provided code matches the stored one
-            if (verifyPassword(code, dbCode)) {
+            if (await verifyPassword(code, dbCode)) {
                 if(!await updateOtpStatus({ receiving_medium, use_case, code })) {
                     return 'error'; // Indicating an internal error occurred
                 }   
@@ -86,7 +86,7 @@ const verifyOtpUsed = async (data) => {
         if (otpRecord) {
             const { code: dbCode, reg_date } = otpRecord;
             // Verify if the provided code matches the stored one
-            if (verifyPassword(code, dbCode)) {
+            if (await verifyPassword(code, dbCode)) {
                 response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;
             }
         }
@@ -95,7 +95,6 @@ const verifyOtpUsed = async (data) => {
         response = 'error'; // Indicating an internal error occurred during verification
     }
 
-    console.log('response', response);
     return response;
 };
 

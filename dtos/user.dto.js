@@ -12,7 +12,7 @@ function createUserDTO(data) {
 
 function updatePasswordDTO(data) {
     return {
-        receiving_medium: data.email?.trim().toLowerCase(),
+        receiving_medium: data.receiving_medium?.trim().toLowerCase(),
         password: data.password,
     };
 }
