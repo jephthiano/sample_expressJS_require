@@ -25,59 +25,6 @@ const login = async (inputs) => {
     return formatResponse(errors);
 };
 
-// signup or forgot_password otp validation
-const sendOtp = async (inputs, type) => {
-    const errors = {};
-    const { receiving_medium } = inputs;
-    const veriType = isPhoneSample(receiving_medium) ? 'mobile_number' : 'email';
-    const resType = replaceValues(veriType, '_', ' ')
-
-    if (type === 'sign_up') {
-        const enc_receiving_medium = selEncrypt(receiving_medium, 'email');
-
-        const data_exists = await User.findOne(
-            { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] },
-            'first_name'
-        );
-
-        if (!receiving_medium || isEmptyString(receiving_medium)) {
-            errors.receiving_medium = "field is required";
-        } else if (data_exists) {
-            errors.receiving_medium = `${resType} already taken`;
-        } else if (!validateInput(receiving_medium, veriType)) {
-            errors.receiving_medium = `invalid ${resType}`;
-        }
-    } else {
-        const { receiving_medium } = inputs;
-        const enc_receiving_medium = selEncrypt(receiving_medium, 'email');
-
-        const data_exists = await User.findOne(
-            { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] },
-            'first_name'
-        );
-
-        if (!receiving_medium || isEmptyString(receiving_medium)) {
-            errors.receiving_medium = `${resType} is required`;
-        } else if (!data_exists) {
-            errors.receiving_medium = `${resType} does not exist`;
-        }
-    }
-
-    return formatResponse(errors);
-};
-
-// Verify OTP
-const verifyOtp = async (inputs) => {
-    const errors = {};
-    const { code } = inputs;
-
-    if (!code || !validateInput(code, 'otp_code')) {
-        errors.code = "invalid OTP code";
-    }
-
-    return formatResponse(errors);
-};
-
 // Registration
 const register = async (inputs, regType) => {
     const errors = {};
@@ -138,10 +85,64 @@ const register = async (inputs, regType) => {
     return formatResponse(errors);
 };
 
+// signup or forgot_password otp validation
+const sendOtp = async (inputs, type) => {
+    const errors = {};
+    const { receiving_medium } = inputs;
+    const veriType = isPhoneSample(receiving_medium) ? 'mobile_number' : 'email';
+    const resType = replaceValues(veriType, '_', ' ')
+
+    if (type === 'sign_up') {
+        const enc_receiving_medium = selEncrypt(receiving_medium, 'email');
+
+        const data_exists = await User.findOne(
+            { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] }
+        );
+
+        if (!receiving_medium || isEmptyString(receiving_medium)) {
+            errors.receiving_medium = "field is required";
+        } else if (data_exists) {
+            errors.receiving_medium = `${resType} already taken`;
+        } else if (!validateInput(receiving_medium, veriType)) {
+            errors.receiving_medium = `invalid ${resType}`;
+        }
+    } else if (type === 'forgot_password') {
+        const { receiving_medium } = inputs;
+        const enc_receiving_medium = selEncrypt(receiving_medium, 'email_phone');
+
+        const data_exists = await User.findOne(
+            { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] },
+            'first_name'
+        );
+
+        if (!receiving_medium || isEmptyString(receiving_medium)) {
+            errors.receiving_medium = `Email/mobile number is required`;
+        } else if (!data_exists) {
+            errors.receiving_medium = `${resType} does not exist`;
+        }
+    }else{
+        errors.receiving_medium = "field is required";
+    }
+
+    return formatResponse(errors);
+};
+
+// Verify OTP
+const verifyOtp = async (inputs) => {
+    const errors = {};
+    const { code } = inputs;
+
+    if (!code || !validateInput(code, 'otp_code')) {
+        errors.code = "invalid OTP code";
+    }
+
+    return formatResponse(errors);
+};
+
 // signup
 const signup = async (inputs, regType) => {
     const errors = {};
-    const {email, mobile_number, first_name, last_name, username, gender, password } = inputs;
+    const {receiving_medium, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
     const [email_exists, mobile_exists, username_exists] = await Promise.all([
         findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
@@ -149,24 +150,8 @@ const signup = async (inputs, regType) => {
         findSingleValue('User', 'username', selEncrypt(username, 'username'), 'username')
     ]);
 
-    // Handle email and mobile number based on veriType
-    if (regType === 'multi') {
-        const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
-
-        if(validateInput(receiving_medium, 'mobile_number')){
-            //for mobile_number as receiving medium
-            if (!receiving_medium || isEmptyString(receiving_medium)) {
-                errors.receiving_medium = "mobile number is required";
-            } else if (!validateInput(receiving_medium, 'mobile_number')) {
-                errors.receiving_medium = "invalid mobile number";
-            } else if (mobile_exists) {
-                errors.receiving_medium = "mobile number already exists";
-            }
-        }else{
-
-        }
-    } else {
-        //for single registration
+    //if receiving medium is mobile number else email
+    if(validateInput(receiving_medium, 'mobile_number')){
         if (!email || isEmptyString(email)) {
             errors.email = "email is required";
         } else if (!validateInput(email, 'email')) {
@@ -174,7 +159,7 @@ const signup = async (inputs, regType) => {
         } else if (email_exists) {
             errors.email = "email already exists";
         }
-
+    } else {
         if (!mobile_number || isEmptyString(mobile_number)) {
             errors.mobile_number = "mobile number is required";
         } else if (!validateInput(mobile_number, 'mobile_number')) {

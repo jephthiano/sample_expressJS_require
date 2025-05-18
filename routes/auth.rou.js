@@ -23,7 +23,7 @@ router.post('/verify_otp/:type', async (req, res) => {
 });
 
 
-//REGISTER
+//SIGN UP
 router.post('/signup', async(req,res) => {
     AuthController.signup(req, res);
 });

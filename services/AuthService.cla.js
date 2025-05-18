@@ -125,15 +125,15 @@ class AuthService extends BaseService{
     }
 
     static async signup(req, res) {
-        let result;
+        const { receiving_medium, code, first_name, email } = req.body;
+        const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
         
         try {
-            const { veri_type, receiving_medium, code, first_name, email } = req.body;
     
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
                 
             if(!verifyOtp) {
-                return this.triggerError("Invalid or used verification code", []);
+                return this.triggerError("Invalid Request", []);
             }
 
             if (verifyOtp === 'expired') {
@@ -141,10 +141,12 @@ class AuthService extends BaseService{
             } 
 
             // Mark verification based on type
-            if (veri_type === 'email') {
-                req.body.email_verification = true;
+            if (veriType === 'email') {
+                req.body.email_verified_at = new Date();
+                req.body.mobile_number = receiving_medium;
             } else {
-                req.body.mobile_number_verification = true;
+                req.body.mobile_number_verified_at = new Date();
+                req.body.email = receiving_medium;
             }
     
             // Create user
@@ -159,8 +161,9 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            // Clean up OTP if multi
-            await deleteOtp(selEncrypt(receiving_medium, 'general'));
+            //[PASS BELOW TO QUEUE JOB]
+            // Clean up OTP
+            deleteOtp(selEncrypt(receiving_medium, 'general'));
     
             // Send welcome email [PASS TO QUEUE JOB]
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
@@ -178,12 +181,12 @@ class AuthService extends BaseService{
             const { code, receiving_medium } = req.body;
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
     
-            if(!verifyOtp){
-                return this.triggerError("Incorrect otp code", []);
+            if(!verifyOtp) {
+                return this.triggerError("Invalid Request", []);
             }
 
-            if(verifyOtp === 'expired'){
-                return this.triggerError("Otp code has expired", []);
+            if (verifyOtp === 'expired') {
+                return this.triggerError("Request timeout, try again", []);
             }
 
             const updatePassword = await AuthRepository.updatePassword(req.body);

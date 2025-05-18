@@ -1,4 +1,4 @@
-const { register, sendOtp, verifyOtp} = require(VALIDATORS + 'custom/auth.val');
+const { register, sendOtp, verifyOtp, signup, resetPassword} = require(VALIDATORS + 'custom/auth.val');
 const { loginJoi } = require(VALIDATORS + 'joi/auth.joi');
 const { parseMessageToObject } = require(MAIN_UTILS + 'general.util');
 const BaseController = require(CONTROLLERS + 'BaseController.cla');
