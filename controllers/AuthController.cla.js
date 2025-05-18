@@ -1,5 +1,5 @@
-const { register, sendOtp} = require(VALIDATORS + 'custom/auth.val');
-const { loginJoi, verifyOtpJoi } = require(VALIDATORS + 'joi/auth.joi');
+const { register, sendOtp, verifyOtp} = require(VALIDATORS + 'custom/auth.val');
+const { loginJoi } = require(VALIDATORS + 'joi/auth.joi');
 const { parseMessageToObject } = require(MAIN_UTILS + 'general.util');
 const BaseController = require(CONTROLLERS + 'BaseController.cla');
 const AuthService = require(SERVICES + 'AuthService.cla');
@@ -50,8 +50,8 @@ class AuthController extends BaseController{
             }
 
             // validate inputs
-            const { error } = verifyOtpJoi.validate(req.body, { abortEarly: false });
-            if (error) this.triggerValidationError(parseMessageToObject(error));
+            const { status, data } = await verifyOtp(req.body, type);
+            if (status) this.triggerValidationError(data);
             
             await AuthService.verifyOtp(req, res, type);
         } catch (error) {
