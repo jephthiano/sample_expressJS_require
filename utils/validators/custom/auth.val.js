@@ -72,7 +72,7 @@ const verifyOtp = async (inputs) => {
     const { code } = inputs;
 
     if (!code || !validateInput(code, 'otp_code')) {
-        errors.code = "Invalid OTP code";
+        errors.code = "invalid OTP code";
     }
 
     return formatResponse(errors);

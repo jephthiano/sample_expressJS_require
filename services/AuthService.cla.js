@@ -104,7 +104,7 @@ class AuthService extends BaseService{
                 use_case: type
             };
 
-            const verify = await verifyOtpNew({data});
+            const verify = await verifyOtpNew(data);
 
             if(!verify){ // for incorrect
                 return this.triggerError("Incorrect otp code", []);
@@ -118,7 +118,7 @@ class AuthService extends BaseService{
                 return this.triggerError("Error occurred while running request", []);
             }
             
-            return this.sendResponse(res, [], "Otp successful verified");
+            return this.sendResponse(res, [], "Otp code successful verified");
         } catch (error) {
             return this.handleException(res, error);
         }
