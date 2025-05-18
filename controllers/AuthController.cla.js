@@ -22,13 +22,15 @@ class AuthController extends BaseController{
     }
 
     // SEND OTP
-    static async sendOtp(req, res, type) {
+    static async sendOtp(req, res) {
+        const { type } = req.params;
+
         try {
-            if(type !== 'sign_up' || type !== 'forgot_password'){
+            if(type !== 'sign_up' && type !== 'forgot_password'){
                 this.triggerError("Invalid Request", []);
             }
 
-            // //validate inputs
+            //validate inputs
             const { status, data } = await sendOtp(req.body, type);
             if (status) this.triggerValidationError(data);
 
@@ -39,9 +41,11 @@ class AuthController extends BaseController{
     }
 
     // VERIFY OTP
-    static async verifyOtp(req, res, type) {
+    static async verifyOtp(req, res) {
+        const { type } = req.params;
+
         try {
-            if(type !== 'sign_up' || type !== 'forgot_password'){
+            if(type !== 'sign_up' && type !== 'forgot_password'){
                 this.triggerError("Invalid Request", []);
             }
 
@@ -59,10 +63,10 @@ class AuthController extends BaseController{
     static async register(req, res) {
         try {
             //validate inputs
-            const { status, data } = await register(req.body);
+            const { status, data } = await register(req.body, 'single');
             if (status) this.triggerValidationError(data);
 
-            await AuthService.register(req, res);
+            return AuthService.register(req, res);
         } catch (error) {
             this.handleException(res, error);
         }
@@ -75,7 +79,7 @@ class AuthController extends BaseController{
             const { status, data } = await resetPassword(req.body);
             if (status) this.triggerValidationError(data);
 
-            await AuthService.resetPassword(req, res);
+            return AuthService.resetPassword(req, res);
         } catch (error) {
             this.handleException(res, error);
         }

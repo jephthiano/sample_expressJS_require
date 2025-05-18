@@ -2,10 +2,10 @@ require("dotenv").config(); // Load environment variables
 const express = require("express");
 const app = express();
 
-require("./config/global")(); // Initialize global variables
-require("./config/middleware")(app); // Apply middlewares
+require("./configs/global")(); // Initialize global variables
+require("./configs/middleware")(app); // Apply middlewares
 
-const { connectDB, mongoose } = require("./config/database"); // Import both
+const { connectDB, mongoose } = require("./configs/database"); // Import both
 const v1RouteEntry = require(ROUTES + "index.rou"); // Route entry point
 
 

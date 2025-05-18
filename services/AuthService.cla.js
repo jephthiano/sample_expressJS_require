@@ -3,6 +3,7 @@ const BaseService = require(SERVICES + 'BaseService.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
+const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
 const Fetch = require(CONTROLLERS + 'FetchController.cla');
 
@@ -29,7 +30,7 @@ class AuthService extends BaseService{
     
             // Check account status
             if (userStatus === 'suspended') {
-                return this.triggerError("Your account has been suspended", []);
+                return this.triggerError("Your account has been suspended, contact admin", []);
             }
     
             // Fetch needed data
@@ -42,22 +43,53 @@ class AuthService extends BaseService{
         }
     }
 
+    // REGISTER
+    static async register(req, res) {
+        let result;
+        try {
+            const { first_name, email } = req.body;
+
+            // Create user
+            const result = await AuthRepository.createUser(res, req.body);
+            if (!result) {
+                return this.triggerError("Account creation failed", []);
+            }
+    
+            // Fetch user-related data
+            const data = await Fetch.neededData(result.id);    
+            
+            // Send success response
+            this.sendResponse(res, data, "Account successfully created");
+
+            // Send welcome email [PASS TO QUEUE JOB]
+            const messageData = sendMessageDTO({ first_name, receiving_medium: email, type: 'welcome' });
+            sendEmail(messageData);
+            
+            return;
+        } catch (error) {
+            return this.handleException(res, error);
+        }
+    }
+
     // [SEND OTP]
     static async sendOtp(req, res, type) {
+        const { receiving_medium } = req.body;
         try {
-            const data = {};
-            data.receiving_medium = req.body.receiving_medium;
-            data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
-            data.use_case = type;
-            data.first_name = 'user';
+            const data = {
+                receiving_medium,
+                send_medium : (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp',
+                use_case : type,
+                first_name : 'user',
+                
+            };
 
-            const sent = await sendOtp({data});
+            const sent = await sendOtp(data);
 
             if(!sent){
                 return this.triggerError("Request for otp failed", []);
             }
 
-            return this.sendResponse(res, [], "Otp successful sent");
+            return this.sendResponse(res, [], "Otp code successful sent");
         } catch (error) {
             return this.handleException(res, error);
         }
@@ -74,15 +106,15 @@ class AuthService extends BaseService{
 
             const verify = await verifyOtpNew({data});
 
-            if(!verify){
+            if(!verify){ // for incorrect
                 return this.triggerError("Incorrect otp code", []);
             }
 
-            if(verify === 'expired'){
+            if(verify === 'expired'){ // for expired
                 return this.triggerError("Otp code has expired", []);
             }
 
-            if(verify === 'expired'){
+            if(verify === 'error'){ // for internal error
                 return this.triggerError("Error occurred while running request", []);
             }
             
@@ -92,30 +124,27 @@ class AuthService extends BaseService{
         }
     }
 
-    // REGISTER
-    static async register(req, res) {
+    static async signup(req, res) {
         let result;
+        
         try {
-            const { veri_type, receiving_medium, code, first_name, email, reg_type } = req.body;
+            const { veri_type, receiving_medium, code, first_name, email } = req.body;
     
-            // Handle multi-step verification if applicable
-            if (reg_type === 'multi') {
-                const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
-                 
-                if(!verifyOtp) {
-                    return this.triggerError("Invalid or used verification code", []);
-                }
+            const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
+                
+            if(!verifyOtp) {
+                return this.triggerError("Invalid or used verification code", []);
+            }
 
-                if (verifyOtp === 'expired') {
-                    return this.triggerError("Request timeout, try again", []);
-                } 
+            if (verifyOtp === 'expired') {
+                return this.triggerError("Request timeout, try again", []);
+            } 
 
-                // Mark verification based on type
-                if (veri_type === 'email') {
-                    req.body.email_verification = true;
-                } else {
-                    req.body.mobile_number_verification = true;
-                }
+            // Mark verification based on type
+            if (veri_type === 'email') {
+                req.body.email_verification = true;
+            } else {
+                req.body.mobile_number_verification = true;
             }
     
             // Create user
@@ -123,19 +152,17 @@ class AuthService extends BaseService{
             if (!result) {
                 return this.triggerError("Account creation failed", []);
             }
-    
-            // Clean up OTP if multi
-            if (reg_type === 'multi') {
-                await deleteOtp(selEncrypt(receiving_medium, 'general'));
-            }
-    
+
             // Fetch user-related data
             const data = await Fetch.neededData(result.id);
-    
+            
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            // Send welcome email
+            // Clean up OTP if multi
+            await deleteOtp(selEncrypt(receiving_medium, 'general'));
+    
+            // Send welcome email [PASS TO QUEUE JOB]
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
             sendEmail(messageData);
     
@@ -151,11 +178,11 @@ class AuthService extends BaseService{
             const { code, receiving_medium } = req.body;
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
     
-            if(!verify){
+            if(!verifyOtp){
                 return this.triggerError("Incorrect otp code", []);
             }
 
-            if(verify === 'expired'){
+            if(verifyOtp === 'expired'){
                 return this.triggerError("Otp code has expired", []);
             }
 
@@ -171,7 +198,7 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
             
-            // Send welcome email
+            // Send password reset notification email
             const { first_name, email } = updatePassword;
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'reset_password');
             sendEmail(messageData);

@@ -2,7 +2,7 @@ const Otp = require(MODELS + 'OtpToken.schema');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { isDateLapsed }  = require(MAIN_UTILS + 'general.util');
 const { generateUniqueId, selEncrypt, }  = require(MAIN_UTILS + 'security.util');
-const { sendEmail, sendWhatsappMessage }  = require(MAIN_UTILS + 'messaging.util');
+const { sendMessage }  = require(MAIN_UTILS + 'messaging.util');
 const { createOtpDTO } = require(DTOS + 'otp.dto');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
@@ -13,29 +13,25 @@ const logError = (type, data) => log(type, data, 'error');
 const sendOtp = async (data) => {
     let response = false;
     data.code = String(generateUniqueId(6));
+    data.type = 'otp_code';
 
     try {
         // Store OTP
         if (await storeOtp(data)) {
-            // Prepare message data
-            const messageData = sendMessageDTO(data, 'otp_code');
+            response = true;
 
-            // Send via email or WhatsApp
-            if (send_medium === 'email') {
-                response = await sendEmail(messageData);
-            } else if (send_medium === 'whatsapp') {
-                response = await sendWhatsappMessage(messageData);
-            }
-
-            // If sending fails, delete the OTP
-            if (!response) {
-                await deleteOtp(data.receiving_medium);
-                response = false;
-            }
+            //MOVE TO QUEUE JOB [ if fail... otp will be deleted]
+            const messageData = sendMessageDTO(data);
+            sendMessage(messageData, data.send_medium);
+            
+            // if (!response) {
+            //     await deleteOtp(data.receiving_medium);
+            //     response = false;
+            // }
                 
         }
     } catch (err) {
-        logError('Send OTP [OTP MODULE]', err);
+        logError('Send OTP [OTP UTIL]', err);
         response = false; // Indicating an internal error occurred during sending
     }
 
