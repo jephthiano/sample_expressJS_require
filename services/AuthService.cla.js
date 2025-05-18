@@ -43,56 +43,6 @@ class AuthService extends BaseService{
         }
     }
 
-    // [SEND OTP]
-    static async sendOtp(req, res, type) {
-        try {
-            const data = {};
-            data.receiving_medium = req.body.receiving_medium;
-            data.send_medium = (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp';
-            data.use_case = type;
-            data.first_name = 'user';
-
-            const sent = await sendOtp({data});
-
-            if(!sent){
-                return this.triggerError("Request for otp failed", []);
-            }
-
-            return this.sendResponse(res, [], "Otp successful sent");
-        } catch (error) {
-            return this.handleException(res, error);
-        }
-    }
-
-    // [VERIFY OTP]
-    static async verifyOtp(req, res, type) {
-        try {
-            const data = {
-                receiving_medium: req.body.receiving_medium,
-                code: req.body.code,
-                use_case: type
-            };
-
-            const verify = await verifyOtpNew({data});
-
-            if(!verify){
-                return this.triggerError("Incorrect otp code", []);
-            }
-
-            if(verify === 'expired'){
-                return this.triggerError("Otp code has expired", []);
-            }
-
-            if(verify === 'expired'){
-                return this.triggerError("Error occurred while running request", []);
-            }
-            
-            return this.sendResponse(res, [], "Otp successful verified");
-        } catch (error) {
-            return this.handleException(res, error);
-        }
-    }
-
     // REGISTER
     static async register(req, res) {
         let result;
@@ -112,10 +62,63 @@ class AuthService extends BaseService{
             this.sendResponse(res, data, "Account successfully created");
 
             // Send welcome email [PASS TO QUEUE JOB]
-            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
+            const messageData = sendMessageDTO({ first_name, receiving_medium: email, type: 'welcome' });
             sendEmail(messageData);
             
             return;
+        } catch (error) {
+            return this.handleException(res, error);
+        }
+    }
+
+    // [SEND OTP]
+    static async sendOtp(req, res, type) {
+        const { receiving_medium } = req.body;
+        try {
+            const data = {
+                receiving_medium,
+                send_medium : (validateInput(receiving_medium, 'email')) ? 'email' : 'whatsapp',
+                use_case : type,
+                first_name : 'user',
+                
+            };
+
+            const sent = await sendOtp(data);
+
+            if(!sent){
+                return this.triggerError("Request for otp failed", []);
+            }
+
+            return this.sendResponse(res, [], "Otp code successful sent");
+        } catch (error) {
+            return this.handleException(res, error);
+        }
+    }
+
+    // [VERIFY OTP]
+    static async verifyOtp(req, res, type) {
+        try {
+            const data = {
+                receiving_medium: req.body.receiving_medium,
+                code: req.body.code,
+                use_case: type
+            };
+
+            const verify = await verifyOtpNew({data});
+
+            if(!verify){ // for incorrect
+                return this.triggerError("Incorrect otp code", []);
+            }
+
+            if(verify === 'expired'){ // for expired
+                return this.triggerError("Otp code has expired", []);
+            }
+
+            if(verify === 'error'){ // for internal error
+                return this.triggerError("Error occurred while running request", []);
+            }
+            
+            return this.sendResponse(res, [], "Otp successful verified");
         } catch (error) {
             return this.handleException(res, error);
         }

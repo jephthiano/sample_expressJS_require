@@ -24,7 +24,24 @@ const inArray = (value, array) => array.includes(value);
 
 const isValidData = (data) => !(data === undefined || data === null || data === '');
 
-const isNumber = (value) => Number.isFinite(value);
+const isPhoneSample = (value) => /^0?\d*$/.test(value.trim());
+
+const detectInputType = (value) => {
+    // Looks like a phone number if it starts with digits (even with leading zero)
+    if (/^0?\d*$/.test(value.trim())) {
+      return 'phone';
+    }
+  
+    return 'unknown';
+  };
+  
+const replaceValues = (data, value, replace) => {
+    const regex = new RegExp(value, 'g');
+    return data.replace(regex, replace);
+};
+  
+
+const isNumber = (value) => !isNaN(value) && typeof Number(value) === "number" && Number.isFinite(value);
 
 const ucFirst = (data) => data.charAt(0).toUpperCase() + data.slice(1);
 
@@ -42,7 +59,6 @@ const parseMessageToObject = (error) => {
     return errors; // Return the structured errors as an object
 };
 
-
 module.exports = {
     initialResponse,
     log,
@@ -53,6 +69,8 @@ module.exports = {
     isEmptyString,
     inArray,
     isValidData,
+    isPhoneSample,
+    replaceValues,
     isNumber,
     ucFirst,
     isDateLapsed,

@@ -9,14 +9,12 @@ router.post('/login', (req,res) => {
 
 //SEND OTP
 router.post('/send_otp/:type', async (req, res) => {
-    const { type } = req.params;
-    AuthController.sendOtp(req, res, type);
+    AuthController.sendOtp(req, res);
 });
 
 //VERIFY OTP
 router.post('/verify_otp/:type', async (req, res) => {
-    const { type } = req.params;
-    AuthController.verifyOtp(req, res, type);
+    AuthController.verifyOtp(req, res);
 });
 
 

@@ -1,11 +1,29 @@
 const nodemailer = require('nodemailer');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { ucFirst }  = require(MAIN_UTILS + 'general.util');
+// const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
 
 const logInfo = (type, data) => log(type, data, 'info');
 
 const logError = (type, data) => log(type, data, 'error');
+
+const sendMessage = async (data, send_medium) => {
+    let response = false;
+    const messageData = data;
+
+    if (send_medium === 'email') {
+        response = await sendEmail(messageData);
+    } else if (send_medium === 'whatsapp') {
+        response = await sendWhatsappMessage(messageData);
+    } else if (send_medium === 'sms') {
+        response = await sendSmsMessage(messageData);
+    } else if (send_medium === 'push_notification') {
+        response = await sendPushNotification(messageData);
+    }
+
+    return response;
+}
 
 const sendEmail = async (data) => {
     const transporter = nodemailer.createTransport({
@@ -70,12 +88,12 @@ const messageTemplate = (type, medium = 'email', data = {}) => {
     const messages = {
         welcome: 'You have successfully registered with Jeph VTU. We are delighted to have you as our customer.',
         otp_code: `Your OTP code is ${data.code}. Please note that this code expires in 5 minutes. Do not share this code with anyone.`,
-        reset_password: 'You have successfully reset your password. If this action was not performed by you, kindly reset your password or notify the admin.',
-        update_password: 'You have successfully updated your password. If this action was not performed by you, kindly reset your password or notify the admin.',
-        receive_fund_success: `${data.senderName} has sent you NGN ${data.amount}`,
-        card_payment: `Card funding of ${data.amount} NGN was successful.`,
-        set_pin: 'You have successfully set your PIN for secure transactions. If this action was not performed by you, kindly change your password and notify the admin.',
-        change_pin: 'You have successfully updated your PIN. If this action was not performed by you, kindly change your password or notify the admin.',
+        // reset_password: 'You have successfully reset your password. If this action was not performed by you, kindly reset your password or notify the admin.',
+        // update_password: 'You have successfully updated your password. If this action was not performed by you, kindly reset your password or notify the admin.',
+        // receive_fund_success: `${data.senderName} has sent you NGN ${data.amount}`,
+        // card_payment: `Card funding of ${data.amount} NGN was successful.`,
+        // set_pin: 'You have successfully set your PIN for secure transactions. If this action was not performed by you, kindly change your password and notify the admin.',
+        // change_pin: 'You have successfully updated your PIN. If this action was not performed by you, kindly change your password or notify the admin.',
     };
     return messages[type] || '';
 };
@@ -139,6 +157,7 @@ const htmlEmailTemplate = (data) => {
 };
 
 module.exports = {
+    sendMessage,
     sendEmail,
     sendWhatsappMessage,
     sendSmsMessage,

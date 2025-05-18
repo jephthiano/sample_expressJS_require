@@ -22,9 +22,11 @@ class AuthController extends BaseController{
     }
 
     // SEND OTP
-    static async sendOtp(req, res, type) {
+    static async sendOtp(req, res) {
+        const { type } = req.params;
+
         try {
-            if(type !== 'sign_up' || type !== 'forgot_password'){
+            if(type !== 'sign_up' && type !== 'forgot_password'){
                 this.triggerError("Invalid Request", []);
             }
 
@@ -39,9 +41,11 @@ class AuthController extends BaseController{
     }
 
     // VERIFY OTP
-    static async verifyOtp(req, res, type) {
+    static async verifyOtp(req, res) {
+        const { type } = req.params;
+
         try {
-            if(type !== 'sign_up' || type !== 'forgot_password'){
+            if(type !== 'sign_up' && type !== 'forgot_password'){
                 this.triggerError("Invalid Request", []);
             }
 
