@@ -5,6 +5,14 @@ const { selEncrypt, }  = require(MAIN_UTILS + 'security.util');
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
 
+// Extract token from headers (Bearer Token)
+const extractToken = (authHeader) => {
+    if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+        return authHeader.split(' ')[1] || null;
+    }
+    return null;
+};
+
 // Generate JWT Token with expiration
 const setToken = (id) => {
     try {
@@ -22,5 +30,6 @@ const setToken = (id) => {
 };
 
 module.exports = {
+    extractToken,
     setToken,
 };
