@@ -35,10 +35,9 @@ class AuthService extends BaseService{
             }
     
             // Fetch needed data
-            const data = await Fetch.neededData(user.id);
+            const data = await Fetch.authFetchData(res, user.id);
 
             return this.sendResponse(res, data, "Login successful");
-    
         } catch (error) {
             return this.handleException(res, error);
         }
@@ -57,7 +56,7 @@ class AuthService extends BaseService{
             }
     
             // Fetch user-related data
-            const data = await Fetch.neededData(result.id);    
+            const data = await Fetch.authFetchData(res, result.id);    
             
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
