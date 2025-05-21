@@ -1,5 +1,5 @@
-const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const BaseService = require(SERVICES + 'BaseService.cla');
+const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');

@@ -1,4 +1,3 @@
-// src/core/handler.js
 const { ValidationError, CustomApiException } = require(CORES + "errors.util");
 
 /**
@@ -43,8 +42,8 @@ function handleException(res, error) {
 /**
  * Throw a generic API exception (default 403).
  */
-function triggerError(message, details = []) {
-  throw new CustomApiException(message, 403, details);
+function triggerError(message, details = [], statusCode = 403) {
+  throw new CustomApiException(message, statusCode, details);
 }
 
 /**
