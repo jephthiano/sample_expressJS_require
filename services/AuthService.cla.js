@@ -4,6 +4,7 @@ const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'sec
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
+const { queueMessaging } = require(QUEUES + 'messagingQueue');
 
 const Fetch = require(CONTROLLERS + 'FetchController.cla');
 
@@ -62,6 +63,8 @@ class AuthService extends BaseService{
             this.sendResponse(res, data, "Account successfully created");
 
             // Send welcome email [PASS TO QUEUE JOB]
+            // Queue welcome email
+            // await queueMessaging(email, 'Welcome to My App!', `Hi ${name}, thanks for registering!`);
             const messageData = sendMessageDTO({ first_name, receiving_medium: email, type: 'welcome' });
             sendEmail(messageData);
             
