@@ -41,7 +41,7 @@ class Fetch {
                     response = {userData, transactionHistory, inAppNotification};
                 }else{
                     const response_data = {userData, transactionHistory, inAppNotification};
-                    
+                    userResource
                     response['status'] = true,
                     response['message'] = 'Success';
                     response['response_data'] = response_data;

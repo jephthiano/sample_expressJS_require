@@ -1,6 +1,7 @@
 const User = require(MODELS + 'User.schema');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { setToken } = require(MAIN_UTILS + 'token.util');
+const UserResource = require(RESOURCES + 'UserResource');
 
 
 let response = {
@@ -25,10 +26,11 @@ class FetchController {
         try{
             //get user data
             const selUserData = "-token -user_ext_data -password -transaction_pin -unique_id -_id -__v";
-            const data = await User.findOne({_id : id}, selUserData);
+            const user = await User.findOne({_id : id});
             token = token ?? setToken(id);
 
-            if(token && data){
+            if(token && user){
+                const data = new UserResource(user).toJSON();
                 response = {token, data}
             }
         }catch(err){

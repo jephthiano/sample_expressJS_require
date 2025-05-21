@@ -4,6 +4,7 @@ const { createUserDTO, updatePasswordDTO } = require(DTOS + 'user.dto');
 const { selEncrypt, }  = require(MAIN_UTILS + 'security.util');
 
 class AuthRepository extends BaseRepository{
+
     static async getUserByLoginId(res, loginId) {
         try{
             const encLoginId = selEncrypt(loginId.toLowerCase(), 'email_phone');
@@ -25,13 +26,14 @@ class AuthRepository extends BaseRepository{
         }
     }
 
-    static async updatePassword(data){
+    static async updatePassword(res, data){
         try{
             data = updatePasswordDTO(data);
+            
             const { password, receiving_medium } = data;
             const encMedium = selEncrypt(receiving_medium, 'email_phone');
             
-            return await UserSch.findOneAndUpdate(
+            return await User.findOneAndUpdate(
                 {$or: [{ mobile_number: encMedium }, { email: encMedium }]},
                 { password },
                 { new: true }

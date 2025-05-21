@@ -189,23 +189,26 @@ class AuthService extends BaseService{
                 return this.triggerError("Request timeout, try again", []);
             }
 
-            const updatePassword = await AuthRepository.updatePassword(req.body);
-    
-            if(!updatePassword){
+            const updateUserData = await AuthRepository.updatePassword(res, req.body);
+            if(!updateUserData){
                 return this.triggerError("Password reset failed", []);
             }
 
-            //delete otp
+            // Send success response
+            this.sendResponse(res, [], "Password successfully reset");
+
+            //[PASS BELOW TO QUEUE JOB]
+            // Clean up OTP
             await deleteOtp(receiving_medium);
             
-            // Send success response
-            this.sendResponse(res, data, "Account successfully created");
             
             // Send password reset notification email
-            const { first_name, email } = updatePassword;
-            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'reset_password');
+            const { first_name, email } = updateUserData;
+            receiving_medium = selEncrypt(first_name, 'first_name');
+            receiving_medium = selEncrypt(email, 'email');
+            const messageData = sendMessageDTO({ first_name, receiving_medium, type: 'reset_password' });
             sendEmail(messageData);
-
+            
             return;
         } catch (error) {
             return this.handleException(res, error);
