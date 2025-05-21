@@ -1,9 +1,10 @@
-const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const BaseService = require(SERVICES + 'BaseService.cla');
+const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
+const { queueMessaging } = require(QUEUES + 'messagingQueue');
 
 const Fetch = require(CONTROLLERS + 'FetchController.cla');
 
@@ -34,10 +35,9 @@ class AuthService extends BaseService{
             }
     
             // Fetch needed data
-            const data = await Fetch.neededData(user.id);
+            const data = await Fetch.authFetchData(res, user.id);
 
             return this.sendResponse(res, data, "Login successful");
-    
         } catch (error) {
             return this.handleException(res, error);
         }
@@ -56,12 +56,14 @@ class AuthService extends BaseService{
             }
     
             // Fetch user-related data
-            const data = await Fetch.neededData(result.id);    
+            const data = await Fetch.authFetchData(res, result.id);    
             
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
 
             // Send welcome email [PASS TO QUEUE JOB]
+            // Queue welcome email
+            // await queueMessaging(email, 'Welcome to My App!', `Hi ${name}, thanks for registering!`);
             const messageData = sendMessageDTO({ first_name, receiving_medium: email, type: 'welcome' });
             sendEmail(messageData);
             
@@ -104,7 +106,7 @@ class AuthService extends BaseService{
                 use_case: type
             };
 
-            const verify = await verifyOtpNew({data});
+            const verify = await verifyOtpNew(data);
 
             if(!verify){ // for incorrect
                 return this.triggerError("Incorrect otp code", []);
@@ -118,22 +120,22 @@ class AuthService extends BaseService{
                 return this.triggerError("Error occurred while running request", []);
             }
             
-            return this.sendResponse(res, [], "Otp successful verified");
+            return this.sendResponse(res, [], "Otp code successful verified");
         } catch (error) {
             return this.handleException(res, error);
         }
     }
 
     static async signup(req, res) {
-        let result;
+        const { receiving_medium, code, first_name, email } = req.body;
+        const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
         
         try {
-            const { veri_type, receiving_medium, code, first_name, email } = req.body;
     
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
                 
             if(!verifyOtp) {
-                return this.triggerError("Invalid or used verification code", []);
+                return this.triggerError("Invalid Request", []);
             }
 
             if (verifyOtp === 'expired') {
@@ -141,10 +143,12 @@ class AuthService extends BaseService{
             } 
 
             // Mark verification based on type
-            if (veri_type === 'email') {
-                req.body.email_verification = true;
+            if (veriType === 'email') {
+                req.body.email_verified_at = new Date();
+                req.body.mobile_number = receiving_medium;
             } else {
-                req.body.mobile_number_verification = true;
+                req.body.mobile_number_verified_at = new Date();
+                req.body.email = receiving_medium;
             }
     
             // Create user
@@ -159,8 +163,9 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            // Clean up OTP if multi
-            await deleteOtp(selEncrypt(receiving_medium, 'general'));
+            //[PASS BELOW TO QUEUE JOB]
+            // Clean up OTP
+            deleteOtp(selEncrypt(receiving_medium, 'general'));
     
             // Send welcome email [PASS TO QUEUE JOB]
             const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
@@ -178,31 +183,34 @@ class AuthService extends BaseService{
             const { code, receiving_medium } = req.body;
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
     
-            if(!verifyOtp){
-                return this.triggerError("Incorrect otp code", []);
+            if(!verifyOtp) {
+                return this.triggerError("Invalid Request", []);
             }
 
-            if(verifyOtp === 'expired'){
-                return this.triggerError("Otp code has expired", []);
+            if (verifyOtp === 'expired') {
+                return this.triggerError("Request timeout, try again", []);
             }
 
-            const updatePassword = await AuthRepository.updatePassword(req.body);
-    
-            if(!updatePassword){
+            const updateUserData = await AuthRepository.updatePassword(res, req.body);
+            if(!updateUserData){
                 return this.triggerError("Password reset failed", []);
             }
 
-            //delete otp
+            // Send success response
+            this.sendResponse(res, [], "Password successfully reset");
+
+            //[PASS BELOW TO QUEUE JOB]
+            // Clean up OTP
             await deleteOtp(receiving_medium);
             
-            // Send success response
-            this.sendResponse(res, data, "Account successfully created");
             
             // Send password reset notification email
-            const { first_name, email } = updatePassword;
-            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'reset_password');
+            const { first_name, email } = updateUserData;
+            receiving_medium = selEncrypt(first_name, 'first_name');
+            receiving_medium = selEncrypt(email, 'email');
+            const messageData = sendMessageDTO({ first_name, receiving_medium, type: 'reset_password' });
             sendEmail(messageData);
-
+            
             return;
         } catch (error) {
             return this.handleException(res, error);

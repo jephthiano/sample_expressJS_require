@@ -14,8 +14,10 @@ module.exports = function () {
     global.REPOSITORIES = path.join(__basedir, 'repositories/');
     global.VENDORS = path.join(__basedir, 'vendor/');
     global.MIDDLEWARE = path.join(__basedir, 'middleware/');
-    global.RESOURCE = path.join(__basedir, 'resources/');
-
+    global.RESOURCES = path.join(__basedir, 'resources/');
+    global.QUEUES = path.join(__basedir, 'queues/');
+    global.WORKERS = path.join(__basedir, 'workers/');
+    
 
     global.CORES = path.join(UTILS, 'cores/');
     global.VALIDATORS = path.join(UTILS, 'validators/');
