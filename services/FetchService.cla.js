@@ -21,23 +21,24 @@ class Fetch extends BaseService{
             this.handleException(res, error);
         }
 
-        return null;
+        return {};
     }
 
     static async appFetchData (res, id, token){
-        response = {};
         try{
             //get user data
-            const user = await User.findOne({_id : id});
-            token = token ?? setToken(id);
+            const user = await FetchRepository.getUserById(res, id);
 
             if(token && user){
                 const data = new UserResource(user).toJSON();
-                response = {token, data}
+                const response = {token, data}
+                return this.sendResponse(res, response, "Success");
             }
         }catch(err){
             this.handleException(res, error);
         }
+
+        return this.triggerError("User not found", [], 404);
     }
 }
 
