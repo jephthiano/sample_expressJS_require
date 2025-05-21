@@ -1,4 +1,3 @@
-// src/core/errors.js
 class ValidationError extends Error {
     constructor(errors) {
       super("Validation failed");

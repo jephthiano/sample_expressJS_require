@@ -1,44 +1,25 @@
-const User = require(MODELS + 'User.schema');
-const { log } = require(MAIN_UTILS + 'logger.util');
-const { setToken } = require(MAIN_UTILS + 'token.util');
-const UserResource = require(RESOURCES + 'UserResource');
+const BaseController = require(CONTROLLERS + 'BaseController.cla');
+const FetchService = require(SERVICES + 'FetchService.cla');
 
 
-let response = {
-    status:false,
-    message:"Failed",
-    message_detail:"Error occurred while running request",
-    response_data:{},
-    error_data:{}
-}
+class FetchController extends BaseController{
 
-class FetchController {
-    static logInfo(data,type= 'Fetch'){
-        log(type, data, 'info')
-    }
-
-    static logError(data, type= 'Fetch'){
-        log(type, data, 'error')
-    }
-
-    static async neededData (id, token = null, type ='fetch'){
-        response = {};
-        try{
-            //get user data
-            const selUserData = "-token -user_ext_data -password -transaction_pin -unique_id -_id -__v";
-            const user = await User.findOne({_id : id});
-            token = token ?? setToken(id);
-
-            if(token && user){
-                const data = new UserResource(user).toJSON();
-                response = {token, data}
-            }
-        }catch(err){
-            Fetch.logError('Fetch Needed Data', err);
+    static async authFetchData (res, id){
+        try {
+            return await FetchService.authFetchData(res, id);
+        } catch (error) {
+            this.handleException(res, error);
         }
-        return response;
+
     }
 
+    static async appFetchData (res, id, token){
+        try{
+            await FetchService.authFetchData(res, id, token);
+        }catch(error){
+            this.handleException(res, error);
+        }
+    }
     
 }
 
