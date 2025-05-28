@@ -1,12 +1,10 @@
 const BaseService = require(SERVICES + 'BaseService.cla');
 const FetchRepository = require(REPOSITORIES + 'FetchRepository.cla');
-
-const User = require(MODELS + 'User.schema');
 const { setToken } = require(MAIN_UTILS + 'token.util');
 const UserResource = require(RESOURCES + 'UserResource');
 
 
-class Fetch extends BaseService{
+class FetchService extends BaseService{
     static async authFetchData (res, id){
         try {
             //get user data
@@ -42,4 +40,4 @@ class Fetch extends BaseService{
     }
 }
 
-module.exports = Fetch;
+module.exports = FetchService;
