@@ -10,12 +10,11 @@ class FetchController extends BaseController{
         } catch (error) {
             this.handleException(res, error);
         }
-
     }
 
-    static async appFetchData (res, id, token){
+    static async appFetchData (req, res){
         try{
-            await FetchService.authFetchData(res, id, token);
+            await FetchService.appFetchData(req, res);
         }catch(error){
             this.handleException(res, error);
         }

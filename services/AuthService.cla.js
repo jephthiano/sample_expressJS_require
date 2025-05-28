@@ -6,7 +6,7 @@ const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 const { queueMessaging } = require(QUEUES + 'messagingQueue');
 
-const Fetch = require(CONTROLLERS + 'FetchController.cla');
+const FetchController = require(CONTROLLERS + 'FetchController.cla');
 
 class AuthService extends BaseService{
 
@@ -35,7 +35,7 @@ class AuthService extends BaseService{
             }
     
             // Fetch needed data
-            const data = await Fetch.authFetchData(res, user.id);
+            const data = await FetchController.authFetchData(res, user);
 
             return this.sendResponse(res, data, "Login successful");
         } catch (error) {
@@ -45,18 +45,17 @@ class AuthService extends BaseService{
 
     // REGISTER
     static async register(req, res) {
-        let result;
         try {
             const { first_name, email } = req.body;
 
             // Create user
-            const result = await AuthRepository.createUser(res, req.body);
-            if (!result) {
+            const user = await AuthRepository.createUser(res, req.body);
+            if (!user) {
                 return this.triggerError("Account creation failed", []);
             }
     
             // Fetch user-related data
-            const data = await Fetch.authFetchData(res, result.id);    
+            const data = await FetchController.authFetchData(res, user);    
             
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
@@ -152,13 +151,13 @@ class AuthService extends BaseService{
             }
     
             // Create user
-            const result = await AuthRepository.createUser(res, req.body);
-            if (!result) {
+            const user = await AuthRepository.createUser(res, req.body);
+            if (!user) {
                 return this.triggerError("Account creation failed", []);
             }
 
             // Fetch user-related data
-            const data = await Fetch.neededData(result.id);
+            const data = await FetchController.neededData(user);
             
             // Send success response
             this.sendResponse(res, data, "Account successfully created");

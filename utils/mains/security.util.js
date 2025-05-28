@@ -11,7 +11,7 @@ const iv = process.env.ENC_IV;
 const cost = 10;
 const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'mobile_number', 'token', 'email_phone'];
 
-const returnResponse = (res, data) => res.status(200).json({ data });
+const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).json({ data });
 
 // Hash password asynchronously
 const hashPassword = async (password) => await bcrypt.hash(password, cost);
