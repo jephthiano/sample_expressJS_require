@@ -17,32 +17,36 @@ const logError = (type, data) => {
 // Middleware to verify token and attach user data to `req`
 const tokenValidator = async (req, res, next) => {
     token = process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
-
+    
     if (!token) {
-        return returnResponse(res, req, { status: 'invalid', message: 'No token provided' });
+        return returnResponse(res, { status: false, message: 'Invalid account' });
     }
-
+    
     try {
+        // validate with jwt
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-        // Fetch user details
-        const user = await User.findOne({ unique_id: decoded.id });
-
-        if (!user) {huj
-            return returnResponse(res, req, { status: 'invalid', message: 'User not found' });
+        
+        // Fetch user details 
+        // ADD WHERE TOKEN = TOKEN
+        const user = await User.findOne({ _id: decoded.id });
+        
+        
+        if (!user) {
+            return returnResponse(res, { status: false, message: 'Invalid accoun' });
         }
-
+        
         if (user.status === 'suspended') {
-            return returnResponse(res, req, { status: 'unauthorized', message: 'You have been suspended, contact admin' });
+            return returnResponse(res, { status: false, message: 'You have been suspended, contact admin' });
         }
-
-        // Attach user data to request object
-        req.user = req.data;
-
+        
+        // Attach data to request object
+        req.user = user;
+        req.token = token;
+        
         next(); // Proceed to next middleware
     } catch (err) {
         logError('Token Verification Error', err);
-        return returnResponse(res, req, { status: 'invalid', message: 'Invalid token' });
+        return returnResponse(res, { status: false, message: 'Invalid account' });
     }
 };
 

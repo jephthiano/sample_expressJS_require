@@ -76,7 +76,10 @@ const UserSchema = new Schema({
         type: Date,
         default: null,
     },
-    token: String,
+    token: {
+        type: String,
+        unique: true,
+    }
 });
 
 // Reusable transformer for update objects

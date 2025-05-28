@@ -1,17 +1,16 @@
 const BaseService = require(SERVICES + 'BaseService.cla');
 const FetchRepository = require(REPOSITORIES + 'FetchRepository.cla');
-
-const User = require(MODELS + 'User.schema');
 const { setToken } = require(MAIN_UTILS + 'token.util');
+const { selEncrypt }  = require(MAIN_UTILS + 'security.util');
 const UserResource = require(RESOURCES + 'UserResource');
 
 
-class Fetch extends BaseService{
-    static async authFetchData (res, id){
+class FetchService extends BaseService{
+    static async authFetchData (res, user){
         try {
             //get user data
-            const user = await FetchRepository.getUserById(res, id);
-            const token = user ? setToken(id) : null ;
+            // const user = await FetchRepository.getUserById(res, id);
+            const token = user ? setToken(user.id) : null ;
 
             if(token && user){
                 const data = new UserResource(user).toJSON();
@@ -24,10 +23,11 @@ class Fetch extends BaseService{
         return {};
     }
 
-    static async appFetchData (res, id, token){
+    static async appFetchData (req, res){
         try{
             //get user data
-            const user = await FetchRepository.getUserById(res, id);
+            const user = await FetchRepository.getUserById(res, req.user.id);
+            const token = selEncrypt(req.token, 'token');
 
             if(token && user){
                 const data = new UserResource(user).toJSON();
@@ -35,11 +35,11 @@ class Fetch extends BaseService{
                 return this.sendResponse(res, response, "Success");
             }
         }catch(err){
-            this.handleException(res, error);
+            this.handleException(res, err);
         }
 
         return this.triggerError("User not found", [], 404);
     }
 }
 
-module.exports = Fetch;
+module.exports = FetchService;
