@@ -11,6 +11,8 @@ const logError = (type, data) => log(type, data, 'error');
 const sendMessage = async (data, send_medium) => {
     let response = false;
     const messageData = data;
+
+    return true;
     
     if (send_medium === 'email') {
         response = await sendEmail(messageData);

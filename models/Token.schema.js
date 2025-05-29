@@ -3,22 +3,37 @@ const { Schema } = mongoose;
 const { hashPassword } = require(MAIN_UTILS + 'security.util');
 
 const TokenSchema = new Schema({
-    userId: mongoose.Schema.Types.ObjectId,
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        unique: true,
+        required: true,
+    },
 
-    token: String,
+    token: {
+        type: String,
+        unique: true,
+        required: true
+    },
 
-    expireAt: {
-    type: Date,
-    required: true,
-    index: { expires: 0 } // TTL index triggers expiration
-  }
+    expire_at: {
+        type: Date,
+        default: () => new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
+        index: { expires: 0 }
+    },
+
+    created_at: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-// Reusable transformer for update objects
 async function transformUserUpdate(update) {
     const target = update.$set || update;
 
-    if (target.token) target.token = await hashPassword(target.token);
+    if (target.token) {
+        target.token = await hashPassword(target.token);
+        target.expire_at = new Date(Date.now() + 60 * 60 * 1000);
+    }
 
     if (update.$set) update.$set = target;
     else Object.assign(update, target);
@@ -26,19 +41,15 @@ async function transformUserUpdate(update) {
     return update;
 }
 
-
-// Pre-save
 TokenSchema.pre('save', async function (next) {
-    if (this.isModified('token')) this.password = await hashPassword(this.token);
-
+    if (this.isModified('token')) {
+        this.token = await hashPassword(this.token); // fixed
+        this.expire_at = new Date(Date.now() + 60 * 60 * 1000);
+    }
     next();
 });
 
-
-// Update hooks
-const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'];
-
-updateHooks.forEach((hook) => {
+['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'].forEach(hook => {
     TokenSchema.pre(hook, async function (next) {
         const update = this.getUpdate();
         await transformUserUpdate(update);
@@ -46,7 +57,6 @@ updateHooks.forEach((hook) => {
         next();
     });
 });
-
 
 const Token = mongoose.model('tokens', TokenSchema);
 module.exports = Token;

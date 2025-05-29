@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { selEncrypt, selDecrypt }  = require(MAIN_UTILS + 'security.util');
-const User = require(MODELS + 'User.schema');
+const Token = require(MODELS + 'Token.schema');
 
 
 const logInfo = (type, data) => log(type, data, 'info');
@@ -26,9 +26,9 @@ const setToken = async (id) => {
         );
 
         // insert into db
-        $updatedUser = await User.findByIdAndUpdate(id, { token });
+        $savedToken = await createOrUpdateToken(id, token);
         
-        if(!$updatedUser) return null;
+        if(!$savedToken) return null;
 
         return selEncrypt(token, 'token'); // Encrypt token
     } catch (err) {
@@ -36,6 +36,24 @@ const setToken = async (id) => {
         return null; // Return null if token generation fails
     }
 };
+
+
+const createOrUpdateToken = async (id, token) => {
+    const savedToken = await Token.findOneAndUpdate(
+        { user_id: id },
+        {
+            token,
+            expire_at: new Date(Date.now() + 60 * 60 * 1000) // 1 hour TTL
+        },
+        {
+            new: true,
+            upsert: true,
+            runValidators: true
+        }
+    );
+
+    return savedToken;
+}
 
 module.exports = {
     extractToken,
