@@ -26,7 +26,7 @@ const setToken = async (id) => {
         );
 
         // insert into db
-        $updatedUser = await User.findByIdAndUpdate(userId, { token });
+        $updatedUser = await User.findByIdAndUpdate(id, { token });
         
         if(!$updatedUser) return null;
 

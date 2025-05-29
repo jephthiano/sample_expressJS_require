@@ -75,11 +75,11 @@ const subjectTemplate = (type) => {
         welcome: 'WELCOME TO JEPH VTU',
         otp_code: 'Request for OTP Code',
         reset_password: 'Reset Password',
-        update_password: 'Update Password',
-        receive_fund_success: 'Incoming Transfer Successful',
-        card_payment: 'Card Funding Successful',
-        set_pin: 'Pin Setup',
-        change_pin: 'Pin Update',
+        // update_password: 'Update Password',
+        // receive_fund_success: 'Incoming Transfer Successful',
+        // card_payment: 'Card Funding Successful',
+        // set_pin: 'Pin Setup',
+        // change_pin: 'Pin Update',
     };
     return subjects[type] || '';
 };
@@ -88,7 +88,7 @@ const messageTemplate = (type, medium = 'email', data = {}) => {
     const messages = {
         welcome: 'You have successfully registered with Jeph VTU. We are delighted to have you as our customer.',
         otp_code: `Your OTP code is ${data.code}. Please note that this code expires in 5 minutes. Do not share this code with anyone.`,
-        // reset_password: 'You have successfully reset your password. If this action was not performed by you, kindly reset your password or notify the admin.',
+        reset_password: 'You have successfully reset your password. If this action was not performed by you, kindly reset your password or notify the admin.',
         // update_password: 'You have successfully updated your password. If this action was not performed by you, kindly reset your password or notify the admin.',
         // receive_fund_success: `${data.senderName} has sent you NGN ${data.amount}`,
         // card_payment: `Card funding of ${data.amount} NGN was successful.`,

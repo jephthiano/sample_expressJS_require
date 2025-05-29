@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require(MODELS + 'User.schema');
 const { log } = require(MAIN_UTILS + 'logger.util');
-const { selDecrypt, returnResponse }  = require(MAIN_UTILS + 'security.util');
+const { selDecrypt, returnResponse, verifyPassword }  = require(MAIN_UTILS + 'security.util');
 const { extractToken } = require(MAIN_UTILS + 'token.util');
 
 // Utility function to log info
@@ -16,25 +16,22 @@ const logError = (type, data) => {
 
 // Middleware to verify token and attach user data to `req`
 const tokenValidator = async (req, res, next) => {
-    token = process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
-    
-    if (!token) {
-        return returnResponse(res, { status: false, message: 'Invalid account' });
-    }
-    
     try {
+        token = process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
+        if (!token) return returnResponse(res, { status: false, message: 'Invalid account' });
+
         // validate with jwt
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         
         // Fetch user details 
-        // ADD WHERE TOKEN = TOKEN
         const user = await User.findOne({ _id: decoded.id });
-        
-        
-        if (!user) {
-            return returnResponse(res, { status: false, message: 'Invalid accoun' });
-        }
-        
+        //if user not found
+        if (!user) return returnResponse(res, { status: false, message: 'Invalid account' });
+
+        //verify the token
+        const  isTokenValid = await verifyPassword(token, user.token);
+        if(!isTokenValid) return returnResponse(res, { status: false, message: 'Invalid account' });
+
         if (user.status === 'suspended') {
             return returnResponse(res, { status: false, message: 'You have been suspended, contact admin' });
         }
