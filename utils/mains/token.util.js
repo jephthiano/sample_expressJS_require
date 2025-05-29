@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { selEncrypt, selDecrypt }  = require(MAIN_UTILS + 'security.util');
+const User = require(MODELS + 'User.schema');
+
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
@@ -15,13 +17,18 @@ const extractToken = (authHeader) => {
 };
 
 // Generate JWT Token with expiration
-const setToken = (id) => {
+const setToken = async (id) => {
     try {
         const token = jwt.sign(
             { id },
             process.env.JWT_SECRET_KEY,
             { expiresIn: '1h' } // Token expires in 1 hour
         );
+
+        // insert into db
+        $updatedUser = await User.findByIdAndUpdate(userId, { token });
+        
+        if(!$updatedUser) return null;
 
         return selEncrypt(token, 'token'); // Encrypt token
     } catch (err) {
