@@ -19,16 +19,9 @@ const extractToken = (authHeader) => {
 // Generate JWT Token with expiration
 const setToken = async (id) => {
     try {
-        const token = jwt.sign(
-            { id },
-            process.env.JWT_SECRET_KEY,
-            { expiresIn: '1h' } // Token expires in 1 hour
-        );
+        const token = await generateToken(id);
 
-        // insert into db
-        $savedToken = await createOrUpdateToken(id, token);
-        
-        if(!$savedToken) return null;
+        if(!token) return null;
 
         return selEncrypt(token, 'token'); // Encrypt token
     } catch (err) {
@@ -37,6 +30,25 @@ const setToken = async (id) => {
     }
 };
 
+const  generateToken = async (id) => {
+    let token = null;
+
+    if(process.env.TOKEN_SETTER === 'jwt') {
+        token = jwt.sign(
+            { id },
+            process.env.JWT_SECRET_KEY,
+            // { expiresIn: '1h' } // Token expires in 1 hour
+        );
+    } else if (process.env.TOKEN_SETTER === 'self') {
+        // generate token
+        const genToken = id;
+
+        // insert into db
+        token = await createOrUpdateToken(id, id);
+    }
+
+    return token;
+}
 
 const createOrUpdateToken = async (id, token) => {
     const savedToken = await Token.findOneAndUpdate(

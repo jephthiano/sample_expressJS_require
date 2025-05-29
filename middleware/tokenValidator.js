@@ -19,7 +19,7 @@ const logError = (type, data) => {
 const tokenValidator = async (req, res, next) => {
     try {
         // if it is seadon or cookie
-        const token = process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
+        const token = getToken(req);
         if (!token) return returnResponse(res, { status: false, message: 'Invalid account' });
 
         // validate with jwt
@@ -55,6 +55,10 @@ const tokenValidator = async (req, res, next) => {
         return returnResponse(res, { status: false, message: 'Error Occurred' });
     }
 };
+
+const getToken = (req) => {
+    return process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
+}
 
 const validateToken = () => {
     
