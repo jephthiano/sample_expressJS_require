@@ -224,14 +224,14 @@ class AuthService extends BaseService{
             if(process.env.TOKEN_SETTER === 'jwt') {
                     return this.sendResponse(res, [], "Logout successfully");
             } else if (process.env.TOKEN_SETTER === 'local_self') {
-                if(!deleteToken(req.user.id)){
+                if (!req.params.id || !(await deleteToken(req.params.id))) {
                     return this.triggerError("Request failed, try again", [])
                 }
 
                 return this.sendResponse(res, [], "Logout successfully");
             } else if (process.env.TOKEN_SETTER === 'redis_self') {
-                if(!deleteToken(req.user.id)){
-                    return this.triggerError("Request failed, try again", [])
+                if (!req.params.id || !(await deleteToken(req.params.id))) {
+                    return this.triggerError("Request failed, try again", []);
                 }
 
                 return this.sendResponse(res, [], "Logout successfully");
