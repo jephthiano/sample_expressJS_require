@@ -47,6 +47,14 @@ const  generateToken = async (id) => {
         const save = await createOrUpdateToken(id, genToken);
 
         token = save ? genToken : null ;
+    } else if (process.env.TOKEN_SETTER === 'redis_self') {
+        // generate token
+        const genToken = generateUniqueToken();
+
+        // insert into db
+        const save = await createOrUpdateToken(id, genToken);
+
+        token = save ? genToken : null ;
     }
 
     return token;
@@ -69,7 +77,14 @@ const createOrUpdateToken = async (id, token) => {
     return savedToken;
 }
 
+const deleteToken = async (id) => {
+    const result = await Token.deleteOne({ user_id: id });
+
+    return result.deletedCount > 0;
+}
+
 module.exports = {
     extractToken,
     setToken,
+    deleteToken,
 };

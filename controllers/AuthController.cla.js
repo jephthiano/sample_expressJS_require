@@ -101,8 +101,8 @@ class AuthController extends BaseController{
 
     // LOGOUT
     static async logout(req, res) {
-        try {
-            // delete cookies
+         try {
+            await AuthService.logout(req, res);
         } catch (error) {
             this.handleException(res, error);
         }

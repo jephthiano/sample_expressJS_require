@@ -64,6 +64,14 @@ const validateToken = async (token) => {
         });
 
         response = Dbtoken?.user_id ?? null;
+    } else if (process.env.TOKEN_SETTER === 'redis_self') {
+        //verify the token
+        const Dbtoken = await Token.findOne({
+            token,
+            expire_at: { $gt: new Date() } // only return if not expired
+        });
+
+        response = Dbtoken?.user_id ?? null;
     }
     return response;
 }
