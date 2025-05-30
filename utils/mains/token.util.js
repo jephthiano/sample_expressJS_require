@@ -37,7 +37,7 @@ const  generateToken = async (id) => {
         token = jwt.sign(
             { id },
             process.env.JWT_SECRET_KEY,
-            // { expiresIn: '1h' } // Token expires in 1 hour
+            { expiresIn: '1h' } // Token expires in 1 hour
         );
     } else if (process.env.TOKEN_SETTER === 'local_self') {
         // generate token
