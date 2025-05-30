@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-
 const { hashPassword, selEncrypt, generateUniqueId } = require(MAIN_UTILS + 'security.util');
 
 const UserSchema = new Schema({
@@ -76,19 +75,14 @@ const UserSchema = new Schema({
         type: Date,
         default: null,
     },
-    token: {
-        type: String,
-        unique: true,
-    }
 });
 
 // Reusable transformer for update objects
 async function transformUserUpdate(update) {
     const target = update.$set || update;
 
-    if (target.password) {
-        target.password = await hashPassword(target.password);
-    }
+    if (target.password) target.password = await hashPassword(target.password);
+    if (target.token) target.token = await hashPassword(target.token);
 
     if (target.email) target.email = selEncrypt(target.email.toLowerCase(), 'email');
     if (target.mobile_number) target.mobile_number = selEncrypt(target.mobile_number, 'mobile_number');

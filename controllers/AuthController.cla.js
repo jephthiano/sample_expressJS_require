@@ -101,15 +101,8 @@ class AuthController extends BaseController{
 
     // LOGOUT
     static async logout(req, res) {
-        try {
-            // unset cookie
-    //Cookie.deleteCookies(req, res, 'token', token)
-    res.clearCookie('_menatreyd');
-            // //validate inputs
-            // const { status, data } = await resetPassword(req.body);
-            // if (status) this.triggerValidationError(data);
-
-            // await AuthService.resetPassword(req, res);
+         try {
+            await AuthService.logout(req, res);
         } catch (error) {
             this.handleException(res, error);
         }
