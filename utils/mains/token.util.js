@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { log } = require(MAIN_UTILS + 'logger.util');
-const { selEncrypt, selDecrypt }  = require(MAIN_UTILS + 'security.util');
+const { selEncrypt, selDecrypt, generateUniqueToken }  = require(MAIN_UTILS + 'security.util');
 const Token = require(MODELS + 'Token.schema');
 
 
@@ -39,12 +39,14 @@ const  generateToken = async (id) => {
             process.env.JWT_SECRET_KEY,
             // { expiresIn: '1h' } // Token expires in 1 hour
         );
-    } else if (process.env.TOKEN_SETTER === 'self') {
+    } else if (process.env.TOKEN_SETTER === 'local_self') {
         // generate token
-        const genToken = id;
+        const genToken = generateUniqueToken();
 
         // insert into db
-        token = await createOrUpdateToken(id, id);
+        const save = await createOrUpdateToken(id, genToken);
+
+        token = save ? genToken : null ;
     }
 
     return token;

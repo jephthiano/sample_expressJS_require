@@ -75,4 +75,5 @@ module.exports = {
     ucFirst,
     isDateLapsed,
     parseMessageToObject,
+    detectInputType,
 };
