@@ -6,7 +6,7 @@ require("./configs/global")(); // Initialize global variables
 require("./configs/middleware")(app); // Apply middlewares
 
 const { connectDB, mongoose } = require("./configs/database"); // Import both
-const v1RouteEntry = require(ROUTES + "index.rou"); // Route entry point
+const v1RouteEntry = require(ROUTES + "v1/index.rou"); // Route entry point
 
 
 connectDB().then(() => {

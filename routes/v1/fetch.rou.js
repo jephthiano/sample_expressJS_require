@@ -1,6 +1,6 @@
 const express = require('express');
 const router = new express.Router();
-const FetchController = require(CONTROLLERS + 'FetchController.cla');
+const FetchController = require(CONTROLLERS + 'v1/FetchController.cla');
 
 
 router.get('/refetch', async(req,res) => {

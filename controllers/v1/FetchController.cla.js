@@ -1,5 +1,5 @@
 const BaseController = require(CONTROLLERS + 'BaseController.cla');
-const FetchService = require(SERVICES + 'FetchService.cla');
+const FetchService = require(SERVICES + 'v1/FetchService.cla');
 
 
 class FetchController extends BaseController{

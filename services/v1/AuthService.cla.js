@@ -7,7 +7,7 @@ const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 const { queueMessaging } = require(QUEUES + 'messagingQueue');
 const { deleteToken } = require(MAIN_UTILS + 'token.util');
 
-const FetchController = require(CONTROLLERS + 'FetchController.cla');
+const FetchController = require(CONTROLLERS + 'v1/FetchController.cla');
 
 class AuthService extends BaseService{
 
