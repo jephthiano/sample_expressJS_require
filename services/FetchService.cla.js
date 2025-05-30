@@ -9,8 +9,7 @@ class FetchService extends BaseService{
     static async authFetchData (res, user){
         try {
             //get user data
-            // const user = await FetchRepository.getUserById(res, id);
-            const token = user ? setToken(user.id) : null ;
+            const token = user ? await setToken(user.id) : null ;
 
             if(token && user){
                 const data = new UserResource(user).toJSON();

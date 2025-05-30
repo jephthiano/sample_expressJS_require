@@ -5,6 +5,7 @@ const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS +
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 const { queueMessaging } = require(QUEUES + 'messagingQueue');
+const { deleteToken } = require(MAIN_UTILS + 'token.util');
 
 const FetchController = require(CONTROLLERS + 'FetchController.cla');
 
@@ -213,6 +214,30 @@ class AuthService extends BaseService{
             return;
         } catch (error) {
             return this.handleException(res, error);
+        }
+    }
+    
+
+    static async logout(req, res) {
+        try {
+            // set for cookies too
+            if(process.env.TOKEN_SETTER === 'jwt') {
+                    return this.sendResponse(res, [], "Logout successfully");
+            } else if (process.env.TOKEN_SETTER === 'local_self') {
+                if (!req.params.id || !(await deleteToken(req.params.id))) {
+                    return this.triggerError("Request failed, try again", [])
+                }
+
+                return this.sendResponse(res, [], "Logout successfully");
+            } else if (process.env.TOKEN_SETTER === 'redis_self') {
+                if (!req.params.id || !(await deleteToken(req.params.id))) {
+                    return this.triggerError("Request failed, try again", []);
+                }
+
+                return this.sendResponse(res, [], "Logout successfully");
+            }
+        } catch (error) {
+            this.handleException(res, error);
         }
     }
 
