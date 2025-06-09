@@ -1,11 +1,13 @@
+require("../configs/global")(); // Initialize global variables
 const { Worker } = require('bullmq');
 const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
-const redis = require(CONFIGS + 'database.js');
+const { redis } = require(CONFIGS + 'database.js');
 
 // Create the worker
 const worker = new Worker(
   'messagingQueue',
   async (job) => {
+    // const payload = sendMessageDTO(job.data);
     try {
       await sendMessage(job.data);
       console.log(`Message sent to ${job.data.send_medium || job.data.receiving_medium}`);

@@ -1,5 +1,5 @@
 const { Queue } = require('bullmq');
-const redis = require(CONFIGS + 'database.js'); // this should export an ioredis instance
+const { redis } = require(CONFIGS + 'database.js');
 require('dotenv').config();
 
 const messagingQueue = new Queue('messagingQueue', {
@@ -10,13 +10,9 @@ const messagingQueue = new Queue('messagingQueue', {
  * Adds an email job to the messaging queue.
  *
  * @param {Object} data - The message payload.
- * @param {string} send_medium - The channel (e.g., 'email', 'sms').
  */
-async function queueMessagingl(data, send_medium) {
-  await messagingQueue.add('sendMessage', {
-    data,
-    send_medium,
-  });
+async function queueMessaging(data, send_medium) {
+  await messagingQueue.add('sendMessage', { data });
 }
 
-module.exports = { queueEmail };
+module.exports = { queueMessaging };
