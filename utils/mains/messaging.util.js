@@ -11,8 +11,6 @@ const logError = (type, data) => log(type, data, 'error');
 const sendMessage = async (data, send_medium) => {
     let response = false;
     const messageData = data;
-
-    return true;
     
     if (send_medium === 'email') {
         response = await sendEmail(messageData);
@@ -33,13 +31,13 @@ const sendEmail = async (data) => {
         port: process.env.SMTP_PORT,
         secure: true,
         auth: {
-            user: process.env.EMAIL_ADDRESS,
-            pass: process.env.EMAIL_PASSWORD,
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
         },
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_ADDRESS,
+        from: process.env.SMTP_USER,
         to: data.receiving_medium,
         subject: data.subject,
         text: data.message,

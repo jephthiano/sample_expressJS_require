@@ -14,4 +14,15 @@ const connectDB = async () => {
         process.exit(1); // Exit process if DB connection fails
     }
 };
-module.exports = { connectDB, mongoose }; // Export both the connection function and mongoose
+
+const redis = new Redis({
+  host: process.env.REDIS_HOST,
+  port: parseInt(process.env.REDIS_PORT),
+  // password: process.env.REDIS_PASSWORD, // if needed
+});
+
+module.exports = { 
+    connectDB, 
+    mongoose,
+    redis,
+}; 
