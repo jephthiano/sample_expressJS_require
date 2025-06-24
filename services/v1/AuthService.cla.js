@@ -4,7 +4,6 @@ const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'sec
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
 const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
-const { queueMessaging } = require(QUEUES + 'messagingQueue');
 const { deleteToken } = require(MAIN_UTILS + 'token.util');
 
 const FetchController = require(CONTROLLERS + 'v1/FetchController.cla');

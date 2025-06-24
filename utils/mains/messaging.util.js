@@ -1,31 +1,49 @@
 const nodemailer = require('nodemailer');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { ucFirst }  = require(MAIN_UTILS + 'general.util');
-// const { sendMessageDTO } = require(DTOS + 'messaging.dto');
+const { queueMessaging } = require(QUEUES + 'messagingQueue');
 
 
 const logInfo = (type, data) => log(type, data, 'info');
 
 const logError = (type, data) => log(type, data, 'error');
 
-const sendMessage = async (data, send_medium) => {
-    let response = false;
+// const processMessage =  async (data, type) => {
+    
+//     if(type === 'queue'){
+//         queueMessaging(data);
+//         return ;
+//     }
+
+//     return await sendMessage(data);
+// }
+
+const sendMessage = async (data, type) => {
     const messageData = data;
 
-    return true;
-    
-    if (send_medium === 'email') {
-        response = await sendEmail(messageData);
-    } else if (send_medium === 'whatsapp') {
-        response = await sendWhatsappMessage(messageData);
-    } else if (send_medium === 'sms') {
-        response = await sendSmsMessage(messageData);
-    } else if (send_medium === 'push_notification') {
-        response = await sendPushNotification(messageData);
+    if(type === 'queue'){
+        queueMessaging(data);
+        return ;
     }
 
-    return response;
-}
+
+    switch (data.send_medium) {
+        case 'email':
+            return await sendEmail(messageData);
+
+        case 'whatsapp':
+            return await sendWhatsappMessage(messageData);peocess
+
+        case 'sms':
+            return await sendSmsMessage(messageData);
+
+        case 'push_notification':
+            return await sendPushNotification(messageData);
+
+        default:
+            throw new Error(`Unsupported send_medium: ${data.send_medium}`);
+    }
+};
 
 const sendEmail = async (data) => {
     const transporter = nodemailer.createTransport({
@@ -33,13 +51,13 @@ const sendEmail = async (data) => {
         port: process.env.SMTP_PORT,
         secure: true,
         auth: {
-            user: process.env.EMAIL_ADDRESS,
-            pass: process.env.EMAIL_PASSWORD,
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
         },
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_ADDRESS,
+        from: process.env.SMTP_USER,
         to: data.receiving_medium,
         subject: data.subject,
         text: data.message,
