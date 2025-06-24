@@ -21,5 +21,5 @@ const getModel = (modelName) => {
 };
 
 module.exports = { 
-    findSingleValue 
+    findSingleValue
 };

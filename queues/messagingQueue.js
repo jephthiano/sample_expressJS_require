@@ -1,16 +1,18 @@
-const { Queue, Worker } = require('bullmq');
-const { sendMessage }  = require(MAIN_UTILS + 'messaging.util');
+const { Queue } = require('bullmq');
+const { redis } = require(CONFIGS + 'database.js');
 require('dotenv').config();
 
-const connection = {
-host: process.env.REDIS_HOST,
-port: parseInt(process.env.REDIS_PORT)
-};
+const messagingQueue = new Queue('messagingQueue', {
+  connection: redis.duplicate(), // ensures a clean connection for the Queue
+});
 
-const emailQueue = new Queue('messagingQueue', { connection });
-
-async function queueEmail(data, send_medium) {
-    await emailQueue.add('sendMessage', { data, send_medium });
+/**
+ * Adds an email job to the messaging queue.
+ *
+ * @param {Object} data - The message payload.
+ */
+async function queueMessaging(data, send_medium) {
+  await messagingQueue.add('sendMessage', { data });
 }
 
-module.exports = { queueEmail };
+module.exports = { queueMessaging };

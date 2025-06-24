@@ -1,17 +1,34 @@
+require("../configs/global")(); // Initialize global variables
 const { Worker } = require('bullmq');
-const { sendMessage }  = require(MAIN_UTILS + 'messaging.util');
-require('dotenv').config();
+const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
+const { redis } = require(CONFIGS + 'database.js');
 
-const worker = new Worker('emailQueue', async job => {
-    await sendMessage(job.data);
-    console.log(`Email sent to ${job.data.receiving_medium}`);
-}, {
-    connection: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT)
+// Create the worker
+const worker = new Worker(
+  'messagingQueue',
+  async (job) => {
+    // const payload = sendMessageDTO(job.data);
+    console.log(job);
+    try {
+      await sendMessage(job.data.data);
+      console.log(job.data.data);
+    } catch (err) {
+      console.error(`Error sending message: ${err.message}`);
+      throw err; // ensure BullMQ registers it as a failure
     }
+  },
+  {
+    connection: redis.duplicate(), // ensure isolated connection
+    // concurrency: 5, // optional
+  }
+);
+
+
+// Error handler
+worker.on('failed', (job, err) => {
+  console.error(`❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
 });
 
-worker.on('failed', (job, err) => {
-    console.error(`Failed to send message to ${job.data.receiving_medium}: ${err.message}`);
+worker.on('completed', (job) => {
+  console.log(`🎉 Job completed: ${job.id}`);
 });
