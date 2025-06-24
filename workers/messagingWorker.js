@@ -8,9 +8,10 @@ const worker = new Worker(
   'messagingQueue',
   async (job) => {
     // const payload = sendMessageDTO(job.data);
+    console.log(job);
     try {
-      await sendMessage(job.data);
-      console.log(`Message sent to ${job.data.send_medium || job.data.receiving_medium}`);
+      await sendMessage(job.data.data);
+      console.log(job.data.data);
     } catch (err) {
       console.error(`Error sending message: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
@@ -25,7 +26,7 @@ const worker = new Worker(
 
 // Error handler
 worker.on('failed', (job, err) => {
-  console.error(`❌ Job failed for ${job?.data?.send_medium || 'unknown'}: ${err.message}`);
+  console.error(`❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
 });
 
 worker.on('completed', (job) => {

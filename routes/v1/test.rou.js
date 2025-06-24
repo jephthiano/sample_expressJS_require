@@ -1,6 +1,6 @@
 const express = require('express');
 const router = new express.Router();
-const { processMessage } = require(MAIN_UTILS + 'messaging.util');
+const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
 //LOGIN
@@ -11,7 +11,7 @@ router.get('/messaging', (req,res) => {
         type: 'welcome',
         send_medium: 'email',
     });
-    processMessage(messageData, 'queue');
+    sendMessage(messageData, 'queue');
     res.status(200).json({message:'working'});
 });
 

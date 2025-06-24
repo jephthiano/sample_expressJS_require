@@ -8,26 +8,31 @@ const logInfo = (type, data) => log(type, data, 'info');
 
 const logError = (type, data) => log(type, data, 'error');
 
-const processMessage =  async (data, type) => {
+// const processMessage =  async (data, type) => {
     
+//     if(type === 'queue'){
+//         queueMessaging(data);
+//         return ;
+//     }
+
+//     return await sendMessage(data);
+// }
+
+const sendMessage = async (data, type) => {
+    const messageData = data;
+
     if(type === 'queue'){
         queueMessaging(data);
         return ;
     }
 
-    return await sendMessage(data);
-}
-
-const sendMessage = async (data) => {
-    const messageData = data;
-    console.log(data.subject);
 
     switch (data.send_medium) {
         case 'email':
             return await sendEmail(messageData);
 
         case 'whatsapp':
-            return await sendWhatsappMessage(messageData);
+            return await sendWhatsappMessage(messageData);peocess
 
         case 'sms':
             return await sendSmsMessage(messageData);
@@ -179,5 +184,4 @@ module.exports = {
     sendPushNotification,
     subjectTemplate,
     messageTemplate,
-    processMessage,
 };
