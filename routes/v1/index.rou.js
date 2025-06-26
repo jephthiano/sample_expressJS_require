@@ -16,7 +16,7 @@ router.use("/fetch", tokenValidator, fetch);// fetch route
 
 
 // router.use("/profile", tokenValidator, profile);// profile 
-// router.use("/cronjob",cronJob);  // auth route [unauthenticated]
+// router.use("/cronjob",cronJob);  // cron job route
 
 router.use('*', (req, res) => {
     res.status(404).send('Invalid request');

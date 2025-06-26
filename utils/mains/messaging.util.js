@@ -2,21 +2,12 @@ const nodemailer = require('nodemailer');
 const { log } = require(MAIN_UTILS + 'logger.util');
 const { ucFirst }  = require(MAIN_UTILS + 'general.util');
 const { queueMessaging } = require(QUEUES + 'messagingQueue');
+const EmailService = require(SERVICE_UTILS + 'messaging/EmailService');
 
 
 const logInfo = (type, data) => log(type, data, 'info');
 
 const logError = (type, data) => log(type, data, 'error');
-
-// const processMessage =  async (data, type) => {
-    
-//     if(type === 'queue'){
-//         queueMessaging(data);
-//         return ;
-//     }
-
-//     return await sendMessage(data);
-// }
 
 const sendMessage = async (data, type) => {
     const messageData = data;
@@ -29,7 +20,7 @@ const sendMessage = async (data, type) => {
 
     switch (data.send_medium) {
         case 'email':
-            return await sendEmail(messageData);
+            return await EmailService.send(messageData);
 
         case 'whatsapp':
             return await sendWhatsappMessage(messageData);peocess
@@ -45,33 +36,33 @@ const sendMessage = async (data, type) => {
     }
 };
 
-const sendEmail = async (data) => {
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: true,
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    });
+// const sendEmail = async (data) => {
+//     const transporter = nodemailer.createTransport({
+//         host: process.env.SMTP_HOST,
+//         port: process.env.SMTP_PORT,
+//         secure: true,
+//         auth: {
+//             user: process.env.SMTP_USER,
+//             pass: process.env.SMTP_PASS,
+//         },
+//     });
 
-    const mailOptions = {
-        from: process.env.SMTP_USER,
-        to: data.receiving_medium,
-        subject: data.subject,
-        text: data.message,
-        html: htmlEmailTemplate(data),
-    };
+//     const mailOptions = {
+//         from: process.env.SMTP_USER,
+//         to: data.receiving_medium,
+//         subject: data.subject,
+//         text: data.message,
+//         html: htmlEmailTemplate(data),
+//     };
 
-    try {
-        await transporter.sendMail(mailOptions);
-        return true;
-    } catch (err) {
-        logError('Send Email Message [MESSAGING]', err);
-        return false;
-    }
-};
+//     try {
+//         await transporter.sendMail(mailOptions);
+//         return true;
+//     } catch (err) {
+//         logError('Send Email Message [MESSAGING]', err);
+//         return false;
+//     }
+// };
 
 const sendWhatsappMessage = async (data) => {
     console.log(data);
@@ -178,7 +169,7 @@ const htmlEmailTemplate = (data) => {
 
 module.exports = {
     sendMessage,
-    sendEmail,
+    // sendEmail,
     sendWhatsappMessage,
     sendSmsMessage,
     sendPushNotification,

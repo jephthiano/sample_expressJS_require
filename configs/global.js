@@ -22,4 +22,5 @@ module.exports = function () {
     global.CORES = path.join(UTILS, 'cores/');
     global.VALIDATORS = path.join(UTILS, 'validators/');
     global.MAIN_UTILS = path.join(UTILS, 'mains/');
+    global.SERVICE_UTILS = path.join(UTILS, 'services/');
 };
