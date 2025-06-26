@@ -1,4 +1,4 @@
-const { subjectTemplate, messageTemplate, } = require(MAIN_UTILS + 'messaging.util');
+const { subjectTemplate, messageTemplate, htmlEmailTemplate} = require(MAIN_UTILS + 'messaging.util');
 
 // pass [first_name, receiving_medium, send_medium, type and misc]
 function sendMessageDTO(data) {
@@ -19,9 +19,10 @@ const emailDTO = (data) => {
         first_name: data.first_name?.trim(),
         receiving_medium: data.receiving_medium?.trim(),
         subject: subjectTemplate(data.type),
-        message: messageTemplate(data.type, data.send_medium, {
+        text_content: messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
         }),
+        html_content:htmlEmailTemplate({fist_name, subject, text_content}),
     };
 };
 

@@ -23,7 +23,7 @@ const sendMessage = async (data, type) => {
             return await EmailService.send(messageData);
 
         case 'whatsapp':
-            return await sendWhatsappMessage(messageData);peocess
+            return await sendWhatsappMessage(messageData);
 
         case 'sms':
             return await sendSmsMessage(messageData);
@@ -35,34 +35,6 @@ const sendMessage = async (data, type) => {
             throw new Error(`Unsupported send_medium: ${data.send_medium}`);
     }
 };
-
-// const sendEmail = async (data) => {
-//     const transporter = nodemailer.createTransport({
-//         host: process.env.SMTP_HOST,
-//         port: process.env.SMTP_PORT,
-//         secure: true,
-//         auth: {
-//             user: process.env.SMTP_USER,
-//             pass: process.env.SMTP_PASS,
-//         },
-//     });
-
-//     const mailOptions = {
-//         from: process.env.SMTP_USER,
-//         to: data.receiving_medium,
-//         subject: data.subject,
-//         text: data.message,
-//         html: htmlEmailTemplate(data),
-//     };
-
-//     try {
-//         await transporter.sendMail(mailOptions);
-//         return true;
-//     } catch (err) {
-//         logError('Send Email Message [MESSAGING]', err);
-//         return false;
-//     }
-// };
 
 const sendWhatsappMessage = async (data) => {
     console.log(data);
@@ -169,10 +141,10 @@ const htmlEmailTemplate = (data) => {
 
 module.exports = {
     sendMessage,
-    // sendEmail,
     sendWhatsappMessage,
     sendSmsMessage,
     sendPushNotification,
     subjectTemplate,
     messageTemplate,
+    htmlEmailTemplate,
 };
