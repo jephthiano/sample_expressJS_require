@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-// const { htmlEmailTemplate } = require(MAIN_UTILS + 'messaging.util');
 const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
 class EmailService {
@@ -21,7 +20,7 @@ class EmailService {
             to: data.receiving_medium,
             subject: data.subject,
             text: data.text_content,
-            html: html_content,
+            html: data.html_content,
         };
 
         try {

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = new express.Router();
 const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
-// const { sendMessageDTO } = require(DTOS + 'messaging.dto');
 
 
 router.get('/messaging', (req,res) => {

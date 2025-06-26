@@ -1,7 +1,6 @@
 require("../configs/global")(); // Initialize global variables
 const { redis } = require(CONFIGS + 'database.js');
 const { Worker } = require('bullmq');
-// const EmailService = require(SERVICE_UTILS + 'messaging/EmailService');
 const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
 
 // Create the worker

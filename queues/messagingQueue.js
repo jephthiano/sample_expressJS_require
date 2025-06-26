@@ -11,7 +11,7 @@ const messagingQueue = new Queue('messagingQueue', {
  *
  * @param {Object} data - The message payload.
  */
-async function queueMessaging(data, send_medium) {
+async function queueMessaging(data) {
   await messagingQueue.add('sendMessage', { data });
 }
 
