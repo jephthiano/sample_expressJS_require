@@ -1,16 +1,41 @@
 const express = require('express');
 const router = new express.Router();
-const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
-const { sendMessageDTO } = require(DTOS + 'messaging.dto');
+const { sendMessage } = require('@main_util/messaging.util');
 
-//LOGIN
+
 router.get('/messaging', (req,res) => {
-    const messageData = sendMessageDTO({
+    // for email
+    // const messageData = {
+    //     first_name: 'Jephthaooh',
+    //     receiving_medium: 'jephthahooh@gmail.com',
+    //     type: 'welcome',
+    //     send_medium: 'email',
+    // };
+
+    // for whatsapp
+    // const messageData = {
+    //     first_name: 'Jephthaooh',
+    //     receiving_medium: '07047474438',
+    //     type: 'welcome',
+    //     send_medium: 'whatsapp',
+    // };
+
+    // for sms notification
+    // const messageData = {
+    //     first_name: 'Jephthaooh',
+    //     receiving_medium: '07047474438',
+    //     type: 'welcome',
+    //     send_medium: 'sms',
+    // };
+
+    // for push notification
+    const messageData = {
         first_name: 'Jephthaooh',
-        receiving_medium: 'jephthahooh@gmail.com',
+        receiving_medium: 'dfgvghvgvgdv',
         type: 'welcome',
-        send_medium: 'email',
-    });
+        send_medium: 'push_notification',
+    };
+
     sendMessage(messageData, 'queue');
     res.status(200).json({message:'working'});
 });

@@ -1,6 +1,6 @@
-const { findSingleValue } = require(MAIN_UTILS + "database.util");
-const { isEmptyObject, isEmptyString }  = require(MAIN_UTILS + 'general.util');
-const { validateInput, selEncrypt, validatePassword }  = require(MAIN_UTILS + 'security.util');
+const { findSingleValue } = require('@main_util/database.util');
+const { isEmptyObject, isEmptyString }  = require('@main_util/general.util');
+const { validateInput, selEncrypt, validatePassword }  = require('@main_util/security.util');
 
 // Utility function for response formatting
 const formatResponse = (errors) => ({

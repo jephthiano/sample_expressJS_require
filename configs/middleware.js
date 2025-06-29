@@ -15,7 +15,7 @@ module.exports = function (app) {
         methods: ['GET', 'POST', 'DELETE', 'PUT']
     };
     
-    const Request = require(MAIN_UTILS + 'request.util');
+    const Request = require('@main_util/request.util');
     
     // Set rate limit message
     const message = JSON.stringify({ status: false, "message": "Too many requests from this IP, please try again later." });

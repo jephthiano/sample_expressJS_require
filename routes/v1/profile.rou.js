@@ -1,12 +1,12 @@
 const express = require('express');
 const router = new express.Router();
 
-const General = require(MAIN_UTILS + 'general.cla');
-const Security = require(MAIN_UTILS + 'Security.cla');
+const General = require('@main_util/general.cla');
+const Security = require('@main_util/Security.cla');
 
-const Profile = require(CONTROLLERS + 'Profile.cla');
-const Validator = require(VALIDATORS + 'profile.val');
-const AuthValidator = require(VALIDATORS + 'auth.val');
+const Profile = require('@controller/Profile.cla');
+const Validator = require('@validator_util/profile.val');
+const AuthValidator = require('@validator_util/auth.val');
 
 
 //change username

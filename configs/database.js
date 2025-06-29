@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Redis = require('ioredis');
-const User = require(MODELS + 'User.schema');
-const { log } = require(MAIN_UTILS + 'logger.util');
+const User = require('@model/User.schema');
+const { log } = require('@main_util/logger.util');
 
 const connectDB = async () => {
     try {

@@ -1,10 +1,10 @@
-const UserSch = require(MODELS + 'User.schema');
-const OtpSch = require(MODELS + 'OtpToken.schema');
+const UserSch = require('@model/User.schema');
+const OtpSch = require('@model/OtpToken.schema');
 
-const Security = require(MAIN_UTILS + 'Security.cla');
-const General = require(MAIN_UTILS + 'general.cla');
-const Otp = require(MAIN_UTILS + 'otp.cla');
-// const Messaging = require(MAIN_UTILS + 'messaging.cla');
+const Security = require('@main_util/Security.cla');
+const General = require('@main_util/general.cla');
+const Otp = require('@main_util/otp.cla');
+// const Messaging = require('@main_util/messaging.cla');
 
 class Profile {
     constructor(req, res) {

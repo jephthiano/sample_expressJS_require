@@ -1,17 +1,14 @@
-require("../configs/global")(); // Initialize global variables
+require('module-alias/register');
+const { redis } = require('@config/database');
 const { Worker } = require('bullmq');
-const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
-const { redis } = require(CONFIGS + 'database.js');
+const { sendMessage } = require('@main_util/messaging.util');
 
 // Create the worker
 const worker = new Worker(
   'messagingQueue',
   async (job) => {
-    // const payload = sendMessageDTO(job.data);
-    console.log(job);
     try {
       await sendMessage(job.data.data);
-      console.log(job.data.data);
     } catch (err) {
       console.error(`Error sending message: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure

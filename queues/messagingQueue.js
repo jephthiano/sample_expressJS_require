@@ -1,5 +1,5 @@
 const { Queue } = require('bullmq');
-const { redis } = require(CONFIGS + 'database.js');
+const { redis } = require('@config/database');
 require('dotenv').config();
 
 const messagingQueue = new Queue('messagingQueue', {
@@ -11,7 +11,7 @@ const messagingQueue = new Queue('messagingQueue', {
  *
  * @param {Object} data - The message payload.
  */
-async function queueMessaging(data, send_medium) {
+async function queueMessaging(data) {
   await messagingQueue.add('sendMessage', { data });
 }
 
