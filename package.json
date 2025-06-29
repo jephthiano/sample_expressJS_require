@@ -26,6 +26,7 @@
     "ioredis": "^5.6.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.2",
     "node-cron": "^3.0.3",
@@ -38,5 +39,23 @@
   },
   "devDependencies": {
     "nodeman": "^1.1.2"
+  },
+  "_moduleAliases": {
+    "@config": "configs",
+    "@dto": "dtos",
+    "@controller": "controllers",
+    "@route": "routes",
+    "@model": "models",
+    "@service": "services",
+    "@repository": "repositories",
+    "@middleware": "middleware",
+    "@resource": "resources",
+    "@queue": "queues",
+
+    "@core_util": "utils/cores",
+    "@validator_util": "utils/validators",
+    "@main_util": "utils/mains",
+    "@service_util": "utils/services"
   }
+
 }

@@ -1,4 +1,4 @@
-const { sendResponse, handleException, triggerError, triggerValidationError, } = require(CORES + "handler.util");
+const { sendResponse, handleException, triggerError, triggerValidationError, } = require('@core_util/handler.util');
 
 class BaseRepository {
   static sendResponse           = sendResponse;

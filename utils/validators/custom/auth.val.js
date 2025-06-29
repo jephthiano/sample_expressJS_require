@@ -1,7 +1,7 @@
-const { findSingleValue } = require(MAIN_UTILS + "database.util");
-const User = require(MODELS + 'User.schema');
-const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require(MAIN_UTILS + 'general.util');
-const { validateInput, selEncrypt, validatePassword }  = require(MAIN_UTILS + 'security.util');
+const { findSingleValue } = require('@main_util/database.util');
+const User = require('@model/User.schema');
+const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require('@main_util/general.util');
+const { validateInput, selEncrypt, validatePassword }  = require('@main_util/security.util');
 
 // Utility function for response formatting
 const formatResponse = (errors) => ({

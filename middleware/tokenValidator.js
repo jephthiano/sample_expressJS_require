@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const Token = require(MODELS + 'Token.schema');
-const User = require(MODELS + 'User.schema');
-const { log } = require(MAIN_UTILS + 'logger.util');
-const { selDecrypt, returnResponse, verifyPassword }  = require(MAIN_UTILS + 'security.util');
-const { extractToken } = require(MAIN_UTILS + 'token.util');
+const Token = require('@model/Token.schema');
+const User = require('@model/User.schema');
+const { log } = require('@main_util/logger.util');
+const { selDecrypt, returnResponse, verifyPassword }  = require('@main_util/security.util');
+const { extractToken } = require('@main_util/token.util');
 
 // Utility function to log info
 const logInfo = (type, data) => {

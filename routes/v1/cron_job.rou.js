@@ -1,8 +1,8 @@
 const express = require('express');
 const router = new express.Router();
 
-const General = require(MAIN_UTILS + 'general.cla');
-const Security = require(MAIN_UTILS + 'Security.cla');
+const General = require('@main_util/general.cla');
+const Security = require('@main_util/Security.cla');
 
 
 //WAKE UP

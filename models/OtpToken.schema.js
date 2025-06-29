@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const { selEncrypt, hashPassword } = require(MAIN_UTILS + 'security.util');
+const { selEncrypt, hashPassword } = require('@main_util/security.util');
 
 // Define Schema
 const OtpTokenSchema = new Schema({

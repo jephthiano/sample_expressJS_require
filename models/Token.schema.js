@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { hashPassword } = require(MAIN_UTILS + 'security.util');
+const { hashPassword } = require('@main_util/security.util');
 
 const TokenSchema = new Schema({
     user_id: {

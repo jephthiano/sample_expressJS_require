@@ -1,7 +1,7 @@
-const BaseRepository = require(REPOSITORIES + 'BaseRepository.cla');
-const User = require(MODELS + 'User.schema');
-const { createUserDTO, updatePasswordDTO } = require(DTOS + 'user.dto');
-const { selEncrypt, }  = require(MAIN_UTILS + 'security.util');
+const BaseRepository = require('@repository/BaseRepository.cla');
+const User = require('@model/User.schema');
+const { createUserDTO, updatePasswordDTO } = require('@dto/user.dto');
+const { selEncrypt, }  = require('@main_util/security.util');
 
 class AuthRepository extends BaseRepository{
 
