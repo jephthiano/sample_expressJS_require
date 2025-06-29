@@ -1,10 +1,10 @@
 const Otp = require(MODELS + 'OtpToken.schema');
-const { log } = require(MAIN_UTILS + 'logger.util');
-const { isDateLapsed }  = require(MAIN_UTILS + 'general.util');
-const { generateUniqueId, selEncrypt, verifyPassword }  = require(MAIN_UTILS + 'security.util');
-const { sendMessage }  = require(MAIN_UTILS + 'messaging.util');
-const { createOtpDTO } = require(DTOS + 'otp.dto');
-const { sendMessageDTO } = require(DTOS + 'messaging.dto');
+const { log } = require('@main_util/logger.util');
+const { isDateLapsed }  = require('@main_util/general.util');
+const { generateUniqueId, selEncrypt, verifyPassword }  = require('@main_util/security.util');
+const { sendMessage }  = require('@main_util/messaging.util');
+const { createOtpDTO } = require('@dto/otp.dto');
+const { sendMessageDTO } = require('@dto/messaging.dto');
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');

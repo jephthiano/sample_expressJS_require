@@ -1,11 +1,11 @@
 const nodemailer = require('nodemailer');
-const { log } = require(MAIN_UTILS + 'logger.util');
-const { ucFirst }  = require(MAIN_UTILS + 'general.util');
+const { log } = require('@main_util/logger.util');
+const { ucFirst }  = require('@main_util/general.util');
 const { queueMessaging } = require(QUEUES + 'messagingQueue');
-const EmailService = require(SERVICE_UTILS + 'messaging/EmailService');
-const SmsService = require(SERVICE_UTILS + 'messaging/SmsService');
-const WhatsAppService = require(SERVICE_UTILS + 'messaging/WhatsAppService');
-const PushNotificationService = require(SERVICE_UTILS + 'messaging/PushNotificationService');
+const EmailService = require('@service_util/messaging/EmailService');
+const SmsService = require('@service_util/messaging/SmsService');
+const WhatsAppService = require('@service_util/messaging/WhatsAppService');
+const PushNotificationService = require('@service_util/messaging/PushNotificationService');
 
 
 const logInfo = (type, data) => log(type, data, 'info');

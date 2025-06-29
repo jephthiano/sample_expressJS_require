@@ -1,5 +1,5 @@
 const { Queue } = require('bullmq');
-const { redis } = require(CONFIGS + 'database.js');
+const { redis } = require('@config/database');
 require('dotenv').config();
 
 const messagingQueue = new Queue('messagingQueue', {

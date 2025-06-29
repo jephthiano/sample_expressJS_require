@@ -1,6 +1,6 @@
 const express = require('express');
 const router = new express.Router();
-const { sendMessage } = require(MAIN_UTILS + 'messaging.util');
+const { sendMessage } = require('@main_util/messaging.util');
 
 
 router.get('/messaging', (req,res) => {

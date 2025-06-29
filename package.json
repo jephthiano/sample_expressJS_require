@@ -42,7 +42,7 @@
   },
   "_moduleAliases": {
     "@config": "configs",
-    "@dto": "dto",
+    "@dto": "dtos",
     "@utils": "utils",
     "@controllers": "controllers",
     "@route": "routes",
@@ -55,9 +55,9 @@
     "@worker": "workers",
 
     "@core_util": "utils/cores",
-    "@validator": "utils/validators",
+    "@validator_util": "utils/validators",
     "@main_util": "utils/mains",
-    "@main_service": "utils/services"
-}
+    "@service_util": "utils/services"
+  }
 
 }

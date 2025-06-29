@@ -1,5 +1,5 @@
 const User = require(MODELS + 'User.schema');
-const { log } = require(MAIN_UTILS + 'logger.util');
+const { log } = require('@main_util/logger.util');
 
 const findSingleValue = async (coll, field, param, select) => {
     let response = false;

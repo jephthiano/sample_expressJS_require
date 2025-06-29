@@ -1,10 +1,10 @@
 const BaseService = require(SERVICES + 'BaseService.cla');
 const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
-const { verifyPassword, selEncrypt, validateInput }  = require(MAIN_UTILS + 'security.util');
-const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require(MAIN_UTILS + 'otp.util');
-const { sendEmail }  = require(MAIN_UTILS + 'messaging.util');
-const { sendMessageDTO } = require(DTOS + 'messaging.dto');
-const { deleteToken } = require(MAIN_UTILS + 'token.util');
+const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
+const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
+const { sendEmail }  = require('@main_util/messaging.util');
+const { sendMessageDTO } = require('@dto/messaging.dto');
+const { deleteToken } = require('@main_util/token.util');
 
 const FetchController = require(CONTROLLERS + 'v1/FetchController.cla');
 

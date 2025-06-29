@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const { sendMessageDTO } = require(DTOS + 'messaging.dto');
+const { sendMessageDTO } = require('@dto/messaging.dto');
 
 class PushNotificationService {
     
