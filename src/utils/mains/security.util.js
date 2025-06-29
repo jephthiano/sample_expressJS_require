@@ -2,13 +2,14 @@ const crypto = require("crypto");
 const cryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
 const validator = require('validator');
+const { queueRehash } = require('@queue/rehashQueue');
 require('dotenv').config();
 
 
 const key = process.env.ENC_KEY;
 const iv = process.env.ENC_IV;
 // const method = process.env.ENC_METHOD; // Encryption method
-const cost = 10;
+const cost = process.env.HASH_COST;
 const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'mobile_number', 'token', 'email_phone'];
 
 const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).json({ data });
@@ -16,8 +17,27 @@ const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).j
 // Hash password asynchronously
 const hashPassword = async (password) => await bcrypt.hash(password, cost);
 
+const rehashUserPassword = async (data) => {
+    //pass to database function
+    await updateSingleField('user', 'id', data.userId, 'password', data.plainPassword);
+
+};
+
 // Verify password asynchronously
-const verifyPassword = async (plainPassword, hashedPassword) => await bcrypt.compare(plainPassword, hashedPassword);
+const verifyPassword = async (plainPassword, hashedPassword, userId = null) => {
+    const match = await bcrypt.compare(plainPassword, hashedPassword);
+    if (!match) return false;
+
+    const currentRounds = parseInt(hashedPassword.split('$')[2], 10);
+    const needsRehash = currentRounds !== cost;
+
+    if (needsRehash && userId) {
+            // pass to queue job
+            queueRehash({userId, plainPassword });
+    }
+
+    return true;
+};
 
 // Encrypt only if type exists in enc_array
 const selEncrypt = (data, type = 'general') => enc_array.includes(type) ? encrypt(data) : data;
@@ -58,6 +78,7 @@ const generateUniqueId = (max) => crypto.randomInt(2, Number(`1${'0'.repeat(max)
 
 module.exports = {
     returnResponse,
+    rehashUserPassword,
     hashPassword,
     verifyPassword,
     selEncrypt,

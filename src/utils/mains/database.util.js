@@ -15,11 +15,29 @@ const findSingleValue = async (coll, field, param, select) => {
     return response;
 };
 
+const updateSingleField = async (collectionName, whereField, whereValue, updateField, newValue) => {
+  try {
+        const model = getModel(collectionName); // dynamically resolve the Mongoose model
+        if (!model) throw new Error(`Model '${collectionName}' not found`);
+
+        const result = await model.updateOne(
+        { [whereField]: whereValue },
+        { $set: { [updateField]: newValue } }
+        );
+
+        return result.modifiedCount > 0;
+  } catch (err) {
+        log(`updateSingleField [DATABASE FUNCTION]`, err, 'error');
+        return false;
+  }
+};
+
 const getModel = (modelName) => {
     const models = { User }; // Add other models here
     return models[modelName] || null;
 };
 
 module.exports = { 
-    findSingleValue
+    findSingleValue,
+    updateSingleField
 };

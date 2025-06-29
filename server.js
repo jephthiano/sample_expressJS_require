@@ -1,5 +1,5 @@
-require("dotenv").config(); // Load environment variables
 require('module-alias/register');
+require("dotenv").config(); // Load environment variables
 const express = require("express");
 const app = express();
 
