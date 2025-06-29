@@ -51,7 +51,6 @@
     "@middleware": "middleware",
     "@resource": "resources",
     "@queue": "queues",
-    "@worker": "workers",
 
     "@core_util": "utils/cores",
     "@validator_util": "utils/validators",

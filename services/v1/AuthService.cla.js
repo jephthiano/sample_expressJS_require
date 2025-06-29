@@ -2,8 +2,7 @@ const BaseService = require('@service/BaseService.cla');
 const AuthRepository = require('@repository/AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
-const { sendEmail }  = require('@main_util/messaging.util');
-const { sendMessageDTO } = require('@dto/messaging.dto');
+const { sendMessage } = require('@main_util/messaging.util');
 const { deleteToken } = require('@main_util/token.util');
 
 const FetchController = require('@controller/v1/FetchController.cla');
@@ -61,10 +60,7 @@ class AuthService extends BaseService{
             this.sendResponse(res, data, "Account successfully created");
 
             // Send welcome email [PASS TO QUEUE JOB]
-            // Queue welcome email
-            // await queueMessaging(email, 'Welcome to My App!', `Hi ${name}, thanks for registering!`);
-            const messageData = sendMessageDTO({ first_name, receiving_medium: email, type: 'welcome' });
-            sendEmail(messageData);
+            sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
             
             return;
         } catch (error) {
@@ -167,8 +163,7 @@ class AuthService extends BaseService{
             deleteOtp(selEncrypt(receiving_medium, 'general'));
     
             // Send welcome email [PASS TO QUEUE JOB]
-            const messageData = sendMessageDTO({ first_name, receiving_medium: email }, 'welcome');
-            sendEmail(messageData);
+            sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
     
             return;
         } catch (error) {
@@ -205,10 +200,16 @@ class AuthService extends BaseService{
             
             // Send password reset notification email
             const { first_name, email } = updateUserData;
-            receiving_medium = selEncrypt(first_name, 'first_name');
-            receiving_medium = selEncrypt(email, 'email');
-            const messageData = sendMessageDTO({ first_name, receiving_medium, type: 'reset_password' });
-            sendEmail(messageData);
+            
+            sendMessage(
+                    { 
+                    first_name: selEncrypt(first_name, 'first_name'),
+                    receiving_medium: selEncrypt(email, 'email'),
+                    send_medium: 'email', 
+                    type: 'reset_password' 
+                }
+            , 'queue'
+            );
             
             return;
         } catch (error) {

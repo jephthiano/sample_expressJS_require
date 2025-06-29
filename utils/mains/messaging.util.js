@@ -45,7 +45,4 @@ const sendMessage = async (data, type) => {
 
 module.exports = {
     sendMessage,
-    // subjectTemplate,
-    // messageTemplate,
-    // htmlEmailTemplate,
 };
