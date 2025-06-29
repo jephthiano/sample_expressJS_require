@@ -158,7 +158,6 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            //[PASS BELOW TO QUEUE JOB]
             // Clean up OTP
             deleteOtp(selEncrypt(receiving_medium, 'general'));
     
