@@ -12,7 +12,6 @@ module.exports = function () {
     global.MODELS = path.join(__basedir, 'models/');
     global.SERVICES = path.join(__basedir, 'services/');
     global.REPOSITORIES = path.join(__basedir, 'repositories/');
-    global.VENDORS = path.join(__basedir, 'vendor/');
     global.MIDDLEWARE = path.join(__basedir, 'middleware/');
     global.RESOURCES = path.join(__basedir, 'resources/');
     global.QUEUES = path.join(__basedir, 'queues/');

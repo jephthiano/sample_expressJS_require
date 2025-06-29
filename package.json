@@ -42,9 +42,22 @@
   },
   "_moduleAliases": {
     "@config": "configs",
+    "@dto": "dto",
     "@utils": "utils",
     "@controllers": "controllers",
-    "@middleware": "middleware"
+    "@route": "routes",
+    "@model": "models",
+    "@service": "services",
+    "@repository": "repositories",
+    "@middleware": "middleware",
+    "@resource": "resources",
+    "@queue": "queues",
+    "@worker": "workers",
+
+    "@core_util": "utils/cores",
+    "@validator": "utils/validators",
+    "@main_util": "utils/mains",
+    "@main_service": "utils/services"
 }
 
 }
