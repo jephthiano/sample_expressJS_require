@@ -1,5 +1,5 @@
-const UserSch = require(MODELS + 'User.schema');
-const OtpSch = require(MODELS + 'OtpToken.schema');
+const UserSch = require('@model/User.schema');
+const OtpSch = require('@model/OtpToken.schema');
 
 const Security = require('@main_util/Security.cla');
 const General = require('@main_util/general.cla');

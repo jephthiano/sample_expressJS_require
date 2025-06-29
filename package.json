@@ -43,8 +43,7 @@
   "_moduleAliases": {
     "@config": "configs",
     "@dto": "dtos",
-    "@utils": "utils",
-    "@controllers": "controllers",
+    "@controller": "controllers",
     "@route": "routes",
     "@model": "models",
     "@service": "services",

@@ -1,5 +1,5 @@
-const BaseRepository = require(REPOSITORIES + 'BaseRepository.cla');
-const User = require(MODELS + 'User.schema');
+const BaseRepository = require('@repository/BaseRepository.cla');
+const User = require('@model/User.schema');
 const { selEncrypt, }  = require('@main_util/security.util');
 
 class FetchRepository extends BaseRepository{

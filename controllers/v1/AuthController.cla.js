@@ -1,5 +1,5 @@
-const BaseController = require(CONTROLLERS + 'BaseController.cla');
-const AuthService = require(SERVICES + 'v1/AuthService.cla');
+const BaseController = require('@controller/BaseController.cla');
+const AuthService = require('@service/v1/AuthService.cla');
 const { register, sendOtp, verifyOtp, signup, resetPassword} = require('@validator_util/custom/auth.val');
 const { loginJoi } = require('@validator_util/joi/auth.joi');
 const { parseMessageToObject } = require('@main_util/general.util');

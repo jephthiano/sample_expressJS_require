@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { log } = require('@main_util/logger.util');
 const { selEncrypt, selDecrypt, generateUniqueToken }  = require('@main_util/security.util');
-const Token = require(MODELS + 'Token.schema');
+const Token = require('@model/Token.schema');
 
 
 const logInfo = (type, data) => log(type, data, 'info');

@@ -4,6 +4,7 @@ const { sendMessage } = require('@main_util/messaging.util');
 
 
 router.get('/messaging', (req,res) => {
+    console.info('working')
     const messageData = {
         first_name: 'Jephthaooh',
         receiving_medium: 'jephthahooh@gmail.com',

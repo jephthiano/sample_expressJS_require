@@ -1,8 +1,8 @@
-const BaseService = require(SERVICES + 'BaseService.cla');
-const FetchRepository = require(REPOSITORIES + 'FetchRepository.cla');
+const BaseService = require('@service/BaseService.cla');
+const FetchRepository = require('@repository/FetchRepository.cla');
 const { setToken } = require('@main_util/token.util');
 const { selEncrypt }  = require('@main_util/security.util');
-const UserResource = require(RESOURCES + 'UserResource');
+const UserResource = require('@resource/UserResource');
 
 
 class FetchService extends BaseService{

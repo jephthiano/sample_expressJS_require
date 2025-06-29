@@ -1,5 +1,5 @@
 const { findSingleValue } = require('@main_util/database.util');
-const User = require(MODELS + 'User.schema');
+const User = require('@model/User.schema');
 const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require('@main_util/general.util');
 const { validateInput, selEncrypt, validatePassword }  = require('@main_util/security.util');
 

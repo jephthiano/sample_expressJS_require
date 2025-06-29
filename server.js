@@ -3,12 +3,10 @@ require('module-alias/register');
 const express = require("express");
 const app = express();
 
-require('@config/global')(); // Initialize global variables
 require('@config/middleware')(app); // Apply middlewares
 
 const { connectDB, mongoose } = require("./configs/database"); // Import both
-const v1RouteEntry = require(ROUTES + "v1/index.rou"); // Route entry point
-
+const v1RouteEntry = require('@route/v1/index.rou'); // Route entry point
 
 connectDB().then(() => {
     app.use("/api/v1", v1RouteEntry);

@@ -1,4 +1,4 @@
-const Otp = require(MODELS + 'OtpToken.schema');
+const Otp = require('@model/OtpToken.schema');
 const { log } = require('@main_util/logger.util');
 const { isDateLapsed }  = require('@main_util/general.util');
 const { generateUniqueId, selEncrypt, verifyPassword }  = require('@main_util/security.util');

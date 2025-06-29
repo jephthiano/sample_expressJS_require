@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const { log } = require('@main_util/logger.util');
 const { ucFirst }  = require('@main_util/general.util');
-const { queueMessaging } = require(QUEUES + 'messagingQueue');
+const { queueMessaging } = require('@queue/messagingQueue');
 const EmailService = require('@service_util/messaging/EmailService');
 const SmsService = require('@service_util/messaging/SmsService');
 const WhatsAppService = require('@service_util/messaging/WhatsAppService');

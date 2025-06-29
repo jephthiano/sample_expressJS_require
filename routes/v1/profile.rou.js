@@ -4,7 +4,7 @@ const router = new express.Router();
 const General = require('@main_util/general.cla');
 const Security = require('@main_util/Security.cla');
 
-const Profile = require(CONTROLLERS + 'Profile.cla');
+const Profile = require('@controller/Profile.cla');
 const Validator = require('@validator_util/profile.val');
 const AuthValidator = require('@validator_util/auth.val');
 

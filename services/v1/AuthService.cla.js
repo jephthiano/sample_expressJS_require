@@ -1,12 +1,12 @@
-const BaseService = require(SERVICES + 'BaseService.cla');
-const AuthRepository = require(REPOSITORIES + 'AuthRepository.cla');
+const BaseService = require('@service/BaseService.cla');
+const AuthRepository = require('@repository/AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
 const { sendEmail }  = require('@main_util/messaging.util');
 const { sendMessageDTO } = require('@dto/messaging.dto');
 const { deleteToken } = require('@main_util/token.util');
 
-const FetchController = require(CONTROLLERS + 'v1/FetchController.cla');
+const FetchController = require('@controller/v1/FetchController.cla');
 
 class AuthService extends BaseService{
 
