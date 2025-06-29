@@ -3,9 +3,9 @@ const { log } = require(MAIN_UTILS + 'logger.util');
 const { ucFirst }  = require(MAIN_UTILS + 'general.util');
 const { queueMessaging } = require(QUEUES + 'messagingQueue');
 const EmailService = require(SERVICE_UTILS + 'messaging/EmailService');
-// const SmsService = require(SERVICE_UTILS + 'messaging/SmsService');
-// const WhatsAppService = require(SERVICE_UTILS + 'messaging/WhatsAppService');
-// const PushNotificationService = require(SERVICE_UTILS + 'messaging/PushNotificationService');
+const SmsService = require(SERVICE_UTILS + 'messaging/SmsService');
+const WhatsAppService = require(SERVICE_UTILS + 'messaging/WhatsAppService');
+const PushNotificationService = require(SERVICE_UTILS + 'messaging/PushNotificationService');
 
 
 const logInfo = (type, data) => log(type, data, 'info');
@@ -26,33 +26,18 @@ const sendMessage = async (data, type) => {
             return await EmailService.send(messageData);
 
         case 'whatsapp':
-            // return await WhatsAppService.send(messageData);
+            return await WhatsAppService.send(messageData);
 
         case 'sms':
-            // return await SmsService.send(messageData);
+            return await SmsService.send(messageData);
 
         case 'push_notification':
-            // return await PushNotificationService.send(messageData);
+            return await PushNotificationService.send(messageData);
 
         default:
             throw new Error(`Unsupported send_medium: ${data.send_medium}`);
     }
 };
-
-// const sendWhatsappMessage = async (data) => {
-//     console.log(data);
-//     return false;
-// };
-
-// const sendSmsMessage = async (data) => {
-//     console.log(data);
-//     return false;
-// };
-
-// const sendPushNotification = async (data) => {
-//     console.log(data);
-//     return false;
-// };
 
 
 
