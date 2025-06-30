@@ -20,10 +20,10 @@ class AuthService extends BaseService{
                 return this.triggerError("Incorrect login details", []);
             }
     
-            const { password: dbPassword, status: userStatus } = user;
+            const { password: dbPassword, status: userStatus, id: userId } = user;
     
             // Verify password (async if using bcrypt.compare)
-            const  isPasswordValid = await verifyPassword(password, dbPassword);
+            const  isPasswordValid = await verifyPassword(password, dbPassword, userId);
             if (!isPasswordValid) {
                 return this.triggerError("Incorrect login details", []);
             }
@@ -158,7 +158,6 @@ class AuthService extends BaseService{
             // Send success response
             this.sendResponse(res, data, "Account successfully created");
     
-            //[PASS BELOW TO QUEUE JOB]
             // Clean up OTP
             deleteOtp(selEncrypt(receiving_medium, 'general'));
     

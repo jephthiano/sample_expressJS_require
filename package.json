@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "start:worker": "node ./workers/messagingWorker.js",
-    "dev:worker": "nodemon ./workers/messagingWorker.js"
+    "start:worker": "node ./src/workers/index.js",
+    "dev:worker": "nodemon ./src/workers/index.js"
   },
   "author": "jephthah oladejo",
   "license": "ISC",
@@ -41,21 +41,22 @@
     "nodeman": "^1.1.2"
   },
   "_moduleAliases": {
-    "@config": "configs",
-    "@dto": "dtos",
-    "@controller": "controllers",
-    "@route": "routes",
-    "@model": "models",
-    "@service": "services",
-    "@repository": "repositories",
-    "@middleware": "middleware",
-    "@resource": "resources",
-    "@queue": "queues",
+    "@config": "src/configs",
+    "@dto": "src/dtos",
+    "@controller": "src/controllers",
+    "@route": "src/routes",
+    "@model": "src/models",
+    "@service": "src/services",
+    "@repository": "src/repositories",
+    "@middleware": "src/middleware",
+    "@resource": "src/resources",
+    "@queue": "src/queues",
+    "@worker": "src/workers",
 
-    "@core_util": "utils/cores",
-    "@validator_util": "utils/validators",
-    "@main_util": "utils/mains",
-    "@service_util": "utils/services"
+    "@core_util": "src/utils/cores",
+    "@validator_util": "src/utils/validators",
+    "@main_util": "src/utils/mains",
+    "@service_util": "src/utils/services"
   }
 
 }
