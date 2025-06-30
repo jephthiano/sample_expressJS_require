@@ -20,10 +20,10 @@ class AuthService extends BaseService{
                 return this.triggerError("Incorrect login details", []);
             }
     
-            const { password: dbPassword, status: userStatus } = user;
+            const { password: dbPassword, status: userStatus, id: userId } = user;
     
             // Verify password (async if using bcrypt.compare)
-            const  isPasswordValid = await verifyPassword(password, dbPassword);
+            const  isPasswordValid = await verifyPassword(password, dbPassword, userId);
             if (!isPasswordValid) {
                 return this.triggerError("Incorrect login details", []);
             }

@@ -3,6 +3,7 @@ const cryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const { queueRehash } = require('@queue/rehashQueue');
+// const { updateSingleField } = require('@main_util/database.util');
 require('dotenv').config();
 
 
@@ -19,7 +20,7 @@ const hashPassword = async (password) => await bcrypt.hash(password, cost);
 
 const rehashUserPassword = async (data) => {
     //pass to database function
-    await updateSingleField('user', 'id', data.userId, 'password', data.plainPassword);
+    // await updateSingleField('user', 'id', data.userId, 'password', data.plainPassword);
 
 };
 
