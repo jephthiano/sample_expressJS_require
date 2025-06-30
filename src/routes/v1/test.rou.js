@@ -1,9 +1,10 @@
 const express = require('express');
 const router = new express.Router();
 const { sendMessage } = require('@main_util/messaging.util');
+const { hashPassword } = require('@main_util/security.util');
 
 
-router.get('/messaging', (req,res) => {
+router.get('/messaging', async (req,res) => {
     // for email
     // const messageData = {
     //     first_name: 'Jephthaooh',
@@ -39,5 +40,13 @@ router.get('/messaging', (req,res) => {
     sendMessage(messageData, 'queue');
     res.status(200).json({message:'working'});
 });
+
+router.get('/hash', async (req,res) => {
+    const hash = await hashPassword('newPAss')
+    console.log(hash)
+});
+
+
+
 
 module.exports = router;

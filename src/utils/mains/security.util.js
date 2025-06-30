@@ -1,10 +1,9 @@
+require('dotenv').config();
 const crypto = require("crypto");
 const cryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const { queueRehash } = require('@queue/rehashQueue');
-// const { updateSingleField } = require('@main_util/database.util');
-require('dotenv').config();
 
 
 const key = process.env.ENC_KEY;
@@ -16,13 +15,7 @@ const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'm
 const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).json({ data });
 
 // Hash password asynchronously
-const hashPassword = async (password) => await bcrypt.hash(password, cost);
-
-const rehashUserPassword = async (data) => {
-    //pass to database function
-    // await updateSingleField('user', 'id', data.userId, 'password', data.plainPassword);
-
-};
+const hashPassword = async (password) => await bcrypt.hash(password, 10);
 
 // Verify password asynchronously
 const verifyPassword = async (plainPassword, hashedPassword, userId = null) => {
@@ -79,7 +72,6 @@ const generateUniqueId = (max) => crypto.randomInt(2, Number(`1${'0'.repeat(max)
 
 module.exports = {
     returnResponse,
-    rehashUserPassword,
     hashPassword,
     verifyPassword,
     selEncrypt,
