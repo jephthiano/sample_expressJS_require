@@ -15,7 +15,7 @@ const worker = new Worker(
 
       // await rehashUserPassword(job.data.data);
     } catch (err) {
-      console.error(`Error sending message: ${err.message}`);
+      console.error(`Error rehashing password: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
   },
