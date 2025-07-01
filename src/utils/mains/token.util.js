@@ -18,19 +18,10 @@ const extractToken = (authHeader) => {
     return null;
 };
 
-// Generate JWT Token with expiration
-const setToken = async (id) => {
-    try {
-        const token = await generateToken(id);
-
-        if(!token) return null;
-
-        return selEncrypt(token, 'token'); // Encrypt token
-    } catch (err) {
-        logError("Set Token Error", err);
-        return null; // Return null if token generation fails
-    }
-};
+//get the token
+const getToken = (req) => {
+    return process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
+}
 
 const  generateToken = async (userId) => {
     let token = null;
@@ -62,6 +53,20 @@ const  generateToken = async (userId) => {
     return token;
 }
 
+// Generate JWT Token with expiration
+const setToken = async (id) => {
+    try {
+        const token = await generateToken(id);
+
+        if(!token) return null;
+
+        return selEncrypt(token, 'token'); // Encrypt token
+    } catch (err) {
+        logError("Set Token Error", err);
+        return null; // Return null if token generation fails
+    }
+};
+
 const createOrUpdateToken = async (userId, token) => {
     const savedToken = await Token.findOneAndUpdate(
         { user_id: userId },
@@ -79,13 +84,38 @@ const createOrUpdateToken = async (userId, token) => {
     return savedToken;
 }
 
-const deleteToken = async (userId) => {
+const validateToken = async (token) => {
+    let response = false;
+
+    if(process.env.TOKEN_SETTER === 'jwt') {
+        // validate with jwt
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+        response = decoded?.id ?? null;
+    } else if (process.env.TOKEN_SETTER === 'local_self') {
+        //verify the token
+        const Dbtoken = await Token.findOne({
+            token,
+            expire_at: { $gt: new Date() } // only return if not expired
+        });
+
+        response = Dbtoken?.user_id ?? null;
+    } else if (process.env.TOKEN_SETTER === 'redis_self') {
+        //verify the token
+        const userId = await redis.get(`auth:token:${token}`);
+
+        response = userId ?? null;
+    }
+    return response;
+}
+
+const deleteToken = async (key) => {
     let status = false;
     if (process.env.TOKEN_SETTER === 'local_self') {
-        const result = await Token.deleteOne({ user_id: userId });
+        const result = await Token.deleteOne({ user_id: key });
         status =  result.deletedCount > 0;
     } else if (process.env.TOKEN_SETTER === 'redis_self') {
-        status = await redis.del(`auth:token:${token}`);
+        status = await redis.del(`auth:token:${key}`);
     }
 
     return status;
@@ -96,4 +126,6 @@ module.exports = {
     extractToken,
     setToken,
     deleteToken,
+    getToken,
+    validateToken
 };

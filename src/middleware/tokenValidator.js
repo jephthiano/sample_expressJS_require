@@ -1,10 +1,7 @@
-const jwt = require('jsonwebtoken');
-const Token = require('@model/Token.schema');
 const User = require('@model/User.schema');
 const { log } = require('@main_util/logger.util');
-const { selDecrypt, returnResponse, verifyPassword }  = require('@main_util/security.util');
-const { extractToken } = require('@main_util/token.util');
-const { redis } = require('@config/database');
+const { returnResponse }  = require('@main_util/security.util');
+const { getToken, validateToken } = require('@main_util/token.util');
 
 // Utility function to log info
 const logInfo = (type, data) => {
@@ -44,33 +41,4 @@ const tokenValidator = async (req, res, next) => {
         return returnResponse(res, { status: false, message: 'Error Occurred' });
     }
 };
-
-const getToken = (req) => {
-    return process.env.TOKEN_TYPE === 'bearer' ? extractToken(req.headers.authorization) : token = selDecrypt(req.cookies._menatreyd, 'token');
-}
-
-const validateToken = async (token) => {
-    let response = false;
-
-    if(process.env.TOKEN_SETTER === 'jwt') {
-        // validate with jwt
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-        response = decoded?.id ?? null;
-    } else if (process.env.TOKEN_SETTER === 'local_self') {
-        //verify the token
-        const Dbtoken = await Token.findOne({
-            token,
-            expire_at: { $gt: new Date() } // only return if not expired
-        });
-
-        response = Dbtoken?.user_id ?? null;
-    } else if (process.env.TOKEN_SETTER === 'redis_self') {
-        //verify the token
-        const userId = await redis.get(`auth:token:${token}`);
-
-        response = userId ?? null;
-    }
-    return response;
-}
 module.exports = { tokenValidator };
