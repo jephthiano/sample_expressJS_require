@@ -2,10 +2,12 @@ const jwt = require('jsonwebtoken');
 const { log } = require('@main_util/logger.util');
 const { selEncrypt, selDecrypt, generateUniqueToken }  = require('@main_util/security.util');
 const Token = require('@model/Token.schema');
+const { redis } = require('@config/database');
 
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
+const tokenExpiry = 60 * 60 * 24; //24 hour TTL
 
 // Extract token from headers (Bearer Token)
 const extractToken = (authHeader) => {
@@ -30,12 +32,12 @@ const setToken = async (id) => {
     }
 };
 
-const  generateToken = async (id) => {
+const  generateToken = async (userId) => {
     let token = null;
 
     if(process.env.TOKEN_SETTER === 'jwt') {
         token = jwt.sign(
-            { id },
+            { userId },
             process.env.JWT_SECRET_KEY,
             { expiresIn: '1h' } // Token expires in 1 hour
         );
@@ -44,15 +46,15 @@ const  generateToken = async (id) => {
         const genToken = generateUniqueToken();
 
         // insert into db
-        const save = await createOrUpdateToken(id, genToken);
+        const save = await createOrUpdateToken(userId, genToken);
 
         token = save ? genToken : null ;
     } else if (process.env.TOKEN_SETTER === 'redis_self') {
         // generate token
         const genToken = generateUniqueToken();
 
-        // insert into db
-        const save = await createOrUpdateToken(id, genToken);
+        // insert into redis db
+        const save =  await redis.set(`auth:token:${genToken}`, userId, 'EX', tokenExpiry);
 
         token = save ? genToken : null ;
     }
@@ -60,12 +62,12 @@ const  generateToken = async (id) => {
     return token;
 }
 
-const createOrUpdateToken = async (id, token) => {
+const createOrUpdateToken = async (userId, token) => {
     const savedToken = await Token.findOneAndUpdate(
-        { user_id: id },
+        { user_id: userId },
         {
             token,
-            expire_at: new Date(Date.now() + 60 * 60 * 1000) // 1 hour TTL
+            expire_at: new Date(Date.now() + tokenExpiry)
         },
         {
             new: true,
@@ -77,10 +79,17 @@ const createOrUpdateToken = async (id, token) => {
     return savedToken;
 }
 
-const deleteToken = async (id) => {
-    const result = await Token.deleteOne({ user_id: id });
+const deleteToken = async (userId) => {
+    let status = false;
+    if (process.env.TOKEN_SETTER === 'local_self') {
+        const result = await Token.deleteOne({ user_id: userId });
+        status =  result.deletedCount > 0;
+    } else if (process.env.TOKEN_SETTER === 'redis_self') {
+        status = await redis.del(`auth:token:${token}`);
+    }
 
-    return result.deletedCount > 0;
+    return status;
+
 }
 
 module.exports = {

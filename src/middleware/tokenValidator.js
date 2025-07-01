@@ -4,6 +4,7 @@ const User = require('@model/User.schema');
 const { log } = require('@main_util/logger.util');
 const { selDecrypt, returnResponse, verifyPassword }  = require('@main_util/security.util');
 const { extractToken } = require('@main_util/token.util');
+const { redis } = require('@config/database');
 
 // Utility function to log info
 const logInfo = (type, data) => {
@@ -66,12 +67,9 @@ const validateToken = async (token) => {
         response = Dbtoken?.user_id ?? null;
     } else if (process.env.TOKEN_SETTER === 'redis_self') {
         //verify the token
-        const Dbtoken = await Token.findOne({
-            token,
-            expire_at: { $gt: new Date() } // only return if not expired
-        });
+        const userId = await redis.get(`auth:token:${token}`);
 
-        response = Dbtoken?.user_id ?? null;
+        response = userId ?? null;
     }
     return response;
 }
