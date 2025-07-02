@@ -4,13 +4,13 @@ const cryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const { queueRehash } = require('@queue/rehashQueue');
-
+// const { v4: uuidv4 } = require('uuid');
 
 const key = process.env.ENC_KEY;
 const iv = process.env.ENC_IV;
 // const method = process.env.ENC_METHOD; // Encryption method
 const cost = process.env.HASH_COST;
-const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'mobile_number', 'token', 'email_phone'];
+const enc_array = ['general', 'token'];
 
 const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).json({ data });
 
@@ -67,6 +67,8 @@ const validatePin = (pin) => validator.isNumeric(pin) && validator.isLength(pin,
 const validatePassword = (password) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+_!@#$^&*.,?]).{8,}$/.test(password);
 
 const generateUniqueToken = () => crypto.randomBytes(32).toString('hex');
+
+const generateUniqueToken2 = () => uuidv4();
 
 const generateUniqueId = (max) => crypto.randomInt(2, Number(`1${'0'.repeat(max)}`));
 
