@@ -3,7 +3,7 @@ const AuthRepository = require('@repository/AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
 const { sendMessage } = require('@main_util/messaging.util');
-const { deleteToken, getToken } = require('@main_util/token.util');
+const { deleteApiToken } = require('@main_util/token.util');
 
 const FetchController = require('@controller/v1/FetchController.cla');
 
@@ -222,20 +222,13 @@ class AuthService extends BaseService{
             // set for cookies too
             if(process.env.TOKEN_SETTER === 'jwt') {
 
-            } else if (process.env.TOKEN_SETTER === 'local_self') {
-                if (!req.params.id || !(await deleteToken(req.params.id))) {
+            } else if (['local_self', 'redis_self'].includes(process.env.TOKEN_SETTER)) {
+                if (!await deleteApiToken(req)) {
                     return this.triggerError("Request failed, try again", [])
                 }
 
-            } else if (process.env.TOKEN_SETTER === 'redis_self') {
-                 const token = getToken(req);
-
-                //  console.log(token);return
-                if (!req.params.id || !(await deleteToken(token))) {
-                    return this.triggerError("Request failed, try again", []);
-                }
-
             }
+            
             return this.sendResponse(res, [], "Logout successfully");
         } catch (error) {
             this.handleException(res, error);

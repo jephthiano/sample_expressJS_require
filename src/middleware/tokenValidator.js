@@ -1,7 +1,7 @@
 const User = require('@model/User.schema');
 const { log } = require('@main_util/logger.util');
 const { returnResponse }  = require('@main_util/security.util');
-const { getToken, validateToken } = require('@main_util/token.util');
+const { validateApiToken } = require('@main_util/token.util');
 
 // Utility function to log info
 const logInfo = (type, data) => {
@@ -16,14 +16,9 @@ const logError = (type, data) => {
 // Middleware to verify token and attach user data to `req`
 const tokenValidator = async (req, res, next) => {
     try {
-        // if it is seadon or cookie
-        const token = getToken(req);
-        if (!token) return returnResponse(res, { status: false, message: 'Invalid account' });
-
-        const userId = await validateToken(token);
+        const userId = await validateApiToken(token);
         if(!userId) return returnResponse(res, { status: false, message: 'Invalid login' });
-
-        
+  
         // Fetch user details 
         const user = await User.findOne({ _id: userId});
         //if user not found
