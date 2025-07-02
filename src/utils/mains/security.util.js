@@ -10,7 +10,7 @@ const key = process.env.ENC_KEY;
 const iv = process.env.ENC_IV;
 // const method = process.env.ENC_METHOD; // Encryption method
 const cost = process.env.HASH_COST;
-const enc_array = ['general', 'email', 'last_name', 'first_name', 'username', 'mobile_number', 'token', 'email_phone'];
+const enc_array = ['general', 'token'];
 
 const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).json({ data });
 
