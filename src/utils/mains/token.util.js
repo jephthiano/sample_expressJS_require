@@ -175,3 +175,17 @@ module.exports = {
     validateApiToken,
     deleteApiToken,
 };
+
+
+
+// AUTO RENEWAL
+// if (process.env.TOKEN_SETTER === 'redis_self') {
+//             userId = await redis.get(`auth:token:${token}`);
+
+//             if (userId) {
+//                 const expiry = parseInt(process.env.TOKEN_EXPIRY) || 86400;
+
+//                 // ⏳ Renew TTL
+//                 await redis.expire(`auth:token:${token}`, expiry);
+//                 await redis.expire(`auth:user:${userId}`, expiry);
+//             }
