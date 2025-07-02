@@ -5,10 +5,8 @@ const Token = require('@model/Token.schema');
 const { redis } = require('@config/database');
 
 
-const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
-const tokenExpiry = 60 * 60 * 24; //24 hour TTL
-
+const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 hour
 
 
 // Generate JWT Token with expiration
@@ -24,36 +22,45 @@ const setApiToken = async (id) => {
         return null; // Return null if token generation fails
     }
 };
-const validateApiToken = async (req) => {
-    let response = false;
-    const token = getApiToken(req);
 
+const validateApiToken = async (req) => {
+    const token = getApiToken(req);
     if (!token) return false;
 
-    try {
-        if (process.env.TOKEN_SETTER === 'jwt') {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-            response = decoded?.id ?? null;
+    let userId = null;
 
-        } else if (process.env.TOKEN_SETTER === 'local_self') {
+    try {
+        const setter = process.env.TOKEN_SETTER;
+
+        if (setter === 'jwt') {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+            userId = decoded?.id;
+
+        } else if (setter === 'local_self') {
             const dbToken = await Token.findOne({
                 token,
                 expire_at: { $gt: new Date() }
             });
 
-            response = dbToken?.user_id ?? null;
+            userId = dbToken?.user_id;
 
-        } else if (process.env.TOKEN_SETTER === 'redis_self') {
-            const userId = await redis.get(`auth:token:${token}`);
-            response = userId ?? null;
+        } else if (setter === 'redis_self') {
+            userId = await redis.get(`auth:token:${token}`);
+        } else {
+            throw new Error(`Unsupported TOKEN_SETTER: ${setter}`);
         }
+
+        if (userId) {
+            await autoRenewTime(userId, token); // Consider making it await if it's async
+            return userId;
+        }
+
+        return false;
 
     } catch (err) {
         logError("Token Validation Error", err);
         return false;
     }
-
-    return response;
 };
 
 
@@ -118,27 +125,9 @@ const  generateToken = async (userId) => {
                 { expiresIn: '1h' } // Token expires in 1 hour
             );
         } else if (process.env.TOKEN_SETTER === 'local_self') {
-            // generate token
-            const newToken = generateUniqueToken();
-
-            // insert into db
-            const save = await createOrUpdateLocalDBToken(userId, newToken);
-
-            token = save ? newToken : null ;
+            token = await createLocalDBToken(userId) ?? null ;
         } else if (process.env.TOKEN_SETTER === 'redis_self') {
-            //delete old token
-            const oldToken = await redis.get(`auth:user:${userId}`);
-            if (oldToken) await redis.del(`auth:token:${oldToken}`);
-            
-            // generate token
-            const newToken = generateUniqueToken();
-
-            // insert into redis db
-            await redis.set(`auth:user:${userId}`, newToken, 'EX', tokenExpiry);
-            await redis.set(`auth:token:${newToken}`, userId, 'EX', tokenExpiry);
-            // const save =  await redis.set(`auth:token:${newToken}`, userId, 'EX', tokenExpiry);
-
-            token = save ? newToken : null ;
+            token = await createRedisToken(userId) ?? null ;
         }
     } catch (err) {
         logError("Token Generation Error", err);
@@ -148,12 +137,14 @@ const  generateToken = async (userId) => {
     return token;
 }
 
-const createOrUpdateLocalDBToken = async (userId, token) => {
+const createLocalDBToken = async (userId) => {
+    // generate token
+    const newToken = generateUniqueToken();
     try{
         const savedToken = await Token.findOneAndUpdate(
             { user_id: userId },
             {
-                token,
+                token: newToken,
                 expire_at: new Date(Date.now() + tokenExpiry)
             },
             {
@@ -163,11 +154,54 @@ const createOrUpdateLocalDBToken = async (userId, token) => {
             }
         );
     } catch (err) {
-        logError("Local DB yo\token Creation Error", err);
+        logError("Local DB Token Creation Error", err);
         return null;
     }
 
-    return savedToken;
+    return newToken;
+}
+
+const createRedisToken =  async (userId) => {
+    const newToken = generateUniqueToken();
+
+    try{
+        //delete old token
+        const oldToken = await redis.get(`auth:user:${userId}`);
+        if (oldToken) await redis.del(`auth:token:${oldToken}`);
+
+        // insert into redis db
+        await redis.set(`auth:user:${userId}`, newToken, 'EX', tokenExpiry);
+        await redis.set(`auth:token:${newToken}`, userId, 'EX', tokenExpiry);
+        
+        return newToken;
+    } catch (err) {
+        logError("Redis Token Creation Error", err);
+        return null;
+    }
+
+}
+
+const autoRenewTime = async(userID, token) => {
+    if (process.env.TOKEN_SETTER === 'local_self') {
+        try{
+
+            return true
+        } catch (err) {
+            logError("Local DB Token Auto Renewal Error", err);
+            return false;
+        }
+    } else if (process.env.TOKEN_SETTER === 'redis_self') {
+        try{
+            // ⏳ Renew TTL
+            await redis.expire(`auth:token:${token}`, tokenExpiry);
+            await redis.expire(`auth:user:${userId}`, tokenExpiry);
+        
+            return true
+        } catch (err) {
+            logError("Redis Token Auto Renewal Error", err);
+            return false;
+        }
+    }
 }
 
 module.exports = {
@@ -175,17 +209,3 @@ module.exports = {
     validateApiToken,
     deleteApiToken,
 };
-
-
-
-// AUTO RENEWAL
-// if (process.env.TOKEN_SETTER === 'redis_self') {
-//             userId = await redis.get(`auth:token:${token}`);
-
-//             if (userId) {
-//                 const expiry = parseInt(process.env.TOKEN_EXPIRY) || 86400;
-
-//                 // ⏳ Renew TTL
-//                 await redis.expire(`auth:token:${token}`, expiry);
-//                 await redis.expire(`auth:user:${userId}`, expiry);
-//             }
