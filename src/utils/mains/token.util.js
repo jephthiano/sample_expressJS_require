@@ -185,6 +185,12 @@ const autoRenewTime = async(userID, token) => {
     if (process.env.TOKEN_SETTER === 'local_self') {
         try{
 
+            const savedToken = await Token.findOneAndUpdate(
+            { user_id: userId },
+            {
+                expire_at: new Date(Date.now() + tokenExpiry)
+            },
+        );
             return true
         } catch (err) {
             logError("Local DB Token Auto Renewal Error", err);
