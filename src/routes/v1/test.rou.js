@@ -43,7 +43,6 @@ router.get('/messaging', async (req,res) => {
 
 router.get('/hash', async (req,res) => {
     const hash = await hashPassword('newPAss')
-    console.log(hash)
 });
 
 
