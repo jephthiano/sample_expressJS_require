@@ -1,5 +1,9 @@
 const nodemailer = require('nodemailer');
 const { sendMessageDTO } = require('@dto/messaging.dto');
+const { log } = require('@main_util/logger.util');
+
+const logInfo = (type, data) => log(type, data, 'info');
+const logError = (type, data) => log(type, data, 'error');
 
 class WhatsAppService {
 
@@ -7,11 +11,11 @@ class WhatsAppService {
         data = sendMessageDTO(data);
 
         try {
-            console.log(data);
+            logInfo('WHATSAPP SERVICE', data);
             return true;
         } catch (err) {
             //fix()
-            logError('Send Email Message [MESSAGING]', err);
+            logError('WHATSAPP SERVICE', err);
             return false;
         }
     }

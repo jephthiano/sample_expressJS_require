@@ -198,7 +198,7 @@ const autoRenewTime = async(userID, token) => {
         }
     } else if (process.env.TOKEN_SETTER === 'redis_self') {
         try{
-            // ⏳ Renew TTL
+            // Renew TTL
             await redis.expire(`auth:token:${token}`, tokenExpiry);
             await redis.expire(`auth:user:${userId}`, tokenExpiry);
         

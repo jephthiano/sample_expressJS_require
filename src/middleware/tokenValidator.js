@@ -3,15 +3,7 @@ const { log } = require('@main_util/logger.util');
 const { returnResponse }  = require('@main_util/security.util');
 const { validateApiToken } = require('@main_util/token.util');
 
-// Utility function to log info
-const logInfo = (type, data) => {
-    log(type, data, 'info');
-};
-
-// Utility function to log errors
-const logError = (type, data) => {
-    log(type, data, 'error');
-};
+const logError = (type, data) => log(type, data, 'error');
 
 // Middleware to verify token and attach user data to `req`
 const tokenValidator = async (req, res, next) => {

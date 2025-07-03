@@ -1,8 +1,11 @@
 require('module-alias/register');
 const { redis } = require('@config/database');
 const { Worker } = require('bullmq');
-// const { rehashUserPassword } = require('@main_util/security.util');
 const { updateSingleField } = require('@main_util/database.util');
+const { log } = require('@main_util/logger.util');
+
+const logInfo = (type, data) => log(type, data, 'info');
+const logError = (type, data) => log(type, data, 'error');
 
 // Create the worker
 const worker = new Worker(
@@ -15,6 +18,7 @@ const worker = new Worker(
 
       // await rehashUserPassword(job.data.data);
     } catch (err) {
+      logInfo('REHASH WORKER', `Error sending message: ${err.message}`);
       console.error(`Error rehashing password: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
@@ -27,9 +31,9 @@ const worker = new Worker(
 
 // Error handler
 worker.on('failed', (job, err) => {
-  console.error(`❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
+  logInfo('REHASH WORKER', `❌ Job failed for rehashing: ${err.message}`);
 });
 
 worker.on('completed', (job) => {
-  console.log(`🎉 Job completed: ${job.id}`);
+  logInfo('REHASH WORKER', `🎉 Job completed: ${job.id}`);
 });
