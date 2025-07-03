@@ -6,10 +6,6 @@ const initialResponse = (type = 'invalid_request') => ({
     error_data: {},
 });
 
-const log = (cont, data, type) => {
-    console.log(cont, type, data);
-};
-
 const isEmptyObject = (obj) => Object.keys(obj).length === 0;
 
 const isEmptyArray = (array) => Array.isArray(array) && array.length === 0;
@@ -61,7 +57,6 @@ const parseMessageToObject = (error) => {
 
 module.exports = {
     initialResponse,
-    log,
     isEmptyObject,
     isEmptyArray,
     isObject,

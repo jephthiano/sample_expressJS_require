@@ -1,5 +1,9 @@
 const nodemailer = require('nodemailer');
 const { sendMessageDTO } = require('@dto/messaging.dto');
+const { log } = require('@main_util/logger.util');
+
+const logInfo = (type, data) => log(type, data, 'info');
+const logError = (type, data) => log(type, data, 'error');
 
 class SmsService {
 
@@ -7,11 +11,10 @@ class SmsService {
         data = sendMessageDTO(data);
 
         try {
-            console.log(data);
+            logInfo('SMS SERVICE', data);
             return true;
         } catch (err) {
-            //fix()
-            logError('Send Email Message [MESSAGING]', err);
+            logError('SMS SERVICE', err);
             return false;
         }
     }

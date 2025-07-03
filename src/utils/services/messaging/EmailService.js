@@ -1,5 +1,9 @@
 const nodemailer = require('nodemailer');
 const { sendMessageDTO } = require('@dto/messaging.dto');
+const { log } = require('@main_util/logger.util');
+
+const logInfo = (type, data) => log(type, data, 'info');
+const logError = (type, data) => log(type, data, 'error');
 
 class EmailService {
     static transporter = nodemailer.createTransport({
@@ -27,8 +31,7 @@ class EmailService {
             await EmailService.transporter.sendMail(mailOptions);
             return true;
         } catch (err) {
-            //fix()
-            logError('Send Email Message [MESSAGING]', err);
+            logError('EMAIL SERVICE', err);
             return false;
         }
     }

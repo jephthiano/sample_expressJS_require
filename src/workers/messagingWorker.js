@@ -2,6 +2,10 @@ require('module-alias/register');
 const { redis } = require('@config/database');
 const { Worker } = require('bullmq');
 const { sendMessage } = require('@main_util/messaging.util');
+const { log } = require('@main_util/logger.util');
+
+const logInfo = (type, data) => log(type, data, 'info');
+const logError = (type, data) => log(type, data, 'error');
 
 // Create the worker
 const worker = new Worker(
@@ -10,7 +14,7 @@ const worker = new Worker(
     try {
       await sendMessage(job.data.data);
     } catch (err) {
-      console.error(`Error sending message: ${err.message}`);
+      logInfo('MESSAGING WORKER', `Error sending message: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
   },
@@ -23,9 +27,9 @@ const worker = new Worker(
 
 // Error handler
 worker.on('failed', (job, err) => {
-  console.error(`❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
+  logInfo('MESSAGING WORKER', `❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
 });
 
 worker.on('completed', (job) => {
-  console.log(`🎉 Job completed: ${job.id}`);
+  logInfo('MESSAGING WORKER', `🎉 Job completed: ${job.id}`);
 });

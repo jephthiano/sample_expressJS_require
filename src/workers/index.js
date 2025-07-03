@@ -1,7 +1,6 @@
 require('module-alias/register');
-
-//db connection
-const { connectDB, mongoose } = require('@config/database'); // Import both
+const { connectDB, mongoose } = require('@config/database');
+const { log } = require('@main_util/logger.util');
 
 
 connectDB().then(() => {
@@ -11,7 +10,7 @@ connectDB().then(() => {
 
     // Graceful shutdown on Ctrl+C or system kill
     process.on("SIGINT", async () => {
-        console.log("🛑 Shutting down server...");
+        log('ENTRY POINT', `🛑 Shutting down server...`, 'error')
         await mongoose.disconnect(); // Now `mongoose` is available
         server.close(() => process.exit(0));
     });
