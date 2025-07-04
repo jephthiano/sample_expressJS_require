@@ -43,15 +43,15 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(type !== 'sign_up' && type !== 'forgot_password'){
-                this.triggerError("Invalid Request", []);
-            }
+            if(type !== 'sign_up' && type !== 'forgot_password') this.triggerError("Invalid Request", []);
 
             //validate inputs
             const { status, data } = await sendOtp(req.body, type);
             if (status) this.triggerValidationError(data);
 
-            const response = await AuthService.sendOtp(req, res, type);
+            const response = await AuthService.sendOtp(req, type);
+
+            this.sendResponse(res, response, "Otp code successful sent");
         } catch (error) {
             this.handleException(res, error);
         }

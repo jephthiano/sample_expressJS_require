@@ -45,7 +45,7 @@ class AuthService{
     }
 
     // [SEND OTP]
-    static async sendOtp(req, res, type) {
+    static async sendOtp(req, type) {
         const { receiving_medium } = req.body;
 
         const data = {
@@ -57,17 +57,13 @@ class AuthService{
         };
 
         const sent = await sendOtp(data);
+        if(!sent) triggerError("Request for otp failed", [])
 
-        if(!sent){
-            triggerError("Request for otp failed", []);
-        }
-
-        return this.sendResponse(res, [], "Otp code successful sent");
+        return [];
     }
 
     // [VERIFY OTP]
     static async verifyOtp(req, res, type) {
-        
         const data = {
             receiving_medium: req.body.receiving_medium,
             code: req.body.code,
