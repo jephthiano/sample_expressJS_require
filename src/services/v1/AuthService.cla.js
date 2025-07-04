@@ -116,7 +116,6 @@ class AuthService{
 
     //FORGOT PASSWORD [RESET PASSWORD]
     static async resetPassword(req) {
-
         const { code, receiving_medium } = req.body;
         const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
 

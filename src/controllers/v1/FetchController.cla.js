@@ -10,7 +10,9 @@ class FetchController extends BaseController{
 
     static async appFetchData (req){
         try{
-            await FetchService.appFetchData(req);
+            const response = await FetchService.appFetchData(req);
+
+            return this.sendResponse(res, response, "Success");
         }catch(error){
             this.handleException(res, error);
         }
@@ -18,4 +20,4 @@ class FetchController extends BaseController{
     
 }
 
-module.exports = FetchController;
+module.exports = FetchController

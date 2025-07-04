@@ -51,8 +51,7 @@ const validateApiToken = async (req) => {
         }
 
         if (userId) {
-            await autoRenewTokenTime(userId, token); // Consider making it await if it's async
-            //SET TOKEN IN THE HEADER fix()
+            const newToken = token = await autoRenewTokenTime(userId, token);
             return userId;
         }
 
@@ -145,11 +144,13 @@ const autoRenewTokenTime = async(userId, token) => {
 
 const createJwtToken = async (userId) => {
     try{
-        token = jwt.sign(
+        const token = jwt.sign(
             { userId },
             process.env.JWT_SECRET_KEY,
             { expiresIn: parseInt(process.env.JWT_EXPIRY) }// in seconds
         );
+
+        return token;
     } catch (err) {
         logError("JWT Token Creation Error", err);
         return null;
@@ -160,7 +161,7 @@ const createLocalDBToken = async (userId) => {
     // generate token
     const newToken = generateUniqueToken();
     try{
-        const savedToken = await Token.findOneAndUpdate(
+        const token = await Token.findOneAndUpdate(
             { user_id: userId },
             {
                 token: newToken,
@@ -172,12 +173,12 @@ const createLocalDBToken = async (userId) => {
                 runValidators: true
             }
         );
+
+        return newToken;
     } catch (err) {
         logError("Local DB Token Creation Error", err);
         return null;
     }
-
-    return newToken;
 }
 
 const createRedisToken =  async (userId) => {
