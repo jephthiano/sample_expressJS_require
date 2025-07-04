@@ -69,7 +69,12 @@ const deleteApiToken = async (req) => {
     let status = false;
 
     try {
-        if (process.env.TOKEN_SETTER === 'local_self') {
+
+        if (process.env.TOKEN_SETTER === 'jwt') {
+
+            status = true;
+        } else if (process.env.TOKEN_SETTER === 'local_self') {
+            
             const userId = req.params?.id ?? null ;
 
             if(userId){

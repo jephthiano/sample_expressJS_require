@@ -62,15 +62,15 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(type !== 'sign_up' && type !== 'forgot_password'){
-                this.triggerError("Invalid Request", []);
-            }
+            if (type !== 'sign_up' && type !== 'forgot_password') this.triggerError("Invalid Request", []);
 
             // validate inputs
             const { status, data } = await verifyOtp(req.body, type);
             if (status) this.triggerValidationError(data);
             
-            const response =  await AuthService.verifyOtp(req, res, type);
+            const response =  await AuthService.verifyOtp(req, type);
+
+            return this.sendResponse(res, response, "Otp code successful verified");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -84,6 +84,8 @@ class AuthController extends BaseController{
             if (status) this.triggerValidationError(data);
 
             const response =  await AuthService.signup(req);
+
+            this.sendResponse(res, response, "Account successfully created");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -97,6 +99,8 @@ class AuthController extends BaseController{
             if (status) this.triggerValidationError(data);
 
            const response =  await AuthService.resetPassword(req);
+           
+           this.sendResponse(res, response, "Password successfully reset");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -107,6 +111,8 @@ class AuthController extends BaseController{
     static async logout(req) {
          try {
             const response =  await AuthService.logout(req);
+
+            this.sendResponse(res, response, "Logout successfully");
         } catch (error) {
             this.handleException(res, error);
         }

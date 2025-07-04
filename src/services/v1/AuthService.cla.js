@@ -63,7 +63,7 @@ class AuthService{
     }
 
     // [VERIFY OTP]
-    static async verifyOtp(req, res, type) {
+    static async verifyOtp(req, type) {
         const data = {
             receiving_medium: req.body.receiving_medium,
             code: req.body.code,
@@ -72,19 +72,13 @@ class AuthService{
 
         const verify = await verifyOtpNew(data);
 
-        if(!verify){ // for incorrect
-            triggerError("Incorrect otp code", []);
-        }
+        if(!verify) triggerError("Incorrect otp code", []);
 
-        if(verify === 'expired'){ // for expired
-            triggerError("Otp code has expired", []);
-        }
+        if(verify === 'expired') triggerError("Otp code has expired", []);
 
-        if(verify === 'error'){ // for internal error
-            triggerError("Error occurred while running request", []);
-        }
-        
-        return this.sendResponse(res, [], "Otp code successful verified");
+        if(verify === 'error') triggerError("Error occurred while running request", []); // for internal error
+
+        return [];
     }
 
     static async signup(req) {
@@ -93,15 +87,11 @@ class AuthService{
     
         const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
             
-        if(!verifyOtp) {
-            triggerError("Invalid Request", []);
-        }
+        if(!verifyOtp) triggerError("Invalid Request", []);
 
-        if (verifyOtp === 'expired') {
-            triggerError("Request timeout, try again", []);
-        } 
+        if (verifyOtp === 'expired') triggerError("Request timeout, try again", []);
 
-        // Mark verification based on type
+        // Mark verification based on type and set the other field not set from form
         if (veriType === 'email') {
             req.body.email_verified_at = new Date();
             req.body.mobile_number = receiving_medium;
@@ -111,24 +101,17 @@ class AuthService{
         }
 
         // Create user
-        const user = await AuthRepository.createUser(res, req.body);
-        if (!user) {
-            triggerError("Account creation failed", []);
-        }
-
-        // Fetch user-related data
-        const data = await FetchController.neededData(user);
-        
-        // Send success response
-        this.sendResponse(res, data, "Account successfully created");
+        const user = await AuthRepository.createUser(req.body);
+        if (!user) triggerError("Account creation failed", []);
 
         // Clean up OTP
         deleteOtp(selEncrypt(receiving_medium, 'general'));
-
+        
         // Send welcome email [PASS TO QUEUE JOB]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
-
-        return;
+        
+        // Fetch user-related data
+        return await FetchController.neededData(user);
     }
 
     //FORGOT PASSWORD [RESET PASSWORD]
@@ -137,34 +120,21 @@ class AuthService{
         const { code, receiving_medium } = req.body;
         const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
 
-        if(!verifyOtp) {
-            triggerError("Invalid Request", []);
-        }
+        if(!verifyOtp) triggerError("Invalid Request", []);
 
-        if (verifyOtp === 'expired') {
-            triggerError("Request timeout, try again", []);
-        }
+        if (verifyOtp === 'expired') triggerError("Request timeout, try again", []);
 
-        const updateUserData = await AuthRepository.updatePassword(res, req.body);
-        if(!updateUserData){
-            triggerError("Password reset failed", []);
-        }
+        const updateUserData = await AuthRepository.updatePassword(req.body);
+        if(!updateUserData) triggerError("Password reset failed", []);
 
-        // Send success response
-        this.sendResponse(res, [], "Password successfully reset");
-
-        //[PASS BELOW TO QUEUE JOB]
         // Clean up OTP
         await deleteOtp(receiving_medium);
-        
-        
+                
         // Send password reset notification email
-        const { first_name, email } = updateUserData;
-        
         sendMessage(
                 { 
-                first_name: selEncrypt(first_name, 'first_name'),
-                receiving_medium: selEncrypt(email, 'email'),
+                first_name: selEncrypt(updateUserData.first_name, 'first_name'),
+                receiving_medium: selEncrypt(updateUserData.email, 'email'),
                 send_medium: 'email', 
                 type: 'reset_password' 
             }
@@ -176,17 +146,10 @@ class AuthService{
     
 
     static async logout(req) {
-        // set for cookies too
-        if(process.env.TOKEN_SETTER === 'jwt') {
+        const response = await deleteApiToken(req);
+        if(!response) triggerError("Request failed, try again", [])
 
-        } else if (['local_self', 'redis_self'].includes(process.env.TOKEN_SETTER)) {
-            if (!await deleteApiToken(req)) {
-                triggerError("Request failed, try again", [])
-            }
-
-        }
-        
-        return this.sendResponse(res, [], "Logout successfully");
+        return response;
     }
 
 }
