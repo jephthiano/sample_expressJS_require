@@ -4,6 +4,7 @@ const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/secur
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
 const { sendMessage } = require('@main_util/messaging.util');
 const { deleteApiToken } = require('@main_util/token.util');
+const { triggerError} = require('@core_util/handler.util');
 
 const FetchController = require('@controller/v1/FetchController.cla');
 
@@ -11,35 +12,32 @@ class AuthService extends BaseService{
 
     // LOGIN
     static async login(req, res) {
-        try {
             const { login_id, password } = req.body;
     
             // Get user data by login ID
             const user = await AuthRepository.getUserByLoginId(res, login_id);
-            if (!user) {
-                return this.triggerError("Incorrect login details", []);
-            }
+
+            if (!user) triggerError("Incorrect login details", []);
+
+            // throw new Error("Incorrect login details");
     
             const { password: dbPassword, status: userStatus, id: userId } = user;
     
             // Verify password (async if using bcrypt.compare)
             const  isPasswordValid = await verifyPassword(password, dbPassword, userId);
             if (!isPasswordValid) {
-                return this.triggerError("Incorrect login details", []);
+                triggerError("Incorrect login details", []);
             }
     
             // Check account status
             if (userStatus === 'suspended') {
-                return this.triggerError("Your account has been suspended, contact admin", []);
+                triggerError("Your account has been suspended, contact admin", []);
             }
     
             // Fetch needed data
             const data = await FetchController.authFetchData(res, user);
 
             return this.sendResponse(res, data, "Login successful");
-        } catch (error) {
-            return this.handleException(res, error);
-        }
     }
 
     // REGISTER
@@ -50,7 +48,7 @@ class AuthService extends BaseService{
             // Create user
             const user = await AuthRepository.createUser(res, req.body);
             if (!user) {
-                return this.triggerError("Account creation failed", []);
+                triggerError("Account creation failed", []);
             }
     
             // Fetch user-related data
@@ -83,7 +81,7 @@ class AuthService extends BaseService{
             const sent = await sendOtp(data);
 
             if(!sent){
-                return this.triggerError("Request for otp failed", []);
+                triggerError("Request for otp failed", []);
             }
 
             return this.sendResponse(res, [], "Otp code successful sent");
@@ -104,15 +102,15 @@ class AuthService extends BaseService{
             const verify = await verifyOtpNew(data);
 
             if(!verify){ // for incorrect
-                return this.triggerError("Incorrect otp code", []);
+                triggerError("Incorrect otp code", []);
             }
 
             if(verify === 'expired'){ // for expired
-                return this.triggerError("Otp code has expired", []);
+                triggerError("Otp code has expired", []);
             }
 
             if(verify === 'error'){ // for internal error
-                return this.triggerError("Error occurred while running request", []);
+                triggerError("Error occurred while running request", []);
             }
             
             return this.sendResponse(res, [], "Otp code successful verified");
@@ -130,11 +128,11 @@ class AuthService extends BaseService{
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
                 
             if(!verifyOtp) {
-                return this.triggerError("Invalid Request", []);
+                triggerError("Invalid Request", []);
             }
 
             if (verifyOtp === 'expired') {
-                return this.triggerError("Request timeout, try again", []);
+                triggerError("Request timeout, try again", []);
             } 
 
             // Mark verification based on type
@@ -149,7 +147,7 @@ class AuthService extends BaseService{
             // Create user
             const user = await AuthRepository.createUser(res, req.body);
             if (!user) {
-                return this.triggerError("Account creation failed", []);
+                triggerError("Account creation failed", []);
             }
 
             // Fetch user-related data
@@ -177,16 +175,16 @@ class AuthService extends BaseService{
             const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
     
             if(!verifyOtp) {
-                return this.triggerError("Invalid Request", []);
+                triggerError("Invalid Request", []);
             }
 
             if (verifyOtp === 'expired') {
-                return this.triggerError("Request timeout, try again", []);
+                triggerError("Request timeout, try again", []);
             }
 
             const updateUserData = await AuthRepository.updatePassword(res, req.body);
             if(!updateUserData){
-                return this.triggerError("Password reset failed", []);
+                triggerError("Password reset failed", []);
             }
 
             // Send success response
@@ -224,7 +222,7 @@ class AuthService extends BaseService{
 
             } else if (['local_self', 'redis_self'].includes(process.env.TOKEN_SETTER)) {
                 if (!await deleteApiToken(req)) {
-                    return this.triggerError("Request failed, try again", [])
+                    triggerError("Request failed, try again", [])
                 }
 
             }
