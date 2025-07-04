@@ -30,25 +30,18 @@ class AuthService{
     }
 
     // REGISTER
-    static async register(req, res) {
+    static async register(req) {
         const { first_name, email } = req.body;
 
         // Create user
-        const user = await AuthRepository.createUser(res, req.body);
-        if (!user) {
-            triggerError("Account creation failed", []);
-        }
-
-        // Fetch user-related data
-        const data = await FetchController.authFetchData(res, user);    
-        
-        // Send success response
-        this.sendResponse(res, data, "Account successfully created");
+        const user = await AuthRepository.createUser(req.body);
+        if (!user) triggerError("Account creation failed", []);
 
         // Send welcome email [PASS TO QUEUE JOB]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
         
-        return;
+        // Fetch user-related data
+        return await FetchController.authFetchData(user);
     }
 
     // [SEND OTP]
@@ -98,7 +91,7 @@ class AuthService{
         return this.sendResponse(res, [], "Otp code successful verified");
     }
 
-    static async signup(req, res) {
+    static async signup(req) {
         const { receiving_medium, code, first_name, email } = req.body;
         const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
     
@@ -143,7 +136,7 @@ class AuthService{
     }
 
     //FORGOT PASSWORD [RESET PASSWORD]
-    static async resetPassword(req, res) {
+    static async resetPassword(req) {
 
         const { code, receiving_medium } = req.body;
         const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
@@ -186,7 +179,7 @@ class AuthService{
     }
     
 
-    static async logout(req, res) {
+    static async logout(req) {
         // set for cookies too
         if(process.env.TOKEN_SETTER === 'jwt') {
 

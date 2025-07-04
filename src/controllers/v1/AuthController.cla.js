@@ -8,15 +8,15 @@ const { parseMessageToObject } = require('@main_util/general.util');
 class AuthController extends BaseController{
 
     // LOGIN
-    static async login(req, res) {
+    static async login(req) {
         try {
 
             // Validate inputs using Joi DTO
             const { error, value } = loginJoi.validate(req.body, { abortEarly: false });
             if (error) this.triggerValidationError(parseMessageToObject(error));
             
-            const response = await AuthService.login(req, res);
-            return this.sendResponse(res, response, "Login successful");
+            const response = await AuthService.login(req);
+            this.sendResponse(res, response, "Login successful");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -24,20 +24,22 @@ class AuthController extends BaseController{
     }
 
     // REGISTER
-    static async register(req, res) {
+    static async register(req) {
         try {
             //validate inputs
             const { status, data } = await register(req.body, 'single');
             if (status) this.triggerValidationError(data);
 
-            await AuthService.register(req, res);
+            const response = await AuthService.register(req);
+
+            this.sendResponse(res, response, "Account successfully created");
         } catch (error) {
             this.handleException(res, error);
         }
     }
 
     // SEND OTP
-    static async sendOtp(req, res) {
+    static async sendOtp(req) {
         const { type } = req.params;
 
         try {
@@ -49,14 +51,14 @@ class AuthController extends BaseController{
             const { status, data } = await sendOtp(req.body, type);
             if (status) this.triggerValidationError(data);
 
-            await AuthService.sendOtp(req, res, type);
+            const response = await AuthService.sendOtp(req, res, type);
         } catch (error) {
             this.handleException(res, error);
         }
     }
 
     // VERIFY OTP
-    static async verifyOtp(req, res) {
+    static async verifyOtp(req) {
         const { type } = req.params;
 
         try {
@@ -68,33 +70,33 @@ class AuthController extends BaseController{
             const { status, data } = await verifyOtp(req.body, type);
             if (status) this.triggerValidationError(data);
             
-            await AuthService.verifyOtp(req, res, type);
+            const response =  await AuthService.verifyOtp(req, res, type);
         } catch (error) {
             this.handleException(res, error);
         }
     }
 
     // SIGNUP
-    static async signup(req, res) {
+    static async signup(req) {
         try {
             //validate inputs
             const { status, data } = await signup(req.body, 'multi');
             if (status) this.triggerValidationError(data);
 
-            await AuthService.signup(req, res);
+            const response =  await AuthService.signup(req);
         } catch (error) {
             this.handleException(res, error);
         }
     }
 
     // RESET PASSWORD
-    static async resetPassword(req, res) {
+    static async resetPassword(req) {
         try {
             //validate inputs
             const { status, data } = await resetPassword(req.body);
             if (status) this.triggerValidationError(data);
 
-            await AuthService.resetPassword(req, res);
+           const response =  await AuthService.resetPassword(req);
         } catch (error) {
             this.handleException(res, error);
         }
@@ -102,9 +104,9 @@ class AuthController extends BaseController{
 
 
     // LOGOUT
-    static async logout(req, res) {
+    static async logout(req) {
          try {
-            await AuthService.logout(req, res);
+            const response =  await AuthService.logout(req);
         } catch (error) {
             this.handleException(res, error);
         }
