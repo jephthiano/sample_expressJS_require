@@ -1,4 +1,3 @@
-const BaseService = require('@service/BaseService.cla');
 const AuthRepository = require('@repository/AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
 const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
@@ -12,32 +11,22 @@ class AuthService extends BaseService{
 
     // LOGIN
     static async login(req, res) {
-            const { login_id, password } = req.body;
-    
-            // Get user data by login ID
-            const user = await AuthRepository.getUserByLoginId(res, login_id);
+        const { login_id, password } = req.body;
 
-            if (!user) triggerError("Incorrect login details", []);
+        // Get user data by login ID
+        const user = await AuthRepository.getUserByLoginId(res, login_id);
+        if (!user) triggerError("Incorrect login details", []);
 
-            // throw new Error("Incorrect login details");
-    
-            const { password: dbPassword, status: userStatus, id: userId } = user;
-    
-            // Verify password (async if using bcrypt.compare)
-            const  isPasswordValid = await verifyPassword(password, dbPassword, userId);
-            if (!isPasswordValid) {
-                triggerError("Incorrect login details", []);
-            }
-    
-            // Check account status
-            if (userStatus === 'suspended') {
-                triggerError("Your account has been suspended, contact admin", []);
-            }
-    
-            // Fetch needed data
-            const data = await FetchController.authFetchData(res, user);
+        // Verify password (async if using bcrypt.compare)
+        const { password: dbPassword, status: userStatus, id: userId } = user;
+        const  isPasswordValid = await verifyPassword(password, dbPassword, userId);
+        if (!isPasswordValid) triggerError("Incorrect login details", []);
 
-            return this.sendResponse(res, data, "Login successful");
+        // Check account status
+        if (userStatus === 'suspended') triggerError("Your account has been suspended, contact admin", []);
+
+        // Fetch needed data
+        return await FetchController.authFetchData(res, user);
     }
 
     // REGISTER

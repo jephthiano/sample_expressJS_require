@@ -5,7 +5,7 @@ const { selEncrypt, }  = require('@main_util/security.util');
 class AuthRepository
 {
 
-    static async getUserByLoginId(res, loginId) {
+    static async getUserByLoginId(loginId) {
         const encLoginId = selEncrypt(loginId.toLowerCase(), 'email_phone');
         const where = { $or: [{ mobile_number: encLoginId }, { email: encLoginId }] };
 
@@ -13,12 +13,12 @@ class AuthRepository
         return await User.findOne(where);
     }
 
-    static async createUser(res, data) {
+    static async createUser(data) {
         const userData = createUserDTO(data);
         return await User.create(userData);
     }
 
-    static async updatePassword(res, data){
+    static async updatePassword(data){
         data = updatePasswordDTO(data);
         
         const { password, receiving_medium } = data;

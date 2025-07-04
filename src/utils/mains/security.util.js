@@ -68,8 +68,6 @@ const validatePassword = (password) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+_
 
 const generateUniqueToken = () => crypto.randomBytes(32).toString('hex');
 
-const generateUniqueToken2 = () => uuidv4();
-
 const generateUniqueId = (max) => crypto.randomInt(2, Number(`1${'0'.repeat(max)}`));
 
 module.exports = {
