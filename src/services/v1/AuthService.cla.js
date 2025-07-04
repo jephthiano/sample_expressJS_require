@@ -14,7 +14,7 @@ class AuthService extends BaseService{
         const { login_id, password } = req.body;
 
         // Get user data by login ID
-        const user = await AuthRepository.getUserByLoginId(res, login_id);
+        const user = await AuthRepository.getUserByLoginId(login_id);
         if (!user) triggerError("Incorrect login details", []);
 
         // Verify password (async if using bcrypt.compare)
