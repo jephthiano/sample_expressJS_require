@@ -1,6 +1,6 @@
 const AuthRepository = require('@repository/AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
-const { sendOtp, verifyOtpNew, verifyOtpUsed, deleteOtp}  = require('@main_util/otp.util');
+const { sendOtp, verifyNewOtp, verifyUsedOtp, deleteOtp}  = require('@main_util/otp.util');
 const { sendMessage } = require('@main_util/messaging.util');
 const { deleteApiToken } = require('@main_util/token.util');
 const { triggerError} = require('@core_util/handler.util');
@@ -70,13 +70,11 @@ class AuthService{
             use_case: type
         };
 
-        const verify = await verifyOtpNew(data);
+        const verify = await verifyNewOtp(data);
 
         if(!verify) triggerError("Incorrect otp code", []);
 
         if(verify === 'expired') triggerError("Otp code has expired", []);
-
-        if(verify === 'error') triggerError("Error occurred while running request", []); // for internal error
 
         return [];
     }
@@ -85,7 +83,7 @@ class AuthService{
         const { receiving_medium, code, first_name, email } = req.body;
         const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
     
-        const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'sign_up', code });
+        const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'sign_up', code });
             
         if(!verifyOtp) triggerError("Invalid Request", []);
 
@@ -117,7 +115,7 @@ class AuthService{
     //FORGOT PASSWORD [RESET PASSWORD]
     static async resetPassword(req) {
         const { code, receiving_medium } = req.body;
-        const verifyOtp = await verifyOtpUsed({ receiving_medium, use_case: 'forgot_password', code }); 
+        const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'forgot_password', code }); 
 
         if(!verifyOtp) triggerError("Invalid Request", []);
 

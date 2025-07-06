@@ -1,11 +1,8 @@
 const Otp = require('@model/OtpToken.schema');
-const { log } = require('@main_util/logger.util');
 const { isDateLapsed }  = require('@main_util/general.util');
 const { generateUniqueId, selEncrypt, verifyPassword }  = require('@main_util/security.util');
 const { sendMessage }  = require('@main_util/messaging.util');
 const { createOtpDTO } = require('@dto/otp.dto');
-
-const logError = (type, data) => log(type, data, 'error');
 
 // SEND OTP
 const sendOtp = async (messageData) => {
@@ -19,66 +16,55 @@ const sendOtp = async (messageData) => {
         sendMessage(messageData, 'queue');
         response = true;
     }
-    
+
     return response;
 };
 
 // VERIFY OTP
-const verifyOtpNew = async (data) => {
+const verifyNewOtp = async (data) => {
     let response = false;
+    const { receiving_medium, use_case, code } = data;
 
-    try {
-        const { receiving_medium, use_case, code } = data;
-        const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
+    const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
+    
+    // Look for the OTP record based on receiving medium, use case, and status
+    const otpRecord = await Otp.findOne({ 
+        receiving_medium: encryptedMedium,
+        use_case, 
+        status: 'new'
+    });
+    
+    if (otpRecord) {
+        const { code: dbCode, reg_date } = otpRecord;
         
-        // Look for the OTP record based on receiving medium, use case, and status
-        const otpRecord = await Otp.findOne({ 
-            receiving_medium: encryptedMedium,
-            use_case, 
-            status: 'new'
-        });
-        
-        if (otpRecord) {
-            const { code: dbCode, reg_date } = otpRecord;
+        // Verify if the provided code matches the stored one
+        if (await verifyPassword(code, dbCode)) {
+            // update otp status to used
+            if(!await updateOtpStatus({ receiving_medium, use_case, code })) triggerError("Error occurred while running request", []); // Indicating an internal error occurred
             
-            // Verify if the provided code matches the stored one
-            if (await verifyPassword(code, dbCode)) {
-                if(!await updateOtpStatus({ receiving_medium, use_case, code })) {
-                    return 'error'; // Indicating an internal error occurred
-                }   
-                
-                // Check if the OTP has expired (300 seconds = 5 minutes)
-                response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;
-            }
+            // Check if the OTP has expired (300 seconds = 5 minutes)
+            response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;
         }
-    } catch (err) {
-        logError('Verify OTP [OTP MODULE]', err);
-        response = 'error'; // Indicating an internal error occurred during verification
     }
 
     return response;
 };
 
-const verifyOtpUsed = async (data) => {
+const verifyUsedOtp = async (data) => {
     let response = false;
 
-    try {
-        const { receiving_medium, use_case, code } = data;
-        const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
+    const { receiving_medium, use_case, code } = data;
+    const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
 
-        // Look for the OTP record based on receiving medium, use case, and status
-        const otpRecord = await Otp.findOne({ receiving_medium: encryptedMedium, use_case, status: 'used' });
+    // Look for the OTP record based on receiving medium, use case, and status
+    const otpRecord = await Otp.findOne({ receiving_medium: encryptedMedium, use_case, status: 'used' });
 
-        if (otpRecord) {
-            const { code: dbCode, reg_date } = otpRecord;
-            // Verify if the provided code matches the stored one
-            if (await verifyPassword(code, dbCode)) {
-                response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;
-            }
+    if (otpRecord) {
+        const { code: dbCode, reg_date } = otpRecord;
+        // Verify if the provided code matches the stored one
+        if (await verifyPassword(code, dbCode)) {
+            response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;
         }
-    } catch (err) {
-        logError('Verify OTP [OTP MODULE]', err);
-        response = 'error'; // Indicating an internal error occurred during verification
     }
 
     return response;
@@ -89,66 +75,44 @@ const verifyOtpUsed = async (data) => {
 const storeOtp = async (data) => {
     let result = null;
 
-    try {
-        const otpData = createOtpDTO(data);
-        const { receiving_medium, code, use_case } = otpData;
-        const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
+    const otpData = createOtpDTO(data);
+    const { receiving_medium, code, use_case } = otpData;
+    const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
 
 
-        result = await Otp.findOneAndUpdate(
-            { receiving_medium: encryptedMedium },
-            { code, use_case, status: 'new' },
-            { new: true }
-        );
+    result = await Otp.findOneAndUpdate(
+        { receiving_medium: encryptedMedium },
+        { code, use_case, status: 'new' },
+        { new: true }
+    );
 
-        // Insert new OTP if update failed
-        if (!result) result = await Otp.create(otpData);
-    } catch (err) {
-        logError('Store OTP [OTP MODULE]', err);
-         result = false; // Indicating an internal error occurred during storing
-    }
+    // Insert new OTP if update failed
+    if (!result) result = await Otp.create(otpData);
+    
     return !!result;
 };
 
 // UPDATE OTP
 const updateOtpStatus = async (data) => {
-    let result = null;
-
-    try {
-        const otpData = createOtpDTO(data);
-        const { receiving_medium, code, use_case } = otpData;
-        
-        result = await Otp.findOneAndUpdate(
-            { receiving_medium: selEncrypt(receiving_medium, 'email_phone') },
-            { status: 'used' },
-            { new: true }
-        );
-
-    } catch (err) {
-        logError('Update OTP [OTP MODULE]', err);
-        result = false; // Indicating an internal error occurred during updating
-    }
-
-    return !!result; //convert value into boolean 
+    const otpData = createOtpDTO(data);
+    const { receiving_medium, code, use_case } = otpData;
+    
+    return !!await Otp.findOneAndUpdate(
+        { receiving_medium: selEncrypt(receiving_medium, 'email_phone') },
+        { status: 'used' },
+        { new: true }
+    ); //convert value into boolean 
 };
 
 // DELETE OTP
 const deleteOtp = async (receiving_medium) => {
-    let result = null;
-    try {
-        receiving_medium = selEncrypt(receiving_medium, 'email_phone');
-        result =  await Otp.deleteMany({ receiving_medium });
-    } catch (err) {
-        logError('Delete OTP [OTP MODULE]', err);
-        result =  null;
-    }
-
-    return !!result; //convert value into boolean 
+    receiving_medium = selEncrypt(receiving_medium, 'email_phone');
+    return !!await Otp.deleteMany({ receiving_medium }); //convert value into boolean
 };
 
 module.exports = {
     sendOtp,
-    verifyOtpNew,
-    verifyOtpUsed,
+    verifyNewOtp,
+    verifyUsedOtp,
     deleteOtp,
 };
