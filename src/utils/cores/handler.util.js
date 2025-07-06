@@ -17,10 +17,12 @@ function sendResponse(res, data = {}, message = "OK", status = true, error = [],
  * ValidationError, DB errors, and CustomApiException.
  */
 function handleException(res, error) {
+  // for validation error
   if (error instanceof ValidationError) {
     return sendResponse(res, {}, error.message, false, error.errors, 422);
   }
 
+  // for database error
   if (error.name === "SequelizeDatabaseError" || error.name === "MongoError") {
     const errorData = process.env.NODE_ENV === "development"
       ? { error: error.message }
@@ -28,6 +30,7 @@ function handleException(res, error) {
     return sendResponse(res, {}, "Something went wrong", false, errorData, 500);
   }
 
+  // for custome error
   if (error instanceof CustomApiException) {
     return sendResponse(res, {}, error.message, false, error.details, error.status);
   }

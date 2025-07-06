@@ -35,5 +35,4 @@ module.exports = function (app) {
     app.use(helmet()); // Set Helmet for security
     app.use(xss()); // Set express XSS protection
     app.use(mongoSanitize()); // Set express Mongo sanitize
-    // app.use(Request.setInputData);
 };
