@@ -1,4 +1,3 @@
-const BaseService = require('@service/BaseService.cla');
 const FetchRepository = require('@repository/FetchRepository.cla');
 const { setApiToken } = require('@main_util/token.util');
 const { selEncrypt }  = require('@main_util/security.util');
@@ -6,7 +5,7 @@ const UserResource = require('@resource/UserResource');
 const { triggerError} = require('@core_util/handler.util');
 
 
-class FetchService extends BaseService{
+class FetchService{
     static async authFetchData (user){
         //get user data
         const token = user ? await setApiToken(user.id) : null ;

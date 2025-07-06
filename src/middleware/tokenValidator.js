@@ -1,7 +1,7 @@
 const User = require('@model/User.schema');
 const { log } = require('@main_util/logger.util');
-const { returnResponse }  = require('@main_util/security.util');
 const { validateApiToken } = require('@main_util/token.util');
+const { handleException, triggerError} = require('@core_util/handler.util');
 
 const logError = (type, data) => log(type, data, 'error');
 
@@ -9,14 +9,14 @@ const logError = (type, data) => log(type, data, 'error');
 const tokenValidator = async (req, res, next) => {
     try {
         const userId = await validateApiToken(token);
-        if(!userId) return returnResponse(res, { status: false, message: 'Invalid login' });
+        if(!userId) triggerError('Invalid login', [], 401);
   
         // Fetch user details 
         const user = await User.findOne({ _id: userId});
         //if user not found
-        if (!user) return returnResponse(res, { status: false, message: 'Invalid account' });
+        if (!user) triggerError('Invalid account', [], 401);
         
-        if (user.status === 'suspended') return returnResponse(res, { status: false, message: 'You have been suspended, contact admin' });
+        if (user.status === 'suspended') triggerError('IYou have been suspended, contact admin', [], 401);
         
         // Attach data to request object
         req.user = user;
@@ -24,8 +24,7 @@ const tokenValidator = async (req, res, next) => {
         
         next(); // Proceed to next middleware
     } catch (err) {
-        logError('Token Verification Error', err);
-        return returnResponse(res, { status: false, message: 'Error occurred' });
+        handleException(res), err;
     }
 };
 module.exports = { tokenValidator };

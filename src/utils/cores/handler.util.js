@@ -56,9 +56,14 @@ function triggerValidationError(details = []) {
   throw new ValidationError(details);
 }
 
+function returnNotFound(res, message='Not Found') {
+  sendResponse(res, {}, message, false, 404);
+}
+
 module.exports = {
   sendResponse,
   handleException,
   triggerError,
   triggerValidationError,
+  returnNotFound,
 };
