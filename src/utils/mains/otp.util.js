@@ -4,36 +4,22 @@ const { isDateLapsed }  = require('@main_util/general.util');
 const { generateUniqueId, selEncrypt, verifyPassword }  = require('@main_util/security.util');
 const { sendMessage }  = require('@main_util/messaging.util');
 const { createOtpDTO } = require('@dto/otp.dto');
-const { sendMessageDTO } = require('@dto/messaging.dto');
 
-const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
 
 // SEND OTP
-const sendOtp = async (data) => {
+const sendOtp = async (messageData) => {
     let response = false;
-    data.code = String(generateUniqueId(6));
-    data.type = 'otp_code';
+    messageData.code = String(generateUniqueId(6));
+    messageData.type = 'otp_code';
 
-    try {
-        // Store OTP
-        if (await storeOtp(data)) {
-            response = true;
-            //MOVE TO QUEUE JOB [ if fail... otp will be deleted]
-            const messageData = sendMessageDTO(data);
-            sendMessage(messageData, data.send_medium);
-            
-            // if (!response) {
-            //     await deleteOtp(data.receiving_medium);
-            //     response = false;
-            // }
-                
-        }
-    } catch (err) {
-        logError('Send OTP [OTP UTIL]', err);
-        response = false; // Indicating an internal error occurred during sending
+    // Store OTP
+    if (await storeOtp(messageData)) {
+        // send code with otp [queue]
+        sendMessage(messageData, 'queue');
+        response = true;
     }
-
+    
     return response;
 };
 

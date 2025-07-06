@@ -14,7 +14,7 @@ const worker = new Worker(
     try {
       await sendMessage(job.data.data);
     } catch (err) {
-      logInfo('MESSAGING WORKER', `Error sending message: ${err.message}`);
+      // logInfo('MESSAGING WORKER', `Error sending message: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
   },
@@ -27,7 +27,7 @@ const worker = new Worker(
 
 // Error handler
 worker.on('failed', (job, err) => {
-  logInfo('MESSAGING WORKER', `❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
+  logError('MESSAGING WORKER', `❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
 });
 
 worker.on('completed', (job) => {

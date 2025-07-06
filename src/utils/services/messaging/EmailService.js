@@ -27,13 +27,7 @@ class EmailService {
             html: data.html_content,
         };
 
-        try {
-            await EmailService.transporter.sendMail(mailOptions);
-            return true;
-        } catch (err) {
-            logError('EMAIL SERVICE', err);
-            return false;
-        }
+        await EmailService.transporter.sendMail(mailOptions);
     }
 }
 

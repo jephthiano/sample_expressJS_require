@@ -25,7 +25,7 @@ const tokenValidator = async (req, res, next) => {
         next(); // Proceed to next middleware
     } catch (err) {
         logError('Token Verification Error', err);
-        return returnResponse(res, { status: false, message: 'Error Occurred' });
+        return returnResponse(res, { status: false, message: 'Error occurred' });
     }
 };
 module.exports = { tokenValidator };

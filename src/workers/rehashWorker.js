@@ -12,13 +12,10 @@ const worker = new Worker(
   'rehashQueue',
   async (job) => {
     try {
-
       const data = job.data.data
       await updateSingleField('User', 'id', data.userId, 'password', data.plainPassword);
-
-      // await rehashUserPassword(job.data.data);
     } catch (err) {
-      logInfo('REHASH WORKER', `Error rehashing password: ${err.message}`);
+      // logInfo('REHASH WORKER', `Error rehashing password: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
   },
