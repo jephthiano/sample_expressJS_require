@@ -102,11 +102,11 @@ class AuthService{
         const user = await AuthRepository.createUser(req.body);
         if (!user) triggerError("Account creation failed", []);
 
-        // Clean up OTP
-        deleteOtp(selEncrypt(receiving_medium, 'general'));
         
-        // Send welcome email [PASS TO QUEUE JOB]
+        // Send welcome email [queue]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
+        // Clean up OTP [queue]
+        deleteOtp(selEncrypt(receiving_medium, 'email_phone'));
         
         // Fetch user-related data
         return await FetchController.neededData(user);
@@ -124,19 +124,19 @@ class AuthService{
         const updateUserData = await AuthRepository.updatePassword(req.body);
         if(!updateUserData) triggerError("Password reset failed", []);
 
-        // Clean up OTP
-        await deleteOtp(receiving_medium);
-                
-        // Send password reset notification email
+        
+        // Send password reset notification email [queue]
         sendMessage(
-                { 
+            { 
                 first_name: selEncrypt(updateUserData.first_name, 'first_name'),
                 receiving_medium: selEncrypt(updateUserData.email, 'email'),
                 send_medium: 'email', 
                 type: 'reset_password' 
             }
-        , 'queue'
+            , 'queue'
         );
+        // Clean up OTP [quue]
+        await deleteOtp(receiving_medium);
         
         return;
     }
