@@ -25,8 +25,8 @@ function handleException(res, error) {
   // for database error
   if (error.name === "SequelizeDatabaseError" || error.name === "MongoError") {
     const errorData = process.env.NODE_ENV === "development"
-      ? { error: error.message }
-      : [];
+                        ? { error: error.message }
+                        : [];
     return sendResponse(res, {}, "Something went wrong", false, errorData, 500);
   }
 
@@ -37,8 +37,8 @@ function handleException(res, error) {
 
   // fallback
   const errorData = process.env.NODE_ENV === "development"
-    ? { error: error.message }
-    : [];
+                      ? { error: error.message }
+                      : [];
   return sendResponse(res, {}, "Something went wrong", false, errorData, 500);
 }
 
