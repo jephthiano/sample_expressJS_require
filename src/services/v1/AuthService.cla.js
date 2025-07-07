@@ -1,6 +1,7 @@
 const AuthRepository = require('@repository/AuthRepository.cla');
 const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
-const { sendOtp, verifyNewOtp, verifyUsedOtp, deleteOtp}  = require('@main_util/otp.util');
+const { sendOtp, verifyNewOtp, verifyUsedOtp}  = require('@main_util/otp.util');
+const { queueDeleteOtp } = require('@queue/rehashQueue');
 const { sendMessage } = require('@main_util/messaging.util');
 const { deleteApiToken } = require('@main_util/token.util');
 const { triggerError} = require('@core_util/handler.util');
@@ -106,7 +107,7 @@ class AuthService{
         // Send welcome email [queue]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
         // Clean up OTP [queue]
-        deleteOtp(selEncrypt(receiving_medium, 'email_phone'));
+        queueDeleteOtp(selEncrypt(receiving_medium, 'receiving_medium'));
         
         // Fetch user-related data
         return await FetchController.neededData(user);
@@ -136,7 +137,7 @@ class AuthService{
             , 'queue'
         );
         // Clean up OTP [quue]
-        await deleteOtp(receiving_medium);
+        await queueDeleteOtp(receiving_medium);
         
         return;
     }

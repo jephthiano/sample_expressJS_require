@@ -1,6 +1,6 @@
 const User = require('@model/User.schema');
 const { createUserDTO, updatePasswordDTO } = require('@dto/user.dto');
-const { selEncrypt, }  = require('@main_util/security.util');
+const { selEncrypt }  = require('@main_util/security.util');
 
 class AuthRepository
 {

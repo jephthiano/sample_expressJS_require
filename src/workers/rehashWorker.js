@@ -15,7 +15,7 @@ const worker = new Worker(
       const data = job.data.data
       await updateSingleField('User', 'id', data.userId, 'password', data.plainPassword);
     } catch (err) {
-      // logInfo('REHASH WORKER', `Error rehashing password: ${err.message}`);
+      logInfo('REHASH WORKER', `Error rehashing password: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
   },
@@ -27,7 +27,7 @@ const worker = new Worker(
 
 // Error handler
 worker.on('failed', (job, err) => {
-  logInfo('REHASH WORKER', `❌ Job failed for rehashing: ${err.message}`);
+  logError('REHASH WORKER', `❌ Job failed for rehashing: ${err.message}`);
 });
 
 worker.on('completed', (job) => {

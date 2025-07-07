@@ -25,7 +25,7 @@ const verifyNewOtp = async (data) => {
     let response = false;
     const { receiving_medium, use_case, code } = data;
 
-    const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
+    const encryptedMedium = selEncrypt(receiving_medium, 'receiving_medium');
     
     // Look for the OTP record based on receiving medium, use case, and status
     const otpRecord = await Otp.findOne({ 
@@ -54,7 +54,7 @@ const verifyUsedOtp = async (data) => {
     let response = false;
 
     const { receiving_medium, use_case, code } = data;
-    const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
+    const encryptedMedium = selEncrypt(receiving_medium, 'receiving_medium');
 
     // Look for the OTP record based on receiving medium, use case, and status
     const otpRecord = await Otp.findOne({ receiving_medium: encryptedMedium, use_case, status: 'used' });
@@ -77,11 +77,10 @@ const storeOtp = async (data) => {
 
     const otpData = createOtpDTO(data);
     const { receiving_medium, code, use_case } = otpData;
-    const encryptedMedium = selEncrypt(receiving_medium, 'email_phone');
 
 
     result = await Otp.findOneAndUpdate(
-        { receiving_medium: encryptedMedium },
+        { receiving_medium: selEncrypt(receiving_medium, 'receiving_medium') },
         { code, use_case, status: 'new' },
         { new: true }
     );
@@ -98,7 +97,7 @@ const updateOtpStatus = async (data) => {
     const { receiving_medium, code, use_case } = otpData;
     
     return !!await Otp.findOneAndUpdate(
-        { receiving_medium: selEncrypt(receiving_medium, 'email_phone') },
+        { receiving_medium: selEncrypt(receiving_medium, 'receiving_medium') },
         { status: 'used' },
         { new: true }
     ); //convert value into boolean 
@@ -106,7 +105,7 @@ const updateOtpStatus = async (data) => {
 
 // DELETE OTP
 const deleteOtp = async (receiving_medium) => {
-    receiving_medium = selEncrypt(receiving_medium, 'email_phone');
+    receiving_medium = selEncrypt(receiving_medium, 'receiving_medium');
     return !!await Otp.deleteMany({ receiving_medium }); //convert value into boolean
 };
 

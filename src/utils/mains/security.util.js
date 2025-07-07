@@ -10,7 +10,7 @@ const key = process.env.ENC_KEY;
 const iv = process.env.ENC_IV;
 // const method = process.env.ENC_METHOD; // Encryption method
 const cost = process.env.HASH_COST;
-const enc_array = ['general', 'token'];
+const enc_array = ['general', 'token', 'receiving_medium'];
 
 // Hash password asynchronously
 const hashPassword = async (password) => await bcrypt.hash(password, 10);

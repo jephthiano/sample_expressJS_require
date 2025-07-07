@@ -108,7 +108,7 @@ const sendOtp = async (inputs, type) => {
         }
     } else if (type === 'forgot_password') {
         const { receiving_medium } = inputs;
-        const enc_receiving_medium = selEncrypt(receiving_medium, 'email_phone');
+        const enc_receiving_medium = selEncrypt(receiving_medium, 'receiving_medium');
 
         const data_exists = await User.findOne(
             { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] },

@@ -1,7 +1,7 @@
 require('module-alias/register');
 const { redis } = require('@config/database');
 const { Worker } = require('bullmq');
-const { sendMessage } = require('@main_util/messaging.util');
+const { deleteOtp } = require('@main_util/otp.util');
 const { log } = require('@main_util/logger.util');
 
 const logInfo = (type, data) => log(type, data, 'info');
@@ -9,12 +9,15 @@ const logError = (type, data) => log(type, data, 'error');
 
 // Create the worker
 const worker = new Worker(
-  'messagingQueue',
+  'deleteOtpQueue',
   async (job) => {
+    // if (job.name === 'deleteOtp') { // can be used to filter
+
     try {
-      await sendMessage(job.data.data);
+      const data = job.data.data;
+      await deleteOtp(data);
     } catch (err) {
-      logInfo('MESSAGING WORKER', `Error sending message: ${err.message}`);
+      logInfo('REHASH WORKER', `Error rehashing password: ${err.message}`);
       throw err; // ensure BullMQ registers it as a failure
     }
   },
@@ -24,12 +27,11 @@ const worker = new Worker(
   }
 );
 
-
 // Error handler
 worker.on('failed', (job, err) => {
-  logError('MESSAGING WORKER', `❌ Job failed for ${job?.data?.data?.send_medium || 'unknown'}: ${err.message}`);
+  logError('DELETE OTP WORKER', `❌ Job failed for deleteing otp: ${err.message}`);
 });
 
 worker.on('completed', (job) => {
-  logInfo('MESSAGING WORKER', `🎉 Job completed: ${job.id}`);
+  logInfo('DELETE OTP WORKER', `🎉 Job completed: ${job.id}`);
 });

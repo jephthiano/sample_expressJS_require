@@ -43,7 +43,7 @@ async function transformOtpUpdate(update) {
     }
 
     if (data.receiving_medium && !data.receiving_medium.startsWith('enc:')) {
-        data.receiving_medium = selEncrypt(data.receiving_medium);
+        data.receiving_medium = selEncrypt(data.receiving_medium, 'receiving_medium');
     }
 
     data.reg_date = new Date();
@@ -64,7 +64,7 @@ OtpTokenSchema.pre('save', async function (next) {
     }
 
     if (this.isModified('receiving_medium') && !this.receiving_medium.startsWith('enc:')) {
-        this.receiving_medium = selEncrypt(this.receiving_medium);
+        this.receiving_medium = selEncrypt(this.receiving_medium, 'receiving_medium');
     }
 
     next();
