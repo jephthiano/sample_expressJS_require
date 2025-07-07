@@ -39,7 +39,7 @@ const validateApiToken = async (req) => {
     } else if (setter === 'redis_self') {
         userId = await redis.get(`auth:token:${token}`);
     } else {
-        triggerError(`Unsupported TOKEN_SETTER: ${setter}`);
+        triggerError(`Unsupported TOKEN_SETTER: ${setter}`, [], 400);
     }
 
     if (userId) {

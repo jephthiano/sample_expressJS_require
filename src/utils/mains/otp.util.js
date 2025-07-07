@@ -40,7 +40,7 @@ const verifyNewOtp = async (data) => {
         // Verify if the provided code matches the stored one
         if (await verifyPassword(code, dbCode)) {
             // update otp status to used
-            if(!await updateOtpStatus({ receiving_medium, use_case, code })) triggerError("Error occurred while running request", []); // Indicating an internal error occurred
+            if(!await updateOtpStatus({ receiving_medium, use_case, code })) triggerError("Error occurred while running request", [], 500); // Indicating an internal error occurred
             
             // Check if the OTP has expired (300 seconds = 5 minutes)
             response = isDateLapsed(reg_date, process.env.OTP_EXPIRY) ? 'expired' : true;

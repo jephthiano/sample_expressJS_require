@@ -4,7 +4,7 @@ const { triggerError} = require('@core_util/handler.util');
 
 const findSingleValue = async (coll, field, param, select) => {
     const model = getModel(coll); // Get model dynamically
-    if (!model) triggerError(`Model ${coll} not found`);
+    if (!model) triggerError(`Model ${coll} not found`,[], 500);
 
     const result = await model.findOne({ [field]: param }, select);
     const response = result ? result[select] : null;
@@ -14,7 +14,7 @@ const findSingleValue = async (coll, field, param, select) => {
 
 const updateSingleField = async (collectionName, whereField, whereValue, updateField, newValue) => {
     const model = getModel(collectionName); // dynamically resolve the Mongoose model
-    if (!model) triggerError(`Model ${coll} not found`);
+    if (!model) triggerError(`Model ${coll} not found`,[], 500);
 
     const result = await model.updateOne(
     { [whereField]: whereValue },

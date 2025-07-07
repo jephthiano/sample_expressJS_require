@@ -16,12 +16,12 @@ class AuthService{
 
         // Get user data by login ID
         const user = await AuthRepository.getUserByLoginId(login_id);
-        if (!user) triggerError("Incorrect login details", []);
+        if (!user) triggerError("Incorrect login details", [], 401);
 
         // Verify password (async if using bcrypt.compare)
         const { password: dbPassword, status: userStatus, id: userId } = user;
         const  isPasswordValid = await verifyPassword(password, dbPassword, userId);
-        if (!isPasswordValid) triggerError("Incorrect login details", []);
+        if (!isPasswordValid) triggerError("Incorrect login details", [], 401);
 
         // Check account status
         if (userStatus === 'suspended') triggerError("Your account has been suspended, contact admin", []);
@@ -36,7 +36,7 @@ class AuthService{
 
         // Create user
         const user = await AuthRepository.createUser(req.body);
-        if (!user) triggerError("Account creation failed", []);
+        if (!user) triggerError("Account creation failed", [], 500);
 
         // Send welcome email [PASS TO QUEUE JOB]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
@@ -58,7 +58,7 @@ class AuthService{
         };
 
         const sent = await sendOtp(data);
-        if(!sent) triggerError("Request for otp failed", [])
+        if(!sent) triggerError("Request for otp failed", [], 500)
 
         return [];
     }
@@ -73,7 +73,7 @@ class AuthService{
 
         const verify = await verifyNewOtp(data);
 
-        if(!verify) triggerError("Incorrect otp code", []);
+        if(!verify) triggerError("Incorrect otp code", [], 401);
 
         if(verify === 'expired') triggerError("Otp code has expired", []);
 
@@ -86,7 +86,7 @@ class AuthService{
     
         const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'sign_up', code });
             
-        if(!verifyOtp) triggerError("Invalid Request", []);
+        if(!verifyOtp) triggerError("Invalid Request", [], 403);
 
         if (verifyOtp === 'expired') triggerError("Request timeout, try again", []);
 
@@ -101,7 +101,7 @@ class AuthService{
 
         // Create user
         const user = await AuthRepository.createUser(req.body);
-        if (!user) triggerError("Account creation failed", []);
+        if (!user) triggerError("Account creation failed", [], 500);
 
         
         // Send welcome email [queue]
@@ -118,12 +118,12 @@ class AuthService{
         const { code, receiving_medium } = req.body;
         const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'forgot_password', code }); 
 
-        if(!verifyOtp) triggerError("Invalid Request", []);
+        if(!verifyOtp) triggerError("Invalid Request", [], 403);
 
         if (verifyOtp === 'expired') triggerError("Request timeout, try again", []);
 
         const updateUserData = await AuthRepository.updatePassword(req.body);
-        if(!updateUserData) triggerError("Password reset failed", []);
+        if(!updateUserData) triggerError("Password reset failed", [], 500);
 
         
         // Send password reset notification email [queue]
@@ -145,7 +145,7 @@ class AuthService{
 
     static async logout(req) {
         const response = await deleteApiToken(req);
-        if(!response) triggerError("Request failed, try again", [])
+        if(!response) triggerError("Request failed, try again", [], 500)
 
         return response;
     }
