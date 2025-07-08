@@ -1,7 +1,6 @@
-const { findSingleValue } = require('@database/mongo/general.db');
-const User = require('@model/User.schema');
+const { findUserByEmailOrPhone , findEmailMobileNumberUsername} = require('@database/mongo/user.db');
 const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require('@main_util/general.util');
-const { validateInput, selEncrypt, validatePassword }  = require('@main_util/security.util');
+const { validateInput, validatePassword }  = require('@main_util/security.util');
 
 // Utility function for response formatting
 const formatResponse = (errors) => ({
@@ -30,11 +29,7 @@ const register = async (inputs, regType) => {
     const errors = {};
     const {email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
-    const [email_exists, mobile_exists, username_exists] = await Promise.all([
-        findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
-        findSingleValue('User', 'mobile_number', selEncrypt(mobile_number, 'mobile_number'), 'mobile_number'),
-        findSingleValue('User', 'username', selEncrypt(username, 'username'), 'username')
-    ]);
+    const [email_exists, mobile_exists, username_exists] = await findEmailMobileNumberUsername(email, mobile_number, username)
     
     if (!email || isEmptyString(email)) {
         errors.email = "email is required";
@@ -93,31 +88,21 @@ const sendOtp = async (inputs, type) => {
     const resType = replaceValues(veriType, '_', ' ')
 
     if (type === 'sign_up') {
-        const enc_receiving_medium = selEncrypt(receiving_medium, 'email');
-
-        const data_exists = await User.findOne(
-            { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] }
-        );
+        const data_exists = await findUserByEmailOrPhone(receiving_medium);
 
         if (!receiving_medium || isEmptyString(receiving_medium)) {
             errors.receiving_medium = "field is required";
-        } else if (data_exists) {
+        } else if (data_exists) { // if data is in db
             errors.receiving_medium = `${resType} already taken`;
         } else if (!validateInput(receiving_medium, veriType)) {
             errors.receiving_medium = `invalid ${resType}`;
         }
     } else if (type === 'forgot_password') {
-        const { receiving_medium } = inputs;
-        const enc_receiving_medium = selEncrypt(receiving_medium, 'receiving_medium');
-
-        const data_exists = await User.findOne(
-            { $or: [{ mobile_number: enc_receiving_medium }, { email: enc_receiving_medium }] },
-            'first_name'
-        );
+        const data_exists = await findUserByEmailOrPhone(receiving_medium);
 
         if (!receiving_medium || isEmptyString(receiving_medium)) {
             errors.receiving_medium = `Email/mobile number is required`;
-        } else if (!data_exists) {
+        } else if (!data_exists) { // if the data is not in db
             errors.receiving_medium = `${resType} does not exist`;
         }
     }else{
@@ -144,11 +129,7 @@ const signup = async (inputs, regType) => {
     const errors = {};
     const {receiving_medium, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
-    const [email_exists, mobile_exists, username_exists] = await Promise.all([
-        findSingleValue('User', 'email', selEncrypt(email, 'email'), 'email'),
-        findSingleValue('User', 'mobile_number', selEncrypt(mobile_number, 'mobile_number'), 'mobile_number'),
-        findSingleValue('User', 'username', selEncrypt(username, 'username'), 'username')
-    ]);
+    const [email_exists, mobile_exists, username_exists] = await findEmailMobileNumberUsername(email, mobile_number, username)
 
     //if receiving medium is mobile number else email
     if(validateInput(receiving_medium, 'mobile_number')){
