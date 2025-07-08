@@ -1,9 +1,8 @@
-const User = require('@model/User.schema');
 const { log } = require('@main_util/logger.util');
 const { validateApiToken } = require('@main_util/token.util');
 const { handleException, triggerError} = require('@core_util/handler.util');
+const { findUserByID } = require('@database/mongo/user.db');
 
-const logError = (type, data) => log(type, data, 'error');
 
 // Middleware to verify token and attach user data to `req`
 const tokenValidator = async (req, res, next) => {
@@ -12,11 +11,11 @@ const tokenValidator = async (req, res, next) => {
         if(!userId) triggerError('Invalid login', [], 401);
   
         // Fetch user details 
-        const user = await User.findOne({ _id: userId});
+        const user = await findUserByID(userId);
         //if user not found
         if (!user) triggerError('Invalid account', [], 401);
         
-        if (user.status === 'suspended') triggerError('IYou have been suspended, contact admin', [], 401);
+        if (user.status === 'suspended') triggerError('You have been suspended, contact admin', [], 401);
         
         // Attach data to request object
         req.user = user;

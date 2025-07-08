@@ -40,6 +40,7 @@ project-root/
 │
 ├── src/
 │ ├── controllers/ # Route handlers
+│ ├── database/ # for database intereations
 │ ├── middlewares/ # Authentication, error handling, etc.
 │ ├── models/ # User, OTP, and other data models
 │ ├── routes/ # API route definitions

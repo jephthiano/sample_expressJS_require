@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { selEncrypt, selDecrypt, generateUniqueToken }  = require('@main_util/security.util');
 const { redis } = require('@config/database');
 const { triggerError} = require('@core_util/handler.util');
-const { findUnexpiredToken, deleteToken, updateOrCeateToken } = require('@database/mongo/otp.db');
+const { findUnexpiredToken, deleteToken, updateOrCeateToken, updateExpireTime } = require('@database/mongo/otp.db');
 
 
 const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 hour
