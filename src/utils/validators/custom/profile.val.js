@@ -1,4 +1,4 @@
-const { findSingleValue } = require('@main_util/database.util');
+const { findSingleValue } = require('@database/mongo/general.db');
 const { isEmptyObject, isEmptyString }  = require('@main_util/general.util');
 const { validateInput, selEncrypt }  = require('@main_util/security.util');
 

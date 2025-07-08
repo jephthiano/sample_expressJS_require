@@ -1,7 +1,7 @@
 require('module-alias/register');
 const { redis } = require('@config/database');
 const { Worker } = require('bullmq');
-const { updateSingleField } = require('@main_util/database.util');
+const { updateSingleField } = require('@database/mongo/general.db');
 const { log } = require('@main_util/logger.util');
 
 const logInfo = (type, data) => log(type, data, 'info');
