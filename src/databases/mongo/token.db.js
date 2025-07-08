@@ -8,11 +8,11 @@ const deleteToken = async (userId) => {
     return await Token.deleteOne({ user_id: userId });
 }
 
-const updateOrCeateToken = async () => {
-    return Token.findOneAndUpdate(
+const updateOrCeateToken = async (userId, token) => {
+    return await Token.findOneAndUpdate(
             { user_id: userId },
             {
-                token: newToken,
+                token,
                 expire_at: new Date(Date.now() + tokenExpiry)
             },
             {
@@ -23,7 +23,19 @@ const updateOrCeateToken = async () => {
         );
 }
 
+const updateExpireTime = async (userId) => {
+    return await Token.findOneAndUpdate(
+        { user_id: userId },
+        {
+            expire_at: new Date(Date.now() + tokenExpiry)
+        },
+    );
+}
+
 
 module.exports = {
     findUnexpiredToken,
+    deleteToken,
+    updateOrCeateToken,
+    updateExpireTime,
 };

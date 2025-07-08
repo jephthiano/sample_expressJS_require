@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { selEncrypt, selDecrypt, generateUniqueToken }  = require('@main_util/security.util');
 const { redis } = require('@config/database');
 const { triggerError} = require('@core_util/handler.util');
-const { findUnexpiredToken, deleteToken } = require('@database/mongo/otp.db');
+const { findUnexpiredToken, deleteToken, updateOrCeateToken } = require('@database/mongo/otp.db');
 
 
 const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 hour
@@ -132,7 +132,7 @@ const createJwtToken = async (userId) => {
 const createLocalDBToken = async (userId) => {
     // generate token
     const newToken = generateUniqueToken();
-    const save = await updateOrCreateToken();
+    const save = await updateOrCeateToken(userId, newToken);
 
     return save ? newToken : null;
     
@@ -163,12 +163,7 @@ const renewJwtToken = async (token) => {
 }
 
 const renewLocalDBToken = async (userId) => {
-    const savedToken = await Token.findOneAndUpdate(
-        { user_id: userId },
-        {
-            expire_at: new Date(Date.now() + tokenExpiry)
-        },
-    );
+    const savedToken = await updateExpireTime(userId);
     return savedToken ?? null
 }
 
