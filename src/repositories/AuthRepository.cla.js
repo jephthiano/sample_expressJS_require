@@ -1,6 +1,6 @@
 const User = require('@model/User.schema');
 const { createUserDTO, updatePasswordDTO } = require('@dto/user.dto');
-const { selEncrypt }  = require('@main_util/security.util');
+const { selEncrypt, selDecrypt }  = require('@main_util/security.util');
 
 class AuthRepository
 {
@@ -24,11 +24,18 @@ class AuthRepository
         const { password, receiving_medium } = data;
         const encMedium = selEncrypt(receiving_medium, 'email_phone');
         
-        return await User.findOneAndUpdate(
+        const user =  await User.findOneAndUpdate(
             {$or: [{ mobile_number: encMedium }, { email: encMedium }]},
             { password },
             { new: true }
-        )   
+        )  
+        
+        if(!user) return null;
+
+        return {
+            email: selDecrypt(user.email, 'email'),
+            first_name: selDecrypt(user.first_name, 'first_name'),
+        };
     }
 }
 

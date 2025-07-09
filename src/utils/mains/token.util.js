@@ -48,7 +48,6 @@ const validateApiToken = async (req) => {
     
 };
 
-
 const deleteApiToken = async (req) => {
     let status = false;
 
@@ -78,6 +77,14 @@ const deleteApiToken = async (req) => {
 
     return status;
 }
+
+const setCurrentToken = (req) => {
+    const token = getApiToken(req);
+
+    return token ? selEncrypt(token, 'token') : token;
+}
+
+
 
 //get the token
 const getApiToken = (req) => {
@@ -179,4 +186,5 @@ module.exports = {
     setApiToken,
     validateApiToken,
     deleteApiToken,
+    setCurrentToken,
 };

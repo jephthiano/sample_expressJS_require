@@ -1,5 +1,5 @@
 const AuthRepository = require('@repository/AuthRepository.cla');
-const { verifyPassword, selEncrypt, validateInput }  = require('@main_util/security.util');
+const { verifyPassword, validateInput }  = require('@main_util/security.util');
 const { sendOtp, verifyNewOtp, verifyUsedOtp}  = require('@main_util/otp.util');
 const { queueDeleteOtp } = require('@queue/rehashQueue');
 const { sendMessage } = require('@main_util/messaging.util');
@@ -107,7 +107,7 @@ class AuthService{
         // Send welcome email [queue]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
         // Clean up OTP [queue]
-        queueDeleteOtp(selEncrypt(receiving_medium, 'receiving_medium'));
+        queueDeleteOtp(receiving_medium);
         
         // Fetch user-related data
         return await FetchController.neededData(user);
@@ -129,8 +129,8 @@ class AuthService{
         // Send password reset notification email [queue]
         sendMessage(
             { 
-                first_name: selEncrypt(updateUserData.first_name, 'first_name'),
-                receiving_medium: selEncrypt(updateUserData.email, 'email'),
+                first_name: updateUserData.first_name,
+                receiving_medium: updateUserData.email,
                 send_medium: 'email', 
                 type: 'reset_password' 
             }

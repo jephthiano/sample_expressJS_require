@@ -1,5 +1,5 @@
 const { isDateLapsed }  = require('@main_util/general.util');
-const { generateUniqueId, selEncrypt, verifyPassword }  = require('@main_util/security.util');
+const { generateUniqueId, verifyPassword }  = require('@main_util/security.util');
 const { sendMessage }  = require('@main_util/messaging.util');
 const { findOneOtpData, storeOtp, updateOtpStatus, deleteManyOtp } = require('@database/mongo/otp.db');
 
@@ -24,7 +24,7 @@ const verifyNewOtp = async (data) => {
     let response = false;
     const { receiving_medium, use_case, code } = data;
 
-    const otpRecord = await findOneOtpData(selEncrypt(receiving_medium, 'receiving_medium'), use_case, 'new');
+    const otpRecord = await findOneOtpData(receiving_medium, use_case, 'new');
     
     if (otpRecord) {
         const { code: dbCode, reg_date } = otpRecord;
@@ -47,7 +47,7 @@ const verifyUsedOtp = async (data) => {
 
     const { receiving_medium, use_case, code } = data;
 
-    const otpRecord = await findOneOtpData(selEncrypt(receiving_medium, 'receiving_medium'), use_case, 'used');
+    const otpRecord = await findOneOtpData(receiving_medium, use_case, 'used');
 
     if (otpRecord) {
         const { code: dbCode, reg_date } = otpRecord;

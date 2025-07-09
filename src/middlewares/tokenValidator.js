@@ -1,4 +1,3 @@
-const { log } = require('@main_util/logger.util');
 const { validateApiToken } = require('@main_util/token.util');
 const { handleException, triggerError} = require('@core_util/handler.util');
 const { findUserByID } = require('@database/mongo/user.db');
@@ -7,7 +6,7 @@ const { findUserByID } = require('@database/mongo/user.db');
 // Middleware to verify token and attach user data to `req`
 const tokenValidator = async (req, res, next) => {
     try {
-        const userId = await validateApiToken(token);
+        const userId = await validateApiToken(req);
         if(!userId) triggerError('Invalid login', [], 401);
   
         // Fetch user details 
@@ -19,7 +18,6 @@ const tokenValidator = async (req, res, next) => {
         
         // Attach data to request object
         req.user = user;
-        req.token = token;
         
         next(); // Proceed to next middleware
     } catch (err) {

@@ -3,6 +3,7 @@ const { createOtpDTO } = require('@dto/otp.dto');
 
 //FIND ONE OTP DATA
 const findOneOtpData = async(receiving_medium, use_case, status) => {
+    receiving_medium = selEncrypt(receiving_medium, 'receiving_medium');
     // Look for the OTP record based on receiving medium, use case, and status
     return await Otp.findOne({ receiving_medium, use_case,  status });
 }
