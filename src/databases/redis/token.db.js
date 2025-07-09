@@ -43,5 +43,5 @@ const { redis } = require('@config/database');
     redisGetUserIdByToken,
     redisDeleteToken,
     redisCreateToken,
-    redisRenewToken.
+    redisRenewToken,
  }
