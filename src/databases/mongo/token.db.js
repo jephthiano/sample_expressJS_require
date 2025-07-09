@@ -1,6 +1,8 @@
 const Token = require('@model/Token.schema');
+const { selEncrypt, generateUniqueToken }  = require('@main_util/security.util');
 
 const findUnexpiredToken = async (token)=> {
+    token = selEncrypt(token, 'token');
     return await Token.findOne({ token, expire_at: { $gt: new Date() } });
 }
 

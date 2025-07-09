@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { hashPassword } = require('@main_util/security.util');
+const { selEncrypt } = require('@main_util/security.util');
 
 const TokenSchema = new Schema({
     user_id: {
@@ -31,7 +31,7 @@ async function transformUserUpdate(update) {
     const target = update.$set || update;
 
     if (target.token) {
-        // target.token = await hashPassword(target.token);
+        target.token = selEncrypt(target.token, 'token');
         target.expire_at = new Date(Date.now() + 60 * 60 * 1000);
     }
 
@@ -43,7 +43,7 @@ async function transformUserUpdate(update) {
 
 TokenSchema.pre('save', async function (next) {
     if (this.isModified('token')) {
-        // this.token = await hashPassword(this.token);
+        this.token = selEncrypt(this.token, 'token');
         this.expire_at = new Date(Date.now() + 60 * 60 * 1000);
     }
     next();

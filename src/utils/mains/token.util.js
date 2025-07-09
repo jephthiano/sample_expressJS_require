@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { selEncrypt, selDecrypt, generateUniqueToken }  = require('@main_util/security.util');
+const { generateUniqueToken }  = require('@main_util/security.util');
 const { redis } = require('@config/database');
 const { triggerError} = require('@core_util/handler.util');
 const { findUnexpiredToken, deleteToken, updateOrCeateToken, updateExpireTime } = require('@database/mongo/otp.db');
@@ -11,9 +11,8 @@ const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 
 const setApiToken = async (id) => {
     const token = await generateToken(id);
 
-    if(!token) return null;
+    return token ?? null;
 
-    return selEncrypt(token, 'token'); // Encrypt token
 };
 
 const validateApiToken = async (req) => {
@@ -40,7 +39,7 @@ const validateApiToken = async (req) => {
     }
 
     if (userId) {
-        const newToken = await autoRenewTokenTime(userId, token); // gonna need if token will be changing at every request
+        const newToken = await autoRenewTokenTime(userId, token); // gonna need  newTokenif token will be changing at every request
         return userId;
     }
 
@@ -78,19 +77,12 @@ const deleteApiToken = async (req) => {
     return status;
 }
 
-const setCurrentToken = (req) => {
-    const token = getApiToken(req);
-
-    return token ? selEncrypt(token, 'token') : token;
-}
-
-
 
 //get the token
 const getApiToken = (req) => {
     const token = process.env.TOKEN_TYPE === 'bearer' 
                     ? extractToken(req.headers.authorization) 
-                    : selDecrypt(req.cookies._menatreyd, 'token');
+                    : req.cookies._menatreyd;
 
     return token ?? null;
 }
@@ -99,7 +91,7 @@ const getApiToken = (req) => {
 const extractToken = (authHeader) => {
     if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
         const token = authHeader.split(' ')[1] || null;
-        return token ? selDecrypt(token, 'token') : null;
+        return token ? token : null;
     }
     return null;
 };
@@ -183,8 +175,8 @@ const renewRedisToken = async (userId) => {
 }
 
 module.exports = {
+    getApiToken,
     setApiToken,
     validateApiToken,
     deleteApiToken,
-    setCurrentToken,
 };

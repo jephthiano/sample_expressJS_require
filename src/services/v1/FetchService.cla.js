@@ -1,5 +1,5 @@
 const FetchRepository = require('@repository/FetchRepository.cla');
-const { setApiToken, setCurrentToken } = require('@main_util/token.util');
+const { setApiToken, getApiToken } = require('@main_util/token.util');
 const UserResource = require('@resource/UserResource');
 const { triggerError} = require('@core_util/handler.util');
 
@@ -20,7 +20,7 @@ class FetchService{
     static async appFetchData (req){
         //get user data
         const user = await FetchRepository.getUserById(req.user.id);
-        const token = setCurrentToken(req); // change to get token
+        const token = getApiToken(req); // change to get token
 
         if(token && user){
             const data = new UserResource(user).toJSON();

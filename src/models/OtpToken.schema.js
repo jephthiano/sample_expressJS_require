@@ -35,23 +35,23 @@ const OtpTokenSchema = new Schema({
 
 // 🔄 Shared transformation logic
 async function transformOtpUpdate(update) {
-    const data = update.$set || update;
+    const target = update.$set || update;
 
     // Only hash if it's a plain string (avoid re-hashing)
-    if (data.code && !data.code.startsWith('$2b$')) {
-        data.code = await hashPassword(data.code);
+    if (target.code && !target.code.startsWith('$2b$')) {
+        target.code = await hashPassword(target.code);
     }
 
-    if (data.receiving_medium && !data.receiving_medium.startsWith('enc:')) {
-        data.receiving_medium = selEncrypt(data.receiving_medium, 'receiving_medium');
+    if (target.receiving_medium && !target.receiving_medium.startsWith('enc:')) {
+        target.receiving_medium = selEncrypt(target.receiving_medium, 'receiving_medium');
     }
 
-    data.reg_date = new Date();
+    target.reg_date = new Date();
 
     if (update.$set) {
-        update.$set = data;
+        update.$set = target;
     } else {
-        Object.assign(update, data);
+        Object.assign(update, target);
     }
 
     return update;
