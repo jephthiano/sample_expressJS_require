@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const { generateUniqueToken }  = require('@main_util/security.util');
 const { redis } = require('@config/database');
 const { triggerError} = require('@core_util/handler.util');
-const { findUnexpiredToken, deleteToken, updateOrCeateToken, updateExpireTime } = require('@database/mongo/otp.db');
+const { findUnexpiredToken, deleteToken, updateOrCeateToken, updateExpireTime } = require('@database/mongo/token.db');
+const { redisGetUserIdByToken, redisDeleteToken, redisCreateToken, redisRenewToken, } = require('@database/mongo/token.db');
 
 
 const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 hour
@@ -33,7 +34,7 @@ const validateApiToken = async (req) => {
         userId = dbToken?.user_id;
 
     } else if (setter === 'redis_self') {
-        userId = await redis.get(`auth:token:${token}`);
+        userId = await redisGetUserIdByToken(token)
     } else {
         triggerError(`Unsupported TOKEN_SETTER: ${setter}`, [], 400);
     }

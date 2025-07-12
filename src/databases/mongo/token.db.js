@@ -1,13 +1,9 @@
 const Token = require('@model/Token.schema');
-const { selEncrypt, generateUniqueToken }  = require('@main_util/security.util');
+const { selEncrypt }  = require('@main_util/security.util');
 
 const findUnexpiredToken = async (token)=> {
     token = selEncrypt(token, 'token');
     return await Token.findOne({ token, expire_at: { $gt: new Date() } });
-}
-
-const deleteToken = async (userId) => {
-    return await Token.deleteOne({ user_id: userId });
 }
 
 const updateOrCeateToken = async (userId, token) => {
@@ -34,10 +30,14 @@ const updateExpireTime = async (userId) => {
     );
 }
 
+const deleteToken = async (userId) => {
+    return await Token.deleteOne({ user_id: userId });
+}
+
 
 module.exports = {
     findUnexpiredToken,
-    deleteToken,
     updateOrCeateToken,
     updateExpireTime,
+    deleteToken,
 };
