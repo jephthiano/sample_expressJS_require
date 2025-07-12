@@ -1,43 +1,34 @@
-const BaseService = require('@service/BaseService.cla');
 const FetchRepository = require('@repository/FetchRepository.cla');
-const { setApiToken } = require('@main_util/token.util');
-const { selEncrypt }  = require('@main_util/security.util');
+const { setApiToken, getApiToken } = require('@main_util/token.util');
 const UserResource = require('@resource/UserResource');
+const { triggerError} = require('@core_util/handler.util');
 
 
-class FetchService extends BaseService{
-    static async authFetchData (res, user){
-        try {
-            //get user data
-            const token = user ? await setApiToken(user.id) : null ;
+class FetchService{
+    static async authFetchData (user){
+        //get user data
+        const token = user ? await setApiToken(user.id) : null ;
 
-            if(token && user){
-                const data = new UserResource(user).toJSON();
-                return {token, data};
-            }
-        } catch (error) {
-            this.handleException(res, error);
+        if(token && user){
+            const data = new UserResource(user).toJSON();
+            return {token, data};
         }
 
         return {};
     }
 
-    static async appFetchData (req, res){
-        try{
-            //get user data
-            const user = await FetchRepository.getUserById(res, req.user.id);
-            const token = selEncrypt(req.token, 'token');
+    static async appFetchData (req){
+        //get user data
+        const user = await FetchRepository.getUserById(req.user.id);
+        const token = getApiToken(req); // change to get token
 
-            if(token && user){
-                const data = new UserResource(user).toJSON();
-                const response = {token, data}
-                return this.sendResponse(res, response, "Success");
-            }
-        }catch(err){
-            this.handleException(res, err);
+        if(token && user){
+            const data = new UserResource(user).toJSON();
+            const response = {token, data}
+            return response;
         }
 
-        return this.triggerError("User not found", [], 404);
+        triggerError("User not found", [], 404);
     }
 }
 

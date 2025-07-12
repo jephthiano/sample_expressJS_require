@@ -7,6 +7,7 @@ connectDB().then(() => {
     // workers
     require('@worker/messagingWorker');
     require('@worker/rehashWorker');
+    require('@worker/deleteOtpWorker');
 
     // Graceful shutdown on Ctrl+C or system kill
     process.on("SIGINT", async () => {

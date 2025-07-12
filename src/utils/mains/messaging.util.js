@@ -20,7 +20,6 @@ const sendMessage = async (data, type) => {
         return ;
     }
 
-
     switch (data.send_medium) {
         case 'email':
             return await EmailService.send(messageData);
@@ -38,10 +37,6 @@ const sendMessage = async (data, type) => {
             throw new Error(`Unsupported send_medium: ${data.send_medium}`);
     }
 };
-
-
-
-
 
 module.exports = {
     sendMessage,

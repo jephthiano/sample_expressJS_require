@@ -7,6 +7,7 @@ class ValidationError extends Error {
     }
   }
   
+  
   class CustomApiException extends Error {
     constructor(message, status = 400, details = []) {
       super(message);

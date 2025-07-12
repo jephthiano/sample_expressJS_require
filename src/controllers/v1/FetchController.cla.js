@@ -4,17 +4,15 @@ const FetchService = require('@service/v1/FetchService.cla');
 
 class FetchController extends BaseController{
 
-    static async authFetchData (res, id){
-        try {
-            return await FetchService.authFetchData(res, id);
-        } catch (error) {
-            this.handleException(res, error);
-        }
+    static async authFetchData (id){
+        return await FetchService.authFetchData(id);
     }
 
-    static async appFetchData (req, res){
+    static async appFetchData (req){
         try{
-            await FetchService.appFetchData(req, res);
+            const response = await FetchService.appFetchData(req);
+
+            return this.sendResponse(res, response, "Success");
         }catch(error){
             this.handleException(res, error);
         }
@@ -22,4 +20,4 @@ class FetchController extends BaseController{
     
 }
 
-module.exports = FetchController;
+module.exports = FetchController

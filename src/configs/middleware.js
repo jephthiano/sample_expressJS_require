@@ -15,8 +15,6 @@ module.exports = function (app) {
         methods: ['GET', 'POST', 'DELETE', 'PUT']
     };
     
-    const Request = require('@main_util/request.util');
-    
     // Set rate limit message
     const message = JSON.stringify({ status: false, "message": "Too many requests from this IP, please try again later." });
     
@@ -35,5 +33,4 @@ module.exports = function (app) {
     app.use(helmet()); // Set Helmet for security
     app.use(xss()); // Set express XSS protection
     app.use(mongoSanitize()); // Set express Mongo sanitize
-    // app.use(Request.setInputData);
 };

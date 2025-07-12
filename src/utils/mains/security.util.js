@@ -10,9 +10,7 @@ const key = process.env.ENC_KEY;
 const iv = process.env.ENC_IV;
 // const method = process.env.ENC_METHOD; // Encryption method
 const cost = process.env.HASH_COST;
-const enc_array = ['general', 'token'];
-
-const returnResponse = (res, data, statusCode = 401) => res.status(statusCode).json({ data });
+const enc_array = ['general', 'token', 'receiving_medium'];
 
 // Hash password asynchronously
 const hashPassword = async (password) => await bcrypt.hash(password, 10);
@@ -68,12 +66,9 @@ const validatePassword = (password) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+_
 
 const generateUniqueToken = () => crypto.randomBytes(32).toString('hex');
 
-const generateUniqueToken2 = () => uuidv4();
-
 const generateUniqueId = (max) => crypto.randomInt(2, Number(`1${'0'.repeat(max)}`));
 
 module.exports = {
-    returnResponse,
     hashPassword,
     verifyPassword,
     selEncrypt,

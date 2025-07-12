@@ -109,7 +109,7 @@ UserSchema.pre('save', async function (next) {
     if (this.isModified('password')) this.password = await hashPassword(this.password);
 
     if (!this.user_account) {
-        this.user_account = { balance: "0.00" };
+        this.user_account = { balance: "0" };
     }
 
     next();

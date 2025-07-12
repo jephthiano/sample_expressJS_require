@@ -48,7 +48,7 @@
     "@model": "src/models",
     "@service": "src/services",
     "@repository": "src/repositories",
-    "@middleware": "src/middleware",
+    "@middleware": "src/middlewares",
     "@resource": "src/resources",
     "@queue": "src/queues",
     "@worker": "src/workers",
