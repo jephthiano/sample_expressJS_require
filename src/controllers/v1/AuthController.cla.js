@@ -14,11 +14,13 @@ class AuthController extends BaseController{
             // Validate inputs using Joi DTO
             const { error, value } = loginJoi.validate(req.body, { abortEarly: false });
             if (error) this.triggerValidationError(parseMessageToObject(error));
-
-            await AuthService.login(req, res);
+            
+            const response = await AuthService.login(req);
+            this.sendResponse(res, response, "Login successful");
         } catch (error) {
             this.handleException(res, error);
         }
+
     }
 
     // REGISTER
@@ -28,7 +30,9 @@ class AuthController extends BaseController{
             const { status, data } = await register(req.body, 'single');
             if (status) this.triggerValidationError(data);
 
-            await AuthService.register(req, res);
+            const response = await AuthService.register(req);
+
+            this.sendResponse(res, response, "Account successfully created");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -39,15 +43,15 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(type !== 'sign_up' && type !== 'forgot_password'){
-                this.triggerError("Invalid Request", []);
-            }
+            if(type !== 'sign_up' && type !== 'forgot_password') this.triggerError("Invalid Request", []);
 
             //validate inputs
             const { status, data } = await sendOtp(req.body, type);
             if (status) this.triggerValidationError(data);
 
-            await AuthService.sendOtp(req, res, type);
+            const response = await AuthService.sendOtp(req, type);
+
+            this.sendResponse(res, response, "Otp code successful sent");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -58,15 +62,15 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(type !== 'sign_up' && type !== 'forgot_password'){
-                this.triggerError("Invalid Request", []);
-            }
+            if (type !== 'sign_up' && type !== 'forgot_password') this.triggerError("Invalid Request", []);
 
             // validate inputs
             const { status, data } = await verifyOtp(req.body, type);
             if (status) this.triggerValidationError(data);
             
-            await AuthService.verifyOtp(req, res, type);
+            const response =  await AuthService.verifyOtp(req, type);
+
+            return this.sendResponse(res, response, "Otp code successful verified");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -79,7 +83,9 @@ class AuthController extends BaseController{
             const { status, data } = await signup(req.body, 'multi');
             if (status) this.triggerValidationError(data);
 
-            await AuthService.signup(req, res);
+            const response =  await AuthService.signup(req);
+
+            this.sendResponse(res, response, "Account successfully created");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -92,7 +98,9 @@ class AuthController extends BaseController{
             const { status, data } = await resetPassword(req.body);
             if (status) this.triggerValidationError(data);
 
-            await AuthService.resetPassword(req, res);
+           const response =  await AuthService.resetPassword(req);
+           
+           this.sendResponse(res, response, "Password successfully reset");
         } catch (error) {
             this.handleException(res, error);
         }
@@ -102,7 +110,9 @@ class AuthController extends BaseController{
     // LOGOUT
     static async logout(req, res) {
          try {
-            await AuthService.logout(req, res);
+            const response =  await AuthService.logout(req);
+
+            this.sendResponse(res, response, "Logout successfully");
         } catch (error) {
             this.handleException(res, error);
         }

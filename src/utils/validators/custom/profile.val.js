@@ -1,6 +1,6 @@
-const { findSingleValue } = require('@main_util/database.util');
 const { isEmptyObject, isEmptyString }  = require('@main_util/general.util');
-const { validateInput, selEncrypt, validatePassword }  = require('@main_util/security.util');
+const { validateInput }  = require('@main_util/security.util');
+const { findUserSingleValuebyEncField, } = require('@database/mongo/user.db');
 
 // Utility function for response formatting
 const formatResponse = (errors) => ({
@@ -11,8 +11,7 @@ const formatResponse = (errors) => ({
 const validateEmailChange = async ({ email }, userData) => {
     let errors = {};
 
-    const enc_email = selEncrypt(email, 'email');
-    const emailExists = await findSingleValue('User', 'email', enc_email, 'email');
+    const emailExists = await findUserSingleValuebyEncField('User', 'email', email, 'email');
 
     // Validate email
     if (!email || isEmptyString(email)) {
@@ -31,8 +30,7 @@ const validateEmailChange = async ({ email }, userData) => {
 const validateUsernameChange = async ({ username }, userData) => {
     let errors = {};
 
-    const encUsername = selEncrypt(username, 'username');
-    const usernameExists = await findSingleValue('User', 'username', encUsername, 'username');
+    const usernameExists = await findUserSingleValuebyEncField('User', 'username', username, 'username');
 
     // Validate username
     if (!username || isEmptyString(username)) {

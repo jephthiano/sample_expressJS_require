@@ -1,5 +1,3 @@
-const role = require("../middleware/role");
-
 class UserResource {
     constructor(user) {
       this.user = user;
@@ -33,9 +31,9 @@ class UserResource {
   
   module.exports = UserResource;
 
-  //for one
+  //for many
   // UserResource.collection(users)
 
-  // for many
+  // for one
   // new UserResource(user).toJSON()
   

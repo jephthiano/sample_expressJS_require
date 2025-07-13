@@ -20,6 +20,7 @@ const emailDTO = (data) => {
     const text_content = messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
         });
+    console.log(text_content);
     return {
         first_name,
         receiving_medium: data.receiving_medium?.trim(),
@@ -113,7 +114,7 @@ const htmlEmailTemplate = (data) => {
 
                 <div class="j-text-color5">
                     <p><b>Dear ${ucFirst(data.first_name)},</b></p>
-                    <p>${data.message}</p>
+                    <p>${data.text_content}</p>
                     <p>We appreciate your effort in being with us.</p>
                     <p>Best Regards.</p>
                     <p>${company_name} Team.</p><br>                           
