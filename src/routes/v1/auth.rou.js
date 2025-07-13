@@ -34,7 +34,7 @@ router.post('/reset_password', async(req,res) => {
 });
 
 //LOGOUT
-router.get('/logout/:id', async(req,res) => {
+router.post('/logout/', async(req,res) => {
     AuthController.logout(req, res);
 });
 

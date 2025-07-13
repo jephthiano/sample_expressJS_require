@@ -1,7 +1,5 @@
-const jwt = require('jsonwebtoken');
-const { generateUniqueToken }  = require('@main_util/security.util');
 const { triggerError} = require('@core_util/handler.util');
-const { findUnexpiredToken, deleteToken, updateOrCeateToken, updateExpireTime } = require('@database/mongo/token.db');
+const { dbFindUnexpiredToken, dbDeleteToken, dbUpdateOrCeateToken, DbRenewToken } = require('@database/mongo/token.db');
 const { redisGetUserIdByToken, redisDeleteToken, redisCreateToken, redisRenewToken, } = require('@database/redis/token.db');
 const { createJwtToken, renewJwtToken, validateJwtToken } = require('@service_util/validation/jwt');
 
@@ -24,15 +22,16 @@ const validateApiToken = async (req) => {
     if (setter === 'jwt') {
         userId = await validateJwtToken(token);
     } else if (setter === 'local_self') {
-        userId = await findUnexpiredToken(token);
+        userId = await dbFindUnexpiredToken(token);
     } else if (setter === 'redis_self') {
         userId = await redisGetUserIdByToken(token)
     } else {
-        triggerError(`Unsupported TOKEN_SETTER: ${setter}`, [], 400);
+        triggerError(`Unsupported Request`, [], 400);
     }
 
     if (userId) {
-        const newToken = await autoRenewTokenTime(userId, token); // gonna need  newTokenif token will be changing at every request [or when  close to expre time]
+        // newToken if token will be changing at every request [or when  close to expre time]
+        // const newToken = await autoRenewTokenTime(userId, token); 
         return userId;
     }
 
@@ -42,15 +41,16 @@ const validateApiToken = async (req) => {
 
 const deleteApiToken = async (req) => {
     let status = false;
+    
+    const token = getApiToken(req);
+    if(!token) return false;
 
     if (process.env.TOKEN_SETTER === 'jwt') {
-        status = true;
+        status = true; // not available
     } else if (process.env.TOKEN_SETTER === 'local_self') {
-        const userId = req.params?.id ?? null ;
-        if(userId) status = await deleteToken(userId)
-
+        status = await dbDeleteToken(token)
     } else if (process.env.TOKEN_SETTER === 'redis_self') {
-        status= await redisDeleteToken($userId);
+        status = await redisDeleteToken(token);
     }
 
     return status;
@@ -79,8 +79,8 @@ const extractToken = (authHeader) => {
 const  generateToken = async (userId) => {
         const methods = {
             jwt: () => createJwtToken(userId),
-            local_self: () => createLocalDBToken(userId),
-            redis_self: () => createRedisToken(userId),
+            local_self: () => dbUpdateOrCeateToken(userId),
+            redis_self: () => redisCreateToken(userId),
         };
 
         const method = process.env.TOKEN_SETTER;
@@ -91,40 +91,12 @@ const  generateToken = async (userId) => {
 const autoRenewTokenTime = async(userId, token) => {
     const methods = {
         jwt: () => renewJwtToken(token),
-        local_self: () => renewLocalDBToken(userId),
-        redis_self: () => renewRedisToken(userId, token),
+        local_self: () => DbRenewToken(userId),
+        redis_self: () => redisRenewToken(userId, token),
     };
 
     const method = process.env.TOKEN_SETTER;
     return methods[method] ? await methods[method]() : null;
-}
-
-const createLocalDBToken = async (userId) => {
-    // generate token
-    const newToken = generateUniqueToken();
-    const save = await updateOrCeateToken(userId, newToken);
-
-    return save ? newToken : null;
-    
-}
-
-const createRedisToken =  async (userId) => {
-    const newToken = generateUniqueToken();
-    const save =  redisCreateToken(userId, newToken);
-
-    return save ? newToken : null;
-}
-
-const renewLocalDBToken = async (userId) => {
-    const savedToken = await updateExpireTime(userId);
-    return savedToken ?? null
-}
-
-const renewRedisToken = async (userId, token) => {
-    // Renew TTL
-    const renew = redisRenewToken(userId, token);
-
-    return !!renew;
 }
 
 module.exports = {
