@@ -1,13 +1,19 @@
 const Token = require('@model/Token.schema');
 const { selEncrypt }  = require('@main_util/security.util');
+const { generateUniqueToken }  = require('@main_util/security.util');
 
-const findUnexpiredToken = async (token)=> {
+const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY);
+
+const dbFindUnexpiredToken = async (token)=> {
     token = selEncrypt(token, 'token');
-    return await Token.findOne({ token, expire_at: { $gt: new Date() } });
+    const user = await Token.findOne({ token, expire_at: { $gt: new Date() } });
+    return user?.user_id ?? null;
 }
 
-const updateOrCeateToken = async (userId, token) => {
-    return await Token.findOneAndUpdate(
+const dbUpdateOrCeateToken = async (userId) => {
+    const token = generateUniqueToken();
+
+    const result = await Token.findOneAndUpdate(
             { user_id: userId },
             {
                 token,
@@ -19,25 +25,32 @@ const updateOrCeateToken = async (userId, token) => {
                 runValidators: true
             }
         );
+
+    return result ? token : null;
 }
 
-const updateExpireTime = async (userId) => {
-    return await Token.findOneAndUpdate(
+const DbRenewToken = async (userId) => {
+    const renew = await Token.findOneAndUpdate(
         { user_id: userId },
         {
             expire_at: new Date(Date.now() + tokenExpiry)
         },
     );
+
+    return renew ? true : false;
 }
 
-const deleteToken = async (userId) => {
-    return await Token.deleteOne({ user_id: userId });
+const dbDeleteToken = async (token) => {
+    const encryptedToken = selEncrypt(token, 'token');
+    const result = await Token.deleteOne({ token: encryptedToken });
+    
+    return result.deletedCount > 0;
 }
 
 
 module.exports = {
-    findUnexpiredToken,
-    updateOrCeateToken,
-    updateExpireTime,
-    deleteToken,
+    dbFindUnexpiredToken,
+    dbUpdateOrCeateToken,
+    DbRenewToken,
+    dbDeleteToken,
 };

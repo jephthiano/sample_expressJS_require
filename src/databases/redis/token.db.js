@@ -1,17 +1,22 @@
 const { redis } = require('@config/database'); 
 const { selEncrypt }  = require('@main_util/security.util');
+const { generateUniqueToken }  = require('@main_util/security.util');
 
-const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 hour
+const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY)
  
  const redisGetUserIdByToken = async (token) => {
    const encryptedToken = selEncrypt(token, 'token');
+   // console.log(token);
     const userId = await redis.get(`auth:token:${encryptedToken}`);
 
-    return userId;
+    return userId ?? null;
  }
 
- const redisCreateToken = async (userId, newToken) => {
+ const redisCreateToken = async (userId) => {
+      const newToken = generateUniqueToken();
       const encryptedToken = selEncrypt(newToken, 'token');
+      
+      // Use a pipeline for atomic operations
       const pipeline = redis.pipeline();
 
       // Get old token (outside pipeline because we need its value immediately)
@@ -32,7 +37,7 @@ const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 
       const userSetSuccess = setUserResult[1] === 'OK';
       const tokenSetSuccess = setTokenResult[1] === 'OK';
 
-      return userSetSuccess && tokenSetSuccess;
+      return userSetSuccess && tokenSetSuccess ? newToken : null;
  };
 
  const redisRenewToken = async (userId, token) => {
@@ -48,14 +53,14 @@ const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY) || 3600; // default to 1 
     const tokenSuccess = tokenResult[1]; // 1 if TTL set successfully
     const userSuccess = userResult[1];
 
-    return tokenSuccess === 1 && userSuccess === 1;
+    return tokenSuccess === 1 && userSuccess === 1 ? true : false;
  };
 
- const redisDeleteToken = async (userId) => {
-    const token = await redis.get(`auth:user:${userId}`);
+ const redisDeleteToken = async (token) => {
+    const encryptedToken = selEncrypt(token, 'token');
+    const userId = await redis.get(`auth:token:${encryptedToken}`);
     
-    if (token) {
-       const encryptedToken = selEncrypt(token, 'token');
+    if (userId) {
        const pipeline = redis.pipeline();
 
         pipeline.del(`auth:token:${encryptedToken}`);

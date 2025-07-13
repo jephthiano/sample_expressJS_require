@@ -1,5 +1,6 @@
 const Otp = require('@model/OtpToken.schema');
 const { createOtpDTO } = require('@dto/otp.dto');
+const { selEncrypt }  = require('@main_util/security.util');
 
 //FIND ONE OTP DATA
 const findOneOtpData = async(receiving_medium, use_case, status) => {
@@ -49,4 +50,5 @@ module.exports = {
     findOneOtpData,
     storeOtp,
     updateOtpStatus,
+    deleteManyOtp,
 };

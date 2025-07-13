@@ -8,7 +8,7 @@ class FetchController extends BaseController{
         return await FetchService.authFetchData(id);
     }
 
-    static async appFetchData (req){
+    static async appFetchData (req, res){
         try{
             const response = await FetchService.appFetchData(req);
 
