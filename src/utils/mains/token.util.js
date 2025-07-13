@@ -28,7 +28,7 @@ const validateApiToken = async (req) => {
     } else {
         triggerError(`Unsupported Request`, [], 400);
     }
-
+    
     if (userId) {
         // newToken if token will be changing at every request [or when  close to expre time]
         // const newToken = await autoRenewTokenTime(userId, token); 

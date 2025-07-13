@@ -6,6 +6,7 @@ const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY)
  
  const redisGetUserIdByToken = async (token) => {
    const encryptedToken = selEncrypt(token, 'token');
+   // console.log(token);
     const userId = await redis.get(`auth:token:${encryptedToken}`);
 
     return userId ?? null;
