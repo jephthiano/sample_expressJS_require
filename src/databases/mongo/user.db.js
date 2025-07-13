@@ -3,7 +3,7 @@ const User = require('@model/User.schema');
 const { selEncrypt }  = require('@main_util/security.util');
 
 const findUserByID = async (userId) => {
-    return awaitUser.findOne({ _id: userId});
+    return await User.findOne({ _id: userId});
 }
 
 const findUserByEmailOrPhone = async(receiving_medium) => {

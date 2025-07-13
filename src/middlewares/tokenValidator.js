@@ -7,7 +7,7 @@ const { findUserByID } = require('@database/mongo/user.db');
 const tokenValidator = async (req, res, next) => {
     try {
         const userId = await validateApiToken(req);
-        if(!userId) triggerError('Invalid login', [], 401);
+        if(!userId) triggerError('Invalid request', [], 401);
   
         // Fetch user details 
         const user = await findUserByID(userId);
@@ -21,7 +21,7 @@ const tokenValidator = async (req, res, next) => {
         
         next(); // Proceed to next middleware
     } catch (err) {
-        handleException(res), err;
+        handleException(res, err);
     }
 };
 module.exports = { tokenValidator };

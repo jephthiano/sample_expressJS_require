@@ -3,7 +3,8 @@ const { selEncrypt }  = require('@main_util/security.util');
 
 const findUnexpiredToken = async (token)=> {
     token = selEncrypt(token, 'token');
-    return await Token.findOne({ token, expire_at: { $gt: new Date() } });
+    const user = await Token.findOne({ token, expire_at: { $gt: new Date() } });
+    return user?.user_id ?? null;
 }
 
 const updateOrCeateToken = async (userId, token) => {
@@ -31,7 +32,8 @@ const updateExpireTime = async (userId) => {
 }
 
 const deleteToken = async (userId) => {
-    return await Token.deleteOne({ user_id: userId });
+    const result = await Token.deleteOne({ user_id: userId });
+    return result.deleteCount > 0;
 }
 
 

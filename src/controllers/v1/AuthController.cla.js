@@ -8,7 +8,7 @@ const { parseMessageToObject } = require('@main_util/general.util');
 class AuthController extends BaseController{
 
     // LOGIN
-    static async login(req) {
+    static async login(req, res) {
         try {
 
             // Validate inputs using Joi DTO
@@ -24,7 +24,7 @@ class AuthController extends BaseController{
     }
 
     // REGISTER
-    static async register(req) {
+    static async register(req, res) {
         try {
             //validate inputs
             const { status, data } = await register(req.body, 'single');
@@ -39,7 +39,7 @@ class AuthController extends BaseController{
     }
 
     // SEND OTP
-    static async sendOtp(req) {
+    static async sendOtp(req, res) {
         const { type } = req.params;
 
         try {
@@ -58,7 +58,7 @@ class AuthController extends BaseController{
     }
 
     // VERIFY OTP
-    static async verifyOtp(req) {
+    static async verifyOtp(req, res) {
         const { type } = req.params;
 
         try {
@@ -77,7 +77,7 @@ class AuthController extends BaseController{
     }
 
     // SIGNUP
-    static async signup(req) {
+    static async signup(req, res) {
         try {
             //validate inputs
             const { status, data } = await signup(req.body, 'multi');
@@ -92,7 +92,7 @@ class AuthController extends BaseController{
     }
 
     // RESET PASSWORD
-    static async resetPassword(req) {
+    static async resetPassword(req, res) {
         try {
             //validate inputs
             const { status, data } = await resetPassword(req.body);
@@ -108,7 +108,7 @@ class AuthController extends BaseController{
 
 
     // LOGOUT
-    static async logout(req) {
+    static async logout(req, res) {
          try {
             const response =  await AuthService.logout(req);
 
