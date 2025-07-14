@@ -1,5 +1,6 @@
 const User = require('@model/User.schema');
-const { log } = require('@main_util/logger.util');
+const OtpToken = require('@model/OtpToken.schema');
+const Token = require('@model/Token.schema');
 const { triggerError} = require('@core_util/handler.util');
 
 const findSingleValue = async (coll, field, param, select) => {
@@ -25,7 +26,7 @@ const updateSingleField = async (collectionName, whereField, whereValue, updateF
 };
 
 const getModel = (modelName) => {
-    const models = { User }; // Add other models here
+    const models = { User, OtpToken, Token }; // Add other models here
     return models[modelName] || null;
 };
 
