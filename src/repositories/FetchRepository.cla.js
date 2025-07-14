@@ -1,9 +1,9 @@
-const User = require('@model/User.schema');
+const { findUserByID } = require('@database/mongo/user.db');
 
 class FetchRepository
 {
-    static async getUserById(id) {
-        return await User.findOne({_id : id});
+    static async getUserById(userId) {
+        return await findUserByID(userId);
     }
 }
 
