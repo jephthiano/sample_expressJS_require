@@ -1,13 +1,14 @@
 require('module-alias/register');
+require('dotenv').config();
 const { connectDB, mongoose } = require('@config/database');
 const { log } = require('@main_util/logger.util');
 
+// workers
+require('@worker/messagingWorker');
+require('@worker/rehashWorker');
+require('@worker/deleteOtpWorker');
 
 connectDB().then(() => {
-    // workers
-    require('@worker/messagingWorker');
-    require('@worker/rehashWorker');
-    require('@worker/deleteOtpWorker');
 
     // Graceful shutdown on Ctrl+C or system kill
     process.on("SIGINT", async () => {

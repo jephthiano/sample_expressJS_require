@@ -1,4 +1,3 @@
-require('module-alias/register');
 const { redis } = require('@config/database');
 const { Worker } = require('bullmq');
 const { updateSingleField } = require('@database/mongo/general.db');

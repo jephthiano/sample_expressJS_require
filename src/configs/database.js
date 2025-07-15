@@ -1,4 +1,3 @@
-require('dotenv').config();
 const mongoose = require("mongoose");
 const Redis = require('ioredis');
 const { log } = require('@main_util/logger.util');

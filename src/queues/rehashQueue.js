@@ -1,6 +1,5 @@
 const { Queue } = require('bullmq');
 const { redis } = require('@config/database');
-require('dotenv').config();
 
 const rehashQueue = new Queue('rehashQueue', {
   connection: redis.duplicate(), // ensures a clean connection for the Queue
