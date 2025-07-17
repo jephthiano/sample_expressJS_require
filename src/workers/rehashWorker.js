@@ -1,4 +1,4 @@
-const { redis } = require('@config/database');
+const { redis } = require('@config/redis');
 const { Worker } = require('bullmq');
 const { updateSingleField } = require('@database/mongo/general.db');
 const { log } = require('@main_util/logger.util');

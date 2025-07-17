@@ -1,4 +1,4 @@
-const { redis } = require('@config/database');
+const { redis } = require('@config/redis'); 
 const { Worker } = require('bullmq');
 const { deleteOtp } = require('@main_util/otp.util');
 const { log } = require('@main_util/logger.util');
