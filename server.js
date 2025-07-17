@@ -3,7 +3,7 @@ require('module-alias/register');
 const express = require("express");
 const app = express();
 
-require('@config/middleware')(app); // Apply middlewares
+require('@config/applyMiddleware')(app); // Apply middlewares
 
 const { connectDB, mongoose } = require('@config/database'); // Import both
 const v1RouteEntry = require('@route/v1/index.rou'); // Route entry point
