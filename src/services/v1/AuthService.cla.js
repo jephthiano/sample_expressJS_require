@@ -73,36 +73,16 @@ class AuthService{
 
         const verify = await verifyNewOtp(data);
 
-        if(!verify) triggerError("Incorrect otp code", [], 401);
-
-        if(verify === 'expired') triggerError("Otp code has expired", []);
-
         return [];
     }
 
     static async signup(req) {
         const { receiving_medium, code, first_name, email } = req.body;
-        const veriType = validateInput(receiving_medium) ? 'mobile_number' : 'email';
-    
-        const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'sign_up', code });
-            
-        if(!verifyOtp) triggerError("Invalid Request", [], 403);
-
-        if (verifyOtp === 'expired') triggerError("Request timeout, try again", []);
-
-        // Mark verification based on type and set the other field not set from form
-        if (veriType === 'email') {
-            req.body.email_verified_at = new Date();
-            req.body.mobile_number = receiving_medium;
-        } else {
-            req.body.mobile_number_verified_at = new Date();
-            req.body.email = receiving_medium;
-        }
+        const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'sign_up', code });  
 
         // Create user
         const user = await AuthRepository.createUser(req.body);
         if (!user) triggerError("Account creation failed", [], 500);
-
         
         // Send welcome email [queue]
         sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
@@ -118,14 +98,9 @@ class AuthService{
         const { code, receiving_medium } = req.body;
         const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'forgot_password', code }); 
 
-        if(!verifyOtp) triggerError("Invalid Request", [], 403);
-
-        if (verifyOtp === 'expired') triggerError("Request timeout, try again", []);
-
         const updateUserData = await AuthRepository.updatePassword(req.body);
         if(!updateUserData) triggerError("Password reset failed", [], 500);
-
-        
+  
         // Send password reset notification email [queue]
         sendMessage(
             { 
