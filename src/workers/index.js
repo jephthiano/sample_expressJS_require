@@ -1,5 +1,5 @@
 require('module-alias/register');
-require('dotenv').config();
+require('@config/env');
 const { connectDB, mongoose } = require('@config/database');
 const { log } = require('@main_util/logger.util');
 
