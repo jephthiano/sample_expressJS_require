@@ -1,6 +1,5 @@
 const { Queue } = require('bullmq');
-const { redis } = require('@config/database');
-require('dotenv').config();
+const { redis } = require('@config/redis'); 
 
 const messagingQueue = new Queue('messagingQueue', {
   connection: redis.duplicate(), // ensures a clean connection for the Queue

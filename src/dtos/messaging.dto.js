@@ -20,7 +20,7 @@ const emailDTO = (data) => {
     const text_content = messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
         });
-    console.log(text_content);
+        
     return {
         first_name,
         receiving_medium: data.receiving_medium?.trim(),

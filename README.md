@@ -1,6 +1,6 @@
 # EXPRESS JS API STARTER PROJECT
 
-A boilerplate Express.js (CommonJS `require`) API project for rapid backend development. This project is designed to help you kickstart any API-based service quickly, with built-in user authentication and OTP-based signup options.
+A boilerplate Express.js (CommonJS `require`) API project for rapid backend development. This project is designed to help you kickstart any API-based service quickly, with built-in user authentication and OTP-based signup options. this project is designed with clean architecture
 
 ---
 
@@ -39,18 +39,18 @@ OLADEJO JEPHTHAH
 project-root/
 │
 ├── src/
+│ ├── config/ # Config & environment setup
 │ ├── controllers/ # Route handlers
 │ ├── database/ # for database intereations
+│ ├── dtos/ # Data Transfer Objects
 │ ├── middlewares/ # Authentication, error handling, etc.
 │ ├── models/ # User, OTP, and other data models
-│ ├── routes/ # API route definitions
-│ ├── services/ # Business logic (OTP, token generation, etc.)
-│ ├── utils/ # Helper functions (token gen, hash, etc.)
-│ ├── config/ # Config & environment setup
-│ ├── dtos/ # Data Transfer Objects
 │ ├── queues/ # Queue setup (e.g. BullMQ)
 │ ├── repositories/ # Data access layer (DB calls)
 │ ├── resources/ # Response formatters, transformers, etc.
+│ ├── routes/ # API route definitions
+│ ├── services/ # Business logic (OTP, token generation, etc.)
+│ ├── utils/ # Helper functions (token gen, hash, etc.)
 │ ├── workers/ # Background workers (e.g. OTP expiry, email jobs)
 │
 └── server.js # Entry point for the application
@@ -62,9 +62,9 @@ project-root/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/express-api-starter.git
+git clone https://github.com/jephthiano/sample_expressJS_require.git
 
-cd express-api-starter
+cd sample_expressJS_require
 
 # Install dependencies
 npm install

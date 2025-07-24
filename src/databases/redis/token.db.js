@@ -1,4 +1,4 @@
-const { redis } = require('@config/database'); 
+const { redis } = require('@config/redis'); 
 const { selEncrypt }  = require('@main_util/security.util');
 const { generateUniqueToken }  = require('@main_util/security.util');
 
@@ -6,7 +6,6 @@ const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY)
  
  const redisGetUserIdByToken = async (token) => {
    const encryptedToken = selEncrypt(token, 'token');
-   // console.log(token);
     const userId = await redis.get(`auth:token:${encryptedToken}`);
 
     return userId ?? null;
