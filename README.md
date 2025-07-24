@@ -1,6 +1,6 @@
 # EXPRESS JS API STARTER PROJECT
 
-A boilerplate Express.js (CommonJS `require`) API project for rapid backend development. This project is designed to help you kickstart any API-based service quickly, with built-in user authentication and OTP-based signup options.
+A boilerplate Express.js (CommonJS `require`) API project for rapid backend development. This project is designed to help you kickstart any API-based service quickly, with built-in user authentication and OTP-based signup options. this project is designed with clean architecture
 
 ---
 
@@ -62,9 +62,9 @@ project-root/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/express-api-starter.git
+git clone https://github.com/jephthiano/sample_expressJS_require.git
 
-cd express-api-starter
+cd sample_expressJS_require
 
 # Install dependencies
 npm install
