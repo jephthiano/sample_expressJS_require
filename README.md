@@ -39,18 +39,18 @@ OLADEJO JEPHTHAH
 project-root/
 │
 ├── src/
+│ ├── config/ # Config & environment setup
 │ ├── controllers/ # Route handlers
 │ ├── database/ # for database intereations
+│ ├── dtos/ # Data Transfer Objects
 │ ├── middlewares/ # Authentication, error handling, etc.
 │ ├── models/ # User, OTP, and other data models
-│ ├── routes/ # API route definitions
-│ ├── services/ # Business logic (OTP, token generation, etc.)
-│ ├── utils/ # Helper functions (token gen, hash, etc.)
-│ ├── config/ # Config & environment setup
-│ ├── dtos/ # Data Transfer Objects
 │ ├── queues/ # Queue setup (e.g. BullMQ)
 │ ├── repositories/ # Data access layer (DB calls)
 │ ├── resources/ # Response formatters, transformers, etc.
+│ ├── routes/ # API route definitions
+│ ├── services/ # Business logic (OTP, token generation, etc.)
+│ ├── utils/ # Helper functions (token gen, hash, etc.)
 │ ├── workers/ # Background workers (e.g. OTP expiry, email jobs)
 │
 └── server.js # Entry point for the application
