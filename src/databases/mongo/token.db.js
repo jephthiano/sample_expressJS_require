@@ -1,6 +1,6 @@
-const Token = require('@model/Token.schema');
-const { selEncrypt }  = require('@main_util/security.util');
-const { generateUniqueToken }  = require('@main_util/security.util');
+const Token = require('#model/Token.schema');
+const { selEncrypt }  = require('#main_util/security.util');
+const { generateUniqueToken }  = require('#main_util/security.util');
 
 const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY);
 

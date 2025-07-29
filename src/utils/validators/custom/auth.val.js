@@ -1,6 +1,6 @@
-const { findUserByEmailOrPhone , findEmailMobileNumberUsername} = require('@database/mongo/user.db');
-const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require('@main_util/general.util');
-const { validateInput, validatePassword }  = require('@main_util/security.util');
+const { findUserByEmailOrPhone , findEmailMobileNumberUsername} = require('#database/mongo/user.db');
+const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require('#main_util/general.util');
+const { validateInput, validatePassword }  = require('#main_util/security.util');
 
 // Utility function for response formatting
 const formatResponse = (errors) => ({

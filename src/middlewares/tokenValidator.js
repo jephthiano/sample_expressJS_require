@@ -1,6 +1,6 @@
-const { validateApiToken } = require('@main_util/token.util');
-const { handleException, triggerError} = require('@core_util/handler.util');
-const { findUserByID } = require('@database/mongo/user.db');
+const { validateApiToken } = require('#main_util/token.util');
+const { handleException, triggerError} = require('#core_util/handler.util');
+const { findUserByID } = require('#database/mongo/user.db');
 
 
 // Middleware to verify token and attach user data to `req`

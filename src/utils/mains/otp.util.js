@@ -1,8 +1,8 @@
-const { isDateLapsed }  = require('@main_util/general.util');
-const { generateUniqueId, verifyPassword }  = require('@main_util/security.util');
-const { sendMessage }  = require('@main_util/messaging.util');
-const { findOneOtpData, storeOtp, updateOtpStatus, deleteManyOtp } = require('@database/mongo/otp.db');
-const { triggerError} = require('@core_util/handler.util');
+const { isDateLapsed }  = require('#main_util/general.util');
+const { generateUniqueId, verifyPassword }  = require('#main_util/security.util');
+const { sendMessage }  = require('#main_util/messaging.util');
+const { findOneOtpData, storeOtp, updateOtpStatus, deleteManyOtp } = require('#database/mongo/otp.db');
+const { triggerError} = require('#core_util/handler.util');
 
 // SEND OTP
 const sendOtp = async (messageData) => {

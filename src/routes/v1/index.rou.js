@@ -1,11 +1,11 @@
 const express = require('express');
 const router = new express.Router();
-const auth = require('@route/v1/auth.rou');
-const fetch = require('@route/v1/fetch.rou');
-const test = require('@route/v1/test.rou');
-// const profile = require('@route/profile.rou');
-const { tokenValidator } = require('@middleware/tokenValidator');
-const { returnNotFound} = require('@core_util/handler.util');
+const auth = require('#route/v1/auth.rou');
+const fetch = require('#route/v1/fetch.rou');
+const test = require('#route/v1/test.rou');
+// const profile = require('#route/profile.rou');
+const { tokenValidator } = require('#middleware/tokenValidator');
+const { returnNotFound} = require('#core_util/handler.util');
 
 
 // USING ROUTES

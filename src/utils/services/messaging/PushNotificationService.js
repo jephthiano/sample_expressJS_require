@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
-const { sendMessageDTO } = require('@dto/messaging.dto');
-const { log } = require('@main_util/logger.util');
+const { sendMessageDTO } = require('#dto/messaging.dto');
+const { log } = require('#main_util/logger.util');
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');

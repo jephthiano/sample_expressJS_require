@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { selEncrypt } = require('@main_util/security.util');
+const { selEncrypt } = require('#main_util/security.util');
 
 const TokenSchema = new Schema({
     user_id: {

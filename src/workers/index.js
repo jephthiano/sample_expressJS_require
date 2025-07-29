@@ -1,12 +1,12 @@
 require('module-alias/register');
-require('@config/env');
-const { connectDB, mongoose } = require('@config/database');
-const { log } = require('@main_util/logger.util');
+require('#config/env');
+const { connectDB, mongoose } = require('#config/database');
+const { log } = require('#main_util/logger.util');
 
 // workers
-require('@worker/messagingWorker');
-require('@worker/rehashWorker');
-require('@worker/deleteOtpWorker');
+require('#worker/messagingWorker');
+require('#worker/rehashWorker');
+require('#worker/deleteOtpWorker');
 
 // Connect DB and manage graceful shutdown
 connectDB().then(() => {

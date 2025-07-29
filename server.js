@@ -1,8 +1,8 @@
 require('module-alias/register');
-require('@config/env');
-const { connectDB, mongoose } = require('@config/database'); // Import both
-const { log } = require('@main_util/logger.util');
-const app = require('@src/app');
+require('#config/env');
+const { connectDB, mongoose } = require('#config/database'); // Import both
+const { log } = require('#main_util/logger.util');
+const app = require('#src/app');
 
 const PORT = process.env.PORT || 5000;
 

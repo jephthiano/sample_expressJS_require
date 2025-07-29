@@ -41,24 +41,24 @@
     "nodeman": "^1.1.2"
   },
   "_moduleAliases": {
-    "@src": "src",
-    "@config": "src/configs",
-    "@dto": "src/dtos",
-    "@controller": "src/controllers",
-    "@route": "src/routes",
-    "@model": "src/models",
-    "@database": "src/databases",
-    "@service": "src/services",
-    "@repository": "src/repositories",
-    "@middleware": "src/middlewares",
-    "@resource": "src/resources",
-    "@queue": "src/queues",
-    "@worker": "src/workers",
+    "#src": "src",
+    "#config": "src/configs",
+    "#dto": "src/dtos",
+    "#controller": "src/controllers",
+    "#route": "src/routes",
+    "#model": "src/models",
+    "#database": "src/databases",
+    "#service": "src/services",
+    "#repository": "src/repositories",
+    "#middleware": "src/middlewares",
+    "#resource": "src/resources",
+    "#queue": "src/queues",
+    "#worker": "src/workers",
 
-    "@core_util": "src/utils/cores",
-    "@validator_util": "src/utils/validators",
-    "@main_util": "src/utils/mains",
-    "@service_util": "src/utils/services"
+    "#core_util": "src/utils/cores",
+    "#validator_util": "src/utils/validators",
+    "#main_util": "src/utils/mains",
+    "#service_util": "src/utils/services"
   }
 
 }

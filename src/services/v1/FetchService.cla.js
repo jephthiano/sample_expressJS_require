@@ -1,7 +1,7 @@
-const FetchRepository = require('@repository/FetchRepository.cla');
-const { setApiToken, getApiToken } = require('@main_util/token.util');
-const UserResource = require('@resource/UserResource');
-const { triggerError} = require('@core_util/handler.util');
+const FetchRepository = require('#repository/FetchRepository.cla');
+const { setApiToken, getApiToken } = require('#main_util/token.util');
+const UserResource = require('#resource/UserResource');
+const { triggerError} = require('#core_util/handler.util');
 
 
 class FetchService{

@@ -1,5 +1,5 @@
 const Redis = require('ioredis');
-const { log } = require('@main_util/logger.util');
+const { log } = require('#main_util/logger.util');
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');

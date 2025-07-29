@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const cryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
 const validator = require('validator');
-const { queueRehash } = require('@queue/rehashQueue');
+const { queueRehash } = require('#queue/rehashQueue');
 // const { v4: uuidv4 } = require('uuid');
 
 const key = process.env.ENC_KEY;
