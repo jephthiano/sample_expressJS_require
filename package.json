@@ -41,6 +41,7 @@
     "nodeman": "^1.1.2"
   },
   "_moduleAliases": {
+    "@src": "src",
     "@config": "src/configs",
     "@dto": "src/dtos",
     "@controller": "src/controllers",
