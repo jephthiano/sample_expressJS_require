@@ -1,4 +1,4 @@
-const { ValidationError, CustomApiException } = require('@core_util/errors.util');
+const { ValidationError, CustomApiException } = require('#core_util/errors.util');
 
 /**
  * Send a standardized JSON response.

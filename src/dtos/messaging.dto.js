@@ -1,4 +1,4 @@
-const { ucFirst }  = require('@main_util/general.util');
+const { ucFirst }  = require('#main_util/general.util');
 
 // pass [first_name, receiving_medium, send_medium, type and misc]
 function sendMessageDTO(data) {

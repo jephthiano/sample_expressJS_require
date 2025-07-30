@@ -1,6 +1,6 @@
-const { redis } = require('@config/redis'); 
-const { selEncrypt }  = require('@main_util/security.util');
-const { generateUniqueToken }  = require('@main_util/security.util');
+const { redis } = require('#config/redis'); 
+const { selEncrypt }  = require('#main_util/security.util');
+const { generateUniqueToken }  = require('#main_util/security.util');
 
 const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY)
  

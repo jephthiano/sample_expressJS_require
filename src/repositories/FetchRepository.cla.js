@@ -1,4 +1,4 @@
-const { findUserByID } = require('@database/mongo/user.db');
+const { findUserByID } = require('#database/mongo/user.db');
 
 class FetchRepository
 {

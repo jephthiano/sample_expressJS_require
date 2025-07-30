@@ -1,4 +1,4 @@
-const { findUserByEmailOrPhone, createUserAccount, resetUserPaswword } = require('@database/mongo/user.db');
+const { findUserByEmailOrPhone, createUserAccount, resetUserPaswword } = require('#database/mongo/user.db');
 
 class AuthRepository
 {

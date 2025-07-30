@@ -1,7 +1,7 @@
-const User = require('@model/User.schema');
-const OtpToken = require('@model/OtpToken.schema');
-const Token = require('@model/Token.schema');
-const { triggerError} = require('@core_util/handler.util');
+const User = require('#model/User.schema');
+const OtpToken = require('#model/OtpToken.schema');
+const Token = require('#model/Token.schema');
+const { triggerError} = require('#core_util/handler.util');
 
 const findSingleValue = async (coll, field, param, select) => {
     const model = getModel(coll); // Get model dynamically

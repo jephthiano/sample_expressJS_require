@@ -1,7 +1,7 @@
-const { findSingleValue } = require('@database/mongo/general.db');
-const User = require('@model/User.schema');
-const { selEncrypt, selDecrypt }  = require('@main_util/security.util');
-const { createUserDTO, updatePasswordDTO } = require('@dto/user.dto');
+const { findSingleValue } = require('#database/mongo/general.db');
+const User = require('#model/User.schema');
+const { selEncrypt, selDecrypt }  = require('#main_util/security.util');
+const { createUserDTO, updatePasswordDTO } = require('#dto/user.dto');
 
 const findUserByID = async (userId) => {
     return await User.findOne({ _id: userId});

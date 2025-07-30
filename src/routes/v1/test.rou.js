@@ -1,7 +1,7 @@
 const express = require('express');
 const router = new express.Router();
-const { sendMessage } = require('@main_util/messaging.util');
-const { hashPassword } = require('@main_util/security.util');
+const { sendMessage } = require('#main_util/messaging.util');
+const { hashPassword } = require('#main_util/security.util');
 
 
 router.get('/messaging', async (req,res) => {

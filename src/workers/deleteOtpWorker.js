@@ -1,7 +1,7 @@
-const { redis } = require('@config/redis'); 
+const { redis } = require('#config/redis'); 
 const { Worker } = require('bullmq');
-const { deleteOtp } = require('@main_util/otp.util');
-const { log } = require('@main_util/logger.util');
+const { deleteOtp } = require('#main_util/otp.util');
+const { log } = require('#main_util/logger.util');
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');

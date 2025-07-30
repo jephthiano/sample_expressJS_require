@@ -1,6 +1,6 @@
-const { isEmptyObject, isEmptyString }  = require('@main_util/general.util');
-const { validateInput }  = require('@main_util/security.util');
-const { findUserSingleValuebyEncField, } = require('@database/mongo/user.db');
+const { isEmptyObject, isEmptyString }  = require('#main_util/general.util');
+const { validateInput }  = require('#main_util/security.util');
+const { findUserSingleValuebyEncField, } = require('#database/mongo/user.db');
 
 // Utility function for response formatting
 const formatResponse = (errors) => ({

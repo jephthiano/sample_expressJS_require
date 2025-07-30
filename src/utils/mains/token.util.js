@@ -1,7 +1,7 @@
-const { triggerError} = require('@core_util/handler.util');
-const { dbFindUnexpiredToken, dbDeleteToken, dbUpdateOrCeateToken, DbRenewToken } = require('@database/mongo/token.db');
-const { redisGetUserIdByToken, redisDeleteToken, redisCreateToken, redisRenewToken, } = require('@database/redis/token.db');
-const { createJwtToken, renewJwtToken, validateJwtToken } = require('@service_util/validation/jwt');
+const { triggerError} = require('#core_util/handler.util');
+const { dbFindUnexpiredToken, dbDeleteToken, dbUpdateOrCeateToken, DbRenewToken } = require('#database/mongo/token.db');
+const { redisGetUserIdByToken, redisDeleteToken, redisCreateToken, redisRenewToken, } = require('#database/redis/token.db');
+const { createJwtToken, renewJwtToken, validateJwtToken } = require('#service_util/validation/jwt');
 
 // Generate Token with expiration
 const setApiToken = async (id) => {

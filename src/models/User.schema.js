@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { hashPassword, selEncrypt, generateUniqueId } = require('@main_util/security.util');
+const { hashPassword, selEncrypt, generateUniqueId } = require('#main_util/security.util');
 
 const UserSchema = new Schema({
     unique_id: {

@@ -1,12 +1,12 @@
-const AuthRepository = require('@repository/AuthRepository.cla');
-const { verifyPassword, validateInput }  = require('@main_util/security.util');
-const { sendOtp, verifyNewOtp, verifyUsedOtp}  = require('@main_util/otp.util');
-const { queueDeleteOtp } = require('@queue/deleteOtpQueue');
-const { sendMessage } = require('@main_util/messaging.util');
-const { deleteApiToken } = require('@main_util/token.util');
-const { triggerError} = require('@core_util/handler.util');
+const AuthRepository = require('#repository/AuthRepository.cla');
+const { verifyPassword, validateInput }  = require('#main_util/security.util');
+const { sendOtp, verifyNewOtp, verifyUsedOtp}  = require('#main_util/otp.util');
+const { queueDeleteOtp } = require('#queue/deleteOtpQueue');
+const { sendMessage } = require('#main_util/messaging.util');
+const { deleteApiToken } = require('#main_util/token.util');
+const { triggerError} = require('#core_util/handler.util');
 
-const FetchController = require('@controller/v1/FetchController.cla');
+const FetchController = require('#controller/v1/FetchController.cla');
 
 class AuthService{
 

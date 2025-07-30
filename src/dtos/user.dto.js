@@ -1,4 +1,4 @@
-import { validateInput }  from '#main_util/security.util.js';
+const { validateInput } = require('#main_util/security.util');
 
 function createUserDTO(data) {
     const veriType = data.receiving_medium 

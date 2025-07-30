@@ -1,7 +1,7 @@
-const { redis } = require('@config/redis'); 
+const { redis } = require('#config/redis'); 
 const { Worker } = require('bullmq');
-const { sendMessage } = require('@main_util/messaging.util');
-const { log } = require('@main_util/logger.util');
+const { sendMessage } = require('#main_util/messaging.util');
+const { log } = require('#main_util/logger.util');
 
 const logInfo = (type, data) => log(type, data, 'info');
 const logError = (type, data) => log(type, data, 'error');
