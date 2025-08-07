@@ -3,11 +3,11 @@ const OtpToken = require('#model/OtpToken.schema');
 const Token = require('#model/Token.schema');
 const { triggerError} = require('#core_util/handler.util');
 
-const findSingleValue = async (collectionName, field, param, select) => {
+const findSingleValue = async (collectionName, whereField, whereValue, selectValue) => {
     const model = getModel(collectionName); // Get model dynamically
     if (!model) triggerError(`Error occurred on the server`,[], 500);
 
-    const result = await model.findOne({ [field]: param }, select);
+    const result = await model.findOne({ [whereField]: param }, selectValue);
     const response = result ? result[select] : null;
 
     return response;
