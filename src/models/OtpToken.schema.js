@@ -32,8 +32,7 @@ const OtpTokenSchema = new Schema({
         default: Date.now
     }
 });
-
-// 🔄 Shared transformation logic
+// Reusable transformer for update objects
 async function transformOtpUpdate(update) {
     const target = update.$set || update;
 
@@ -57,7 +56,7 @@ async function transformOtpUpdate(update) {
     return update;
 }
 
-// ✅ Pre-save for new entries
+// Pre-save
 OtpTokenSchema.pre('save', async function (next) {
     if (this.isModified('code') && !this.code.startsWith('$2b$')) {
         this.code = await hashPassword(this.code);
@@ -70,13 +69,14 @@ OtpTokenSchema.pre('save', async function (next) {
     next();
 });
 
-// ✅ For all update operations
-const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany'];
-updateHooks.forEach(hook => {
-    OtpTokenSchema.pre(hook, async function (next) {
+// Update hooks
+const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'];
+
+updateHooks.forEach((hook) => {
+    UserSchema.pre(hook, async function (next) {
         const update = this.getUpdate();
-        await transformOtpUpdate(update);
-        this.setUpdate(update);
+        await transformOtpUpdate(update);// call the transform logic
+        this.setUpdate(update); // replace the olf value with the new one
         next();
     });
 });

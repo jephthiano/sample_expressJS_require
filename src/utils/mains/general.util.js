@@ -1,3 +1,12 @@
+const { triggerError} = require('#core_util/handler.util');
+
+const getEnvorThrow = (key) => {
+    const val = process.env[key];
+    if (!val) triggerError("Error occurred on the server", [], 500);
+    
+    return val;
+}
+
 const initialResponse = (type = 'invalid_request') => ({
     status: false,
     message: type === 'invalid_input' ? 'invalid inputs' : 'invalid request',
@@ -56,6 +65,7 @@ const parseMessageToObject = (error) => {
 };
 
 module.exports = {
+    getEnvorThrow,
     initialResponse,
     isEmptyObject,
     isEmptyArray,

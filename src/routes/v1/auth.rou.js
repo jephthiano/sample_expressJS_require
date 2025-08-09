@@ -3,12 +3,12 @@ const router = new express.Router();
 const AuthController = require('#controller/v1/AuthController.cla');
 
 //LOGIN
-router.post('/login', (req,res) => {
+router.post('/login', async (req, res) => {
     AuthController.login(req, res);
 });
 
 //REGISTER
-router.post('/register', async(req,res) => {
+router.post('/register', async (req, res) => {
     AuthController.register(req, res);
 });
 
@@ -24,17 +24,17 @@ router.post('/verify_otp/:type', async (req, res) => {
 
 
 //SIGN UP
-router.post('/signup', async(req,res) => {
+router.post('/signup', async (req, res) => {
     AuthController.signup(req, res);
 });
 
 //RESET PASSWORD
-router.post('/reset_password', async(req,res) => {
+router.post('/reset_password', async (req, res) => {
     AuthController.resetPassword(req, res);
 });
 
 //LOGOUT
-router.post('/logout/', async(req,res) => {
+router.post('/logout/', async (req, res) => {
     AuthController.logout(req, res);
 });
 

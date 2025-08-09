@@ -27,7 +27,9 @@ const TokenSchema = new Schema({
     }
 });
 
-async function transformUserUpdate(update) {
+
+// Reusable transformer for update objects
+async function transformTokenUpdate(update) {
     const target = update.$set || update;
 
     if (target.token) {
@@ -41,6 +43,7 @@ async function transformUserUpdate(update) {
     return update;
 }
 
+// Pre-save
 TokenSchema.pre('save', async function (next) {
     if (this.isModified('token')) {
         this.token = selEncrypt(this.token, 'token');
@@ -49,11 +52,14 @@ TokenSchema.pre('save', async function (next) {
     next();
 });
 
-['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'].forEach(hook => {
-    TokenSchema.pre(hook, async function (next) {
+// Update hooks
+const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'];
+
+updateHooks.forEach((hook) => {
+    UserSchema.pre(hook, async function (next) {
         const update = this.getUpdate();
-        await transformUserUpdate(update);
-        this.setUpdate(update);
+        await transformTokenUpdate(update);// call the transform logic
+        this.setUpdate(update); // replace the olf value with the new one
         next();
     });
 });
