@@ -4,7 +4,7 @@ const { sendMessage } = require('#main_util/messaging.util');
 const { hashPassword } = require('#main_util/security.util');
 
 
-router.get('/messaging', async (req,res) => {
+router.get('/messaging', async (req, res) => {
     // for email
     // const messageData = {
     //     first_name: 'Jephthaooh',
@@ -41,7 +41,7 @@ router.get('/messaging', async (req,res) => {
     res.status(200).json({message:'working'});
 });
 
-router.get('/hash', async (req,res) => {
+router.get('/hash', async (req, res) => {
     const hash = await hashPassword('newPAss')
 });
 
