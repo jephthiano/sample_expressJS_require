@@ -2,7 +2,7 @@ const { validateInput } = require('#main_util/security.util');
 
 function createUserDTO(data) {
     const veriType = data.receiving_medium 
-                ? validateInput(data.receiving_medium) ? 'mobile_number' : 'email'
+                ? validateInput(data.receiving_medium, 'mobile_number') ? 'mobile_number' : 'email'
                 : null ;
                 
     let email; let mobile_number; 

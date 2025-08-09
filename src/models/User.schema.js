@@ -108,9 +108,9 @@ UserSchema.pre('save', async function (next) {
     if (this.isModified('last_name')) this.last_name = selEncrypt(this.last_name.toLowerCase(), 'last_name');
     if (this.isModified('password')) this.password = await hashPassword(this.password);
 
-    if (!this.user_account) {
-        this.user_account = { balance: "0" };
-    }
+    // if (!this.user_account) {
+    //     this.user_account = { balance: "0" };
+    // }
 
     next();
 });
@@ -122,12 +122,11 @@ const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAnd
 updateHooks.forEach((hook) => {
     UserSchema.pre(hook, async function (next) {
         const update = this.getUpdate();
-        await transformUserUpdate(update);
-        this.setUpdate(update);
+        await transformUserUpdate(update);// call the transform logic
+        this.setUpdate(update); // replace the olf value with the new one
         next();
     });
 });
-
 
 const User = mongoose.model('users', UserSchema);
 module.exports = User;
