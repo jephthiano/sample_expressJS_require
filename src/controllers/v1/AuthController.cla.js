@@ -3,6 +3,7 @@ const AuthService = require('#service/v1/AuthService.cla');
 const { register, sendOtp, verifyOtp, signup, resetPassword} = require('#validator_util/custom/auth.val');
 const { loginJoi } = require('#validator_util/joi/auth.joi');
 const { parseMessageToObject } = require('#main_util/general.util');
+const { setTokenCookie } = require('#main_util/cookie.util');
 
 
 class AuthController extends BaseController{
@@ -16,6 +17,8 @@ class AuthController extends BaseController{
             if (error) this.triggerValidationError(parseMessageToObject(error));
             
             const response = await AuthService.login(req);
+            
+            setTokenCookie(res, response);
             this.sendResponse(res, response, "Login successful");
         } catch (error) {
             this.handleException(res, error);
@@ -32,6 +35,7 @@ class AuthController extends BaseController{
 
             const response = await AuthService.register(req);
 
+            setTokenCookie(res, response);
             this.sendResponse(res, response, "Account successfully created");
         } catch (error) {
             this.handleException(res, error);
@@ -85,6 +89,7 @@ class AuthController extends BaseController{
 
             const response =  await AuthService.signup(req);
 
+            setTokenCookie(res, response);
             this.sendResponse(res, response, "Account successfully created");
         } catch (error) {
             this.handleException(res, error);

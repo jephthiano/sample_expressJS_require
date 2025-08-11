@@ -73,7 +73,7 @@ OtpTokenSchema.pre('save', async function (next) {
 const updateHooks = ['findOneAndUpdate', 'updateOne', 'updateMany', 'findByIdAndUpdate'];
 
 updateHooks.forEach((hook) => {
-    UserSchema.pre(hook, async function (next) {
+    OtpTokenSchema.pre(hook, async function (next) {
         const update = this.getUpdate();
         await transformOtpUpdate(update);// call the transform logic
         this.setUpdate(update); // replace the olf value with the new one
