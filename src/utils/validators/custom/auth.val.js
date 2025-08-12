@@ -1,5 +1,5 @@
 const { findUserByEmailOrPhone , findEmailMobileNumberUsername} = require('#database/mongo/user.db');
-const { isEmptyObject, isEmptyString, replaceValues, isPhoneSample }  = require('#main_util/general.util');
+const { isEmptyObject, isEmptyString, replaceValues }  = require('#main_util/general.util');
 const { validateInput, validatePassword }  = require('#main_util/security.util');
 
 // Utility function for response formatting
@@ -25,7 +25,7 @@ const login = async (inputs) => {
 };
 
 // Registration
-const register = async (inputs, regType) => {
+const register = async (inputs) => {
     const errors = {};
     const {email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 
@@ -84,7 +84,7 @@ const register = async (inputs, regType) => {
 const sendOtp = async (inputs, type) => {
     const errors = {};
     const { receiving_medium } = inputs;
-    const veriType = isPhoneSample(receiving_medium) ? 'mobile_number' : 'email';
+    const veriType = validateInput(receiving_medium, 'mobile_number') ? 'mobile_number' : 'email';
     const resType = replaceValues(veriType, '_', ' ')
 
     if (type === 'sign_up') {
@@ -125,7 +125,7 @@ const verifyOtp = async (inputs) => {
 };
 
 // signup
-const signup = async (inputs, regType) => {
+const signup = async (inputs) => {
     const errors = {};
     const {receiving_medium, email, mobile_number, first_name, last_name, username, gender, password } = inputs;
 

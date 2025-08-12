@@ -15,7 +15,7 @@ class AuthController extends BaseController{
 
             // Validate inputs using Joi DTO
             const { error, value } = loginJoi.validate(req.body, { abortEarly: false });
-            if (error) this.triggerValidationError(parseMessageToObject(error));
+            if (error) this.triggerValidationError(parseMessageToObject(error.details));
             
             const response = await AuthService.login(req);
             
@@ -31,7 +31,7 @@ class AuthController extends BaseController{
     static async register(req, res) {
         try {
             //validate inputs
-            const { status, data } = await register(req.body, 'single');
+            const { status, data } = await register(req.body);
             if (status) this.triggerValidationError(data);
 
             const response = await AuthService.register(req);
@@ -85,7 +85,7 @@ class AuthController extends BaseController{
     static async signup(req, res) {
         try {
             //validate inputs
-            const { status, data } = await signup(req.body, 'multi');
+            const { status, data } = await signup(req.body);
             if (status) this.triggerValidationError(data);
 
             const response =  await AuthService.signup(req);
