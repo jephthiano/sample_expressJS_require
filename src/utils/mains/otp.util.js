@@ -6,7 +6,7 @@ const { triggerError} = require('#core_util/handler.util');
 
  
 const isValidOtpParam =  async (type) => {
-    return in_array(['forgot_password','sign_up'], type)
+    return ['sign_up', 'forgot_password'].includes(type);
 }
 
 // SEND OTP
