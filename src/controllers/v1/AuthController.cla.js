@@ -4,6 +4,7 @@ const { register, sendOtp, verifyOtp, signup, resetPassword} = require('#validat
 const { loginJoi } = require('#validator_util/joi/auth.joi');
 const { parseMessageToObject } = require('#main_util/general.util');
 const { setTokenCookie } = require('#main_util/cookie.util');
+const { isValidOtpParam } = require('#main_util/otp.util');
 
 
 class AuthController extends BaseController{
@@ -47,7 +48,7 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(type !== 'sign_up' && type !== 'forgot_password') this.triggerError("Invalid Request", []);
+            if(!isValidOtpParam(type)) this.triggerError("Invalid Request", []);
 
             //validate inputs
             const { status, data } = await sendOtp(req.body, type);
@@ -66,7 +67,7 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if (type !== 'sign_up' && type !== 'forgot_password') this.triggerError("Invalid Request", []);
+            if(!isValidOtpParam(type)) this.triggerError("Invalid Request", []);
 
             // validate inputs
             const { status, data } = await verifyOtp(req.body, type);
