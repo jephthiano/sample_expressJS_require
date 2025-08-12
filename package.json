@@ -1,7 +1,7 @@
 {
   "name": "Sample Api (Require)",
   "version": "1.0.0",
-  "description": "",
+  "description": "A boilerplate Express.js (CommonJs `require) API project for rapid backend development. This project is designed to help you kickstart any API-based service quickly, with built-in user authentication and OTP-based signup options. this project is designed with clean architecture",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
