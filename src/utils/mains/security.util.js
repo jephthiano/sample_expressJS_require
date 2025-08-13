@@ -19,16 +19,16 @@ const verifyPassword = async (plainPassword, hashedPassword, userId = null) => {
     const match = await bcrypt.compare(plainPassword, hashedPassword);
     if (!match) return false;
 
-    const currentRounds = parseInt(hashedPassword.split('$')[2], 10);
-    const needsRehash = currentRounds !== cost;
-
-    if (needsRehash && userId) {
-            // pass to queue job
-            queueRehash({userId, plainPassword });
-    }
+    // pass to queue job [if rehash is needed]
+    if (passwordNeedRehash(hashedPassword) && userId) queueRehash({userId, plainPassword });
 
     return true;
 };
+
+const passwordNeedRehash = (hashedPassword) => {
+    const currentRounds = parseInt(hashedPassword.split('$')[2], 10); // split by $
+    return currentRounds !== parseInt(cost);
+}
 
 // Encrypt only if type exists in enc_array
 const selEncrypt = (data, type = 'general') => enc_array.includes(type) ? encrypt(data) : data;

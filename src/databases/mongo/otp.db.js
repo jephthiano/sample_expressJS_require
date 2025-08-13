@@ -1,4 +1,4 @@
-const Otp = require('#model/OtpToken.schema');
+const Otp = require('#model/Otp.schema');
 const { createOtpDTO } = require('#dto/otp.dto');
 const { selEncrypt }  = require('#main_util/security.util');
 

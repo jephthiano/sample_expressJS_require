@@ -15,7 +15,7 @@ function sendMessageDTO(data) {
 }
 
 const emailDTO = (data) => {
-    const first_name = data.first_name?.trim()
+    const first_name = data.first_name?.trim() ?? "User";
     const subject = subjectTemplate(data.type);
     const text_content = messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
@@ -31,9 +31,8 @@ const emailDTO = (data) => {
 };
 
 const smsDTO = (data) => {
-    const send_medium = 'sms';
     return {
-        first_name: data.first_name?.trim(),
+        first_name: data.first_name?.trim() ?? "User",
         receiving_medium: data.receiving_medium?.trim(),
         message: messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
@@ -42,9 +41,8 @@ const smsDTO = (data) => {
 };
 
 const whatsappDTO = (data) => {
-    const send_medium = 'whatsapp';
     return {
-        first_name: data.first_name?.trim(),
+        first_name: data.first_name?.trim() ?? "User",
         receiving_medium: data.receiving_medium?.trim(),
         message: messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
@@ -54,9 +52,8 @@ const whatsappDTO = (data) => {
 
 
 const pushNotificationDTO = (data) => {
-    const send_medium = 'push_notification';
     return {
-        first_name: data.first_name?.trim(),
+        first_name: data.first_name?.trim() ?? "User",
         receiving_medium: data.receiving_medium?.trim(),
         message: messageTemplate(data.type, data.send_medium, {
             code: data.code?.trim() || null,
