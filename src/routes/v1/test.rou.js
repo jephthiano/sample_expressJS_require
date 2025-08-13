@@ -6,12 +6,12 @@ const { hashPassword } = require('#main_util/security.util');
 
 router.get('/messaging', async (req, res) => {
     // for email
-    // const messageData = {
-    //     first_name: 'Jephthaooh',
-    //     receiving_medium: 'jephthahooh@gmail.com',
-    //     type: 'welcome',
-    //     send_medium: 'email',
-    // };
+    const messageData = {
+        first_name: 'Jephthah',
+        receiving_medium: 'jephthahooh@gmail.com',
+        type: 'welcome',
+        send_medium: 'email',
+    };
 
     // for whatsapp
     // const messageData = {
@@ -30,12 +30,12 @@ router.get('/messaging', async (req, res) => {
     // };
 
     // for push notification
-    const messageData = {
-        first_name: 'Jephthaooh',
-        receiving_medium: 'dfgvghvgvgdv',
-        type: 'welcome',
-        send_medium: 'push_notification',
-    };
+    // const messageData = {
+    //     first_name: 'Jephthaooh',
+    //     receiving_medium: 'dfgvghvgvgdv',
+    //     type: 'welcome',
+    //     send_medium: 'push_notification',
+    // };
 
     sendMessage(messageData, 'queue');
     res.status(200).json({message:'working'});
