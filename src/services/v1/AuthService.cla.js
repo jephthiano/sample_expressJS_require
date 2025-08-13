@@ -64,21 +64,20 @@ class AuthService{
     }
 
     // [VERIFY OTP]
-    static async verifyOtp(req, type) {
-        const data = {
-            receiving_medium: req.body.receiving_medium,
-            code: req.body.code,
-            use_case: type
-        };
+    static async verifyOtp(req, use_case) {
+        const { code, receiving_medium } = req.body;
+        
+        const data = { receiving_medium, code, use_case };
 
-        const verify = await verifyNewOtp(data);
+        await verifyNewOtp(data);
 
         return [];
     }
 
     static async signup(req) {
         const { receiving_medium, code, first_name, email } = req.body;
-        const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'sign_up', code });  
+        
+        await verifyUsedOtp({ receiving_medium, use_case: 'sign_up', code });  
 
         // Create user
         const user = await AuthRepository.createUser(req.body);
@@ -96,7 +95,8 @@ class AuthService{
     //FORGOT PASSWORD [RESET PASSWORD]
     static async resetPassword(req) {
         const { code, receiving_medium } = req.body;
-        const verifyOtp = await verifyUsedOtp({ receiving_medium, use_case: 'forgot_password', code }); 
+        
+        await verifyUsedOtp({ receiving_medium, use_case: 'forgot_password', code }); 
 
         const updateUserData = await AuthRepository.updatePassword(req.body);
         if(!updateUserData) triggerError("Password reset failed", [], 500);
