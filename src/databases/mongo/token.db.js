@@ -1,8 +1,8 @@
 const Token = require('#model/Token.schema');
-const { selEncrypt }  = require('#main_util/security.util');
-const { generateUniqueToken }  = require('#main_util/security.util');
+const { selEncrypt, generateUniqueToken }  = require('#main_util/security.util');
+const { getEnvorThrow } = require('#main_util/general.util');
 
-const tokenExpiry = parseInt(process.env.TOKEN_EXPIRY);
+const TOKEN_EXPIRY = parseInt(getEnvorThrow('TOKEN_EXPIRY'));
 
 const dbFindUnexpiredToken = async (token)=> {
     token = selEncrypt(token, 'token');
@@ -17,7 +17,7 @@ const dbUpdateOrCeateToken = async (userId) => {
             { user_id: userId },
             {
                 token,
-                expire_at: new Date(Date.now() + tokenExpiry)
+                expire_at: new Date(Date.now() + TOKEN_EXPIRY)
             },
             {
                 new: true,
@@ -33,7 +33,7 @@ const DbRenewToken = async (userId) => {
     const renew = await Token.findOneAndUpdate(
         { user_id: userId },
         {
-            expire_at: new Date(Date.now() + tokenExpiry)
+            expire_at: new Date(Date.now() + TOKEN_EXPIRY)
         },
     );
 

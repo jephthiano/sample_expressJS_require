@@ -1,15 +1,20 @@
 const nodemailer = require('nodemailer');
 const { sendMessageDTO } = require('#dto/messaging.dto');
-const { log } = require('#main_util/logger.util');
+const { getEnvorThrow } = require('#main_util/general.util');
 
 class EmailService {
+    static SMTP_HOST = getEnvorThrow('SMTP_HOST');
+    static SMTP_PORT = parseInt(getEnvorThrow('SMTP_PORT'));
+    static SMTP_USER = getEnvorThrow('SMTP_USER');
+    static SMTP_PASS = getEnvorThrow('SMTP_PASS');
+
     static transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
+        host: EmailService.SMTP_HOST,
+        port: EmailService.SMTP_PORT,
         secure: true,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: EmailService.SMTP_USER,
+            pass: EmailService.SMTP_PASS,
         },
     });
 
@@ -17,7 +22,7 @@ class EmailService {
         data = sendMessageDTO(data);
 
         const mailOptions = {
-            from: process.env.SMTP_USER,
+            from: EmailService.SMTP_USER,
             to: data.receiving_medium,
             subject: data.subject,
             text: data.text_content,
