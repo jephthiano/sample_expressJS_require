@@ -2,9 +2,10 @@ require('module-alias/register');
 require('#config/env');
 const { connectDB, mongoose } = require('#config/database'); // Import both
 const { log } = require('#main_util/logger.util');
+const { getEnvorThrow } = require('#main_util/general.util');
 const app = require('#src/app');
 
-const PORT = process.env.PORT || 5000;
+const PORT = getEnvorThrow('PORT');
 
 const startServer = async () => {
   try {

@@ -1,7 +1,10 @@
+const { getEnvorThrow } = require('#main_util/general.util');
+
 const setTokenCookie = (res, responseData) => {
     const token  = responseData?.token ?? null;
-    
-    if(token && process.env.TOKEN_TYPE === 'cookie'){
+    const TOKEN_TYPE = getEnvorThrow('TOKEN_TYPE');
+
+    if(token && TOKEN_TYPE === 'cookie'){
         res.cookie("_menatreyd", token, {
             httpOnly: true,
             // secure: true,

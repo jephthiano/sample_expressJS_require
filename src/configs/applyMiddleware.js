@@ -5,10 +5,13 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
+const { getEnvorThrow } = require('#main_util/general.util');
+
+// const CLIENT_URL = getEnvorThrow('CLIENT_URL');
 
 module.exports = function (app) {
     const corsOptions = {
-        origin: process.env.CLIENT_URL,
+        origin: '*', // CLIENT_URL
         allowedHeaders: "",
         credentials: true,
         methods: ['GET', 'POST', 'DELETE', 'PUT']

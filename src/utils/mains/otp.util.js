@@ -1,10 +1,11 @@
-const { isDateLapsed }  = require('#main_util/general.util');
+const { isDateLapsed, getEnvorThrow }  = require('#main_util/general.util');
 const { generateUniqueId, verifyPassword }  = require('#main_util/security.util');
 const { sendMessage }  = require('#main_util/messaging.util');
 const { findOneOtpData, storeOtp, updateOtpStatus, deleteManyOtp } = require('#database/mongo/otp.db');
 const { triggerError} = require('#core_util/handler.util');
 
  
+const OTP_EXPIRY = getEnvorThrow('OTP_EXPIRY');
 const isValidOtpParam =  async (type) => {
     return ['sign_up', 'forgot_password'].includes(type);
 }
@@ -44,7 +45,7 @@ const verifyNewOtp = async (data) => {
     if(!await updateOtpStatus({ receiving_medium, use_case, code })) triggerError("Error occurred while running request", [], 500); // Indicating an internal error occurred
     
     // Check if the OTP has expired (300 seconds = 5 minutes)
-    if(isDateLapsed(reg_date, process.env.OTP_EXPIRY)) triggerError("Otp code has expired", []);
+    if(isDateLapsed(reg_date, OTP_EXPIRY)) triggerError("Otp code has expired", []);
 
     return true;
 };
@@ -63,7 +64,7 @@ const verifyUsedOtp = async (data) => {
 
     if(!isOtpCorrect) triggerError("Incorrect otp code", [], 401);
     
-    if(isDateLapsed(reg_date, process.env.OTP_EXPIRY)) triggerError("Request timeout, try again", []);
+    if(isDateLapsed(reg_date, OTP_EXPIRY)) triggerError("Request timeout, try again", []);
 
     return true;
 };
