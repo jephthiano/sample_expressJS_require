@@ -1,6 +1,6 @@
 const { ucFirst }  = require('#main_util/general.util');
 
-// pass [first_name, receiving_medium, send_medium, type and misc]
+// pass [first_name, receiving_medium, send_medium, message_type and misc]
 function sendMessageDTO(data) {
     const send_medium = data.send_medium || 'email';
     
@@ -16,8 +16,8 @@ function sendMessageDTO(data) {
 
 const emailDTO = (data) => {
     const first_name = data.first_name?.trim() ?? "User";
-    const subject = subjectTemplate(data.type);
-    const text_content = messageTemplate(data.type, data.send_medium, {
+    const subject = subjectTemplate(data.message_type);
+    const text_content = messageTemplate(data.message_type, data.send_medium, {
             code: data.code?.trim() || null,
         });
         
@@ -34,7 +34,7 @@ const smsDTO = (data) => {
     return {
         first_name: data.first_name?.trim() ?? "User",
         receiving_medium: data.receiving_medium?.trim(),
-        message: messageTemplate(data.type, data.send_medium, {
+        message: messageTemplate(data.message_type, data.send_medium, {
             code: data.code?.trim() || null,
         }),
     };
@@ -44,7 +44,7 @@ const whatsappDTO = (data) => {
     return {
         first_name: data.first_name?.trim() ?? "User",
         receiving_medium: data.receiving_medium?.trim(),
-        message: messageTemplate(data.type, data.send_medium, {
+        message: messageTemplate(data.message_type, data.send_medium, {
             code: data.code?.trim() || null,
         }),
     };
@@ -55,28 +55,28 @@ const pushNotificationDTO = (data) => {
     return {
         first_name: data.first_name?.trim() ?? "User",
         receiving_medium: data.receiving_medium?.trim(),
-        message: messageTemplate(data.type, data.send_medium, {
+        message: messageTemplate(data.message_type, data.send_medium, {
             code: data.code?.trim() || null,
         }),
     };
 };
 
-const subjectTemplate = (type) => {
+const subjectTemplate = (message_type) => {
     const subjects = {
         welcome: 'WELCOME TO JEPH VTU',
         otp_code: 'Request for OTP Code',
         reset_password: 'Reset Password',
     };
-    return subjects[type] || '';
+    return subjects[message_type] || '';
 };
 
-const messageTemplate = (type, medium = 'email', data = {}) => {
+const messageTemplate = (message_type, medium = 'email', data = {}) => {
     const messages = {
         welcome: 'You have successfully registered with Jeph VTU. We are delighted to have you as our customer.',
         otp_code: `Your OTP code is ${data.code}. Please note that this code expires in 5 minutes. Do not share this code with anyone.`,
         reset_password: 'You have successfully reset your password. If this action was not performed by you, kindly reset your password or notify the admin.',
     };
-    return messages[type] || '';
+    return messages[message_type] || '';
 };
 
 const htmlEmailTemplate = (data) => {
@@ -89,7 +89,7 @@ const htmlEmailTemplate = (data) => {
         <head>
             <meta charset='UTF-8'>
             <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+            <meta http-equiv='Content-message_type' content='text/html; charset=UTF-8'>
             <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
             <style>

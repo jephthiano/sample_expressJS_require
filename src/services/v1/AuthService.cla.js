@@ -39,7 +39,7 @@ class AuthService{
         if (!user) triggerError("Account creation failed", [], 500);
 
         // Send welcome email [PASS TO QUEUE JOB]
-        sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
+        sendMessage({ first_name, receiving_medium: email, send_medium: 'email', message_type: 'welcome' }, 'queue');
         
         // Fetch user-related data
         return await FetchController.authFetchData(user);
@@ -84,7 +84,7 @@ class AuthService{
         if (!user) triggerError("Account creation failed", [], 500);
         
         // Send welcome email [queue]
-        sendMessage({ first_name, receiving_medium: email, send_medium: 'email', type: 'welcome' }, 'queue');
+        sendMessage({ first_name, receiving_medium: email, send_medium: 'email', message_type: 'welcome' }, 'queue');
         // Clean up OTP [queue]
         queueDeleteOtp(receiving_medium);
         
@@ -107,7 +107,7 @@ class AuthService{
                 first_name: updateUserData.first_name,
                 receiving_medium: updateUserData.email,
                 send_medium: 'email', 
-                type: 'reset_password' 
+                message_type: 'reset_password' 
             }
             , 'queue'
         );
