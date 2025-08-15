@@ -14,7 +14,7 @@ const isValidOtpParam =  async (type) => {
 const sendOtp = async (messageData) => {
     let response = false;
     messageData.code = String(generateUniqueId(6));
-    messageData.type = 'otp_code';
+    messageData.message_type = 'otp_code';
 
     // Store OTP
     if (await storeOtp(messageData)) {
