@@ -1,7 +1,7 @@
 const { findSingleValue } = require('#database/mongo/general.db');
 const User = require('#model/User.schema');
 const { selEncrypt, selDecrypt }  = require('#main_util/security.util');
-const { createUserDTO, updatePasswordDTO } = require('#dto/user.dto');
+const { createUserDTO, updatePasswordDTO } = require('#dto/core/user.dto');
 
 const findUserByID = async (userId) => {
     return await User.findOne({ _id: userId});
@@ -50,12 +50,7 @@ const resetUserPaswword = async(data) => {
             { new: true }
         )  
         
-        if(!user) return null;
-
-        return {
-            email: selDecrypt(user.email, 'email'),
-            first_name: selDecrypt(user.first_name, 'first_name'),
-        };
+        return user ?? null;
 }
 
 module.exports = {

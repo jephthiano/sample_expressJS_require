@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const { sendMessageDTO } = require('#dto/messaging.dto');
+const { sendMessageDTO } = require('#dto/core/messaging.dto');
 const { getEnvorThrow } = require('#main_util/general.util');
 
 class EmailService {
