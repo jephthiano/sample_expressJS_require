@@ -1,5 +1,5 @@
 const Otp = require('#model/Otp.schema');
-const { createOtpDTO } = require('#dto/otp.dto');
+const { createOtpDTO } = require('#dto/core/otp.dto');
 const { selEncrypt }  = require('#main_util/security.util');
 
 //FIND ONE OTP DATA

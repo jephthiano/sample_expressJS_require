@@ -40,12 +40,9 @@ const validateApiToken = async (req) => {
     
 };
 
-const deleteApiToken = async (req) => {
-    let status = false;
+const deleteApiToken = async (token) => {
+    let status;
     
-    const token = getApiToken(req);
-    if(!token) return false;
-
     if (TOKEN_SETTER === 'jwt') {
         status = true; // not available
     } else if (TOKEN_SETTER === 'local_self') {

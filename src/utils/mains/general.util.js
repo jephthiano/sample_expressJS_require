@@ -15,6 +15,8 @@ const isObject = (value) => typeof value === 'object' && value !== null && !Arra
 
 const isKeyInObject = (key, object) => Object.prototype.hasOwnProperty.call(object, key);
 
+const isValidString = (variable) => typeof variable === 'string' && variable.trim().length > 0;
+
 const isEmptyString = (variable) => typeof variable === 'string' && variable.trim().length === 0;
 
 const inArray = (value, array) => array.includes(value);
@@ -51,6 +53,7 @@ module.exports = {
     isEmptyArray,
     isObject,
     isKeyInObject,
+    isValidString,
     isEmptyString,
     inArray,
     isValidData,

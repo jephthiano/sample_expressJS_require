@@ -5,6 +5,8 @@ const { loginJoi } = require('#validator_util/joi/auth.joi');
 const { parseMessageToObject } = require('#main_util/general.util');
 const { setTokenCookie } = require('#main_util/cookie.util');
 const { isValidOtpParam } = require('#main_util/otp.util');
+const { getApiToken } = require('#main_util/token.util.js');
+const { LoginInputDto, registerInputDto, sendOtpInputDto, verifyOtpInputDto, signupInputDto, resetPasswordInputDto } = require('#src/dtos/input/auth.dto.js');
 
 
 class AuthController extends BaseController{
@@ -12,13 +14,16 @@ class AuthController extends BaseController{
     // LOGIN
     static async login(req, res) {
         try {
-
+            
             // Validate inputs using Joi DTO
             const { error, value } = loginJoi.validate(req.body, { abortEarly: false });
             if (error) this.triggerValidationError(parseMessageToObject(error.details));
             
-            const response = await AuthService.login(req);
-            
+            // pass pure data from dto [not raw data]
+            const inputData = LoginInputDto(req.body);
+
+            const response = await AuthService.login(inputData);
+
             setTokenCookie(res, response);
             this.sendResponse(res, response, "Login successful");
         } catch (error) {
@@ -34,7 +39,10 @@ class AuthController extends BaseController{
             const { status, data } = await register(req.body);
             if (status) this.triggerValidationError(data);
 
-            const response = await AuthService.register(req);
+            // pass pure data from dto [not raw data]
+            const inputData = registerInputDto(req.body);
+
+            const response = await AuthService.register(inputData);
 
             setTokenCookie(res, response);
             this.sendResponse(res, response, "Account successfully created");
@@ -48,13 +56,16 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(!isValidOtpParam(type)) this.triggerError("Invalid Request", []);
+            if(!isValidOtpParam(type)) this.triggerError("Invalid Request", []); // check if it is a valid otp medium
 
             //validate inputs
             const { status, data } = await sendOtp(req.body, type);
             if (status) this.triggerValidationError(data);
 
-            const response = await AuthService.sendOtp(req, type);
+            // pass pure data from dto [not raw data]
+            const inputData = sendOtpInputDto(req.body);
+
+            const response = await AuthService.sendOtp(inputData, type);
 
             this.sendResponse(res, response, "Otp code successful sent");
         } catch (error) {
@@ -67,13 +78,16 @@ class AuthController extends BaseController{
         const { type } = req.params;
 
         try {
-            if(!isValidOtpParam(type)) this.triggerError("Invalid Request", []);
+            if(!isValidOtpParam(type)) this.triggerError("Invalid Request", []); // check if it is a valid otp medium
 
             // validate inputs
             const { status, data } = await verifyOtp(req.body, type);
             if (status) this.triggerValidationError(data);
+
+            // pass pure data from dto [not raw data]
+            const inputData = verifyOtpInputDto(req.body);
             
-            const response =  await AuthService.verifyOtp(req, type);
+            const response =  await AuthService.verifyOtp(inputData, type);
 
             return this.sendResponse(res, response, "Otp code successful verified");
         } catch (error) {
@@ -88,7 +102,10 @@ class AuthController extends BaseController{
             const { status, data } = await signup(req.body);
             if (status) this.triggerValidationError(data);
 
-            const response =  await AuthService.signup(req);
+            // pass pure data from dto [not raw data]
+            const inputData = signupInputDto(req.body);
+
+            const response =  await AuthService.signup(inputData);
 
             setTokenCookie(res, response);
             this.sendResponse(res, response, "Account successfully created");
@@ -104,7 +121,10 @@ class AuthController extends BaseController{
             const { status, data } = await resetPassword(req.body);
             if (status) this.triggerValidationError(data);
 
-           const response =  await AuthService.resetPassword(req);
+            // pass pure data from dto [not raw data]
+            const inputData = resetPasswordInputDto(req.body);
+
+           const response =  await AuthService.resetPassword(inputData);
            
            this.sendResponse(res, response, "Password successfully reset");
         } catch (error) {
@@ -116,7 +136,11 @@ class AuthController extends BaseController{
     // LOGOUT
     static async logout(req, res) {
          try {
-            const response =  await AuthService.logout(req);
+            const token = getApiToken(req);
+
+            if (!token) this.triggerError("Request failed, try again", [], 400);
+
+            const response =  await AuthService.logout(token);
 
             this.sendResponse(res, response, "Logout successfully");
         } catch (error) {
