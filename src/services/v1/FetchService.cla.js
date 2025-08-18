@@ -5,12 +5,12 @@ const { triggerError} = require('#core_util/handler.util');
 
 
 class FetchService{
-    static async authFetchData (user){
+    static async authFetchData (userData){
         //get user data
-        const token = user ? await setApiToken(user.id) : null ;
+        const token = ususerDatar ? await setApiToken(userData.id) : null ;
 
-        if(token && user){
-            const data = new UserResource(user).toJSON();
+        if(token && userData){
+            const data = new UserResource(userData).toJSON();
             return {token, data};
         }
 

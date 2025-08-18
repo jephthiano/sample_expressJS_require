@@ -50,12 +50,7 @@ const resetUserPaswword = async(data) => {
             { new: true }
         )  
         
-        if(!user) return null;
-
-        return {
-            email: selDecrypt(user.email, 'email'),
-            first_name: selDecrypt(user.first_name, 'first_name'),
-        };
+        return user ?? null;
 }
 
 module.exports = {

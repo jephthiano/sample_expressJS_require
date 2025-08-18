@@ -6,7 +6,7 @@ const { parseMessageToObject } = require('#main_util/general.util');
 const { setTokenCookie } = require('#main_util/cookie.util');
 const { isValidOtpParam } = require('#main_util/otp.util');
 const { getApiToken } = require('#main_util/token.util.js');
-const { LoginInputDto, registerInputDto, sendOtpInputDto, verifyOtpInputDto, signupInputDto, resetPasswordInputDto } = require('#src/dtos/input/auth.dto.js');
+const { loginInputDto, registerInputDto, sendOtpInputDto, verifyOtpInputDto, signupInputDto, resetPasswordInputDto } = require('#src/dtos/input/auth.dto.js');
 
 
 class AuthController extends BaseController{
@@ -20,7 +20,7 @@ class AuthController extends BaseController{
             if (error) this.triggerValidationError(parseMessageToObject(error.details));
             
             // pass pure data from dto [not raw data]
-            const inputData = LoginInputDto(req.body);
+            const inputData = loginInputDto(req.body);
 
             const response = await AuthService.login(inputData);
 
