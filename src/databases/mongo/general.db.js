@@ -7,8 +7,8 @@ const findSingleValue = async (collectionName, whereField, whereValue, selectVal
     const model = getModel(collectionName); // Get model dynamically
     if (!model) triggerError(`Error occurred on the server`,[], 500);
 
-    const result = await model.findOne({ [whereField]: param }, selectValue);
-    const response = result ? result[select] : null;
+    const result = await model.findOne({ [whereField]: whereValue }, selectValue);
+    const response = result ? result[selectValue] : null;
 
     return response;
 };
