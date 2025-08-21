@@ -1,4 +1,4 @@
-const { isEmptyObject, isEmptyString }  = require('#main_util/general.util');
+const { isEmptyObject, inArray }  = require('#main_util/general.util');
 const { validateInput }  = require('#main_util/security.util');
 const { findUserSingleValuebyEncField, } = require('#database/mongo/user.db');
 
@@ -14,7 +14,7 @@ const validateEmailChange = async ({ email }, userData) => {
     const emailExists = await findUserSingleValuebyEncField('User', 'email', email, 'email');
 
     // Validate email
-    if (!email || isEmptyString(email)) {
+    if (!inArray(email)) {
         errors.email = "Email is required";
     } else if (!validateInput(email, 'email')) {
         errors.email = "Invalid email format";
@@ -33,7 +33,7 @@ const validateUsernameChange = async ({ username }, userData) => {
     const usernameExists = await findUserSingleValuebyEncField('User', 'username', username, 'username');
 
     // Validate username
-    if (!username || isEmptyString(username)) {
+    if (!inArray(username)) {
         errors.username = "Username is required";
     } else if (!validateInput(username, 'username')) {
         errors.username = "Username should be between 5 to 10 alphabets";

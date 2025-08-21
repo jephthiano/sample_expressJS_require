@@ -9,14 +9,6 @@ const getEnvorThrow = (key) => {
 
 const isEmptyObject = (obj) => Object.keys(obj).length === 0;
 
-const isEmptyArray = (array) => Array.isArray(array) && array.length === 0;
-
-const isObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const isKeyInObject = (key, object) => Object.prototype.hasOwnProperty.call(object, key);
-
-const isValidString = (variable) => typeof variable === 'string' && variable.trim().length > 0;
-
 const isEmptyString = (variable) => typeof variable === 'string' && variable.trim().length === 0;
 
 const inArray = (value, array) => array.includes(value);
@@ -27,9 +19,6 @@ const replaceValues = (data, value, replace) => {
     const regex = new RegExp(value, 'g');
     return data.replace(regex, replace);
 };
-  
-
-const isNumber = (value) => !isNaN(value) && typeof Number(value) === "number" && Number.isFinite(value);
 
 const ucFirst = (data) => data.charAt(0).toUpperCase() + data.slice(1);
 
@@ -50,15 +39,10 @@ const parseMessageToObject = (errorDetails) => {
 module.exports = {
     getEnvorThrow,
     isEmptyObject,
-    isEmptyArray,
-    isObject,
-    isKeyInObject,
-    isValidString,
     isEmptyString,
     inArray,
     isValidData,
     replaceValues,
-    isNumber,
     ucFirst,
     isDateLapsed,
     parseMessageToObject,

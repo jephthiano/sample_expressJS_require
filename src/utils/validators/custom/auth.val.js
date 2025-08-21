@@ -1,5 +1,5 @@
 const { findUserByEmailOrPhone , findEmailMobileNumberUsername} = require('#database/mongo/user.db');
-const { isEmptyObject, isEmptyString, replaceValues }  = require('#main_util/general.util');
+const { isEmptyObject, replaceValues, isValidData, inArray}  = require('#main_util/general.util');
 const { validateInput, validatePassword }  = require('#main_util/security.util');
 
 // Utility function for response formatting
@@ -13,11 +13,11 @@ const login = async (inputs) => {
     const errors = {};
     const { login_id, password } = inputs;
 
-    if (!login_id || isEmptyString(login_id)) {
+    if (!isValidData(login_id)) {
         errors.login_id = "login ID cannot be empty";
     }
 
-    if (!password || isEmptyString(password)) {
+    if (!isValidData(password)) {
         errors.password = "password cannot be empty";
     }
 
@@ -31,7 +31,7 @@ const register = async (inputs) => {
 
     const [email_exists, mobile_exists, username_exists] = await findEmailMobileNumberUsername(email, mobile_number, username)
     
-    if (!email || isEmptyString(email)) {
+    if (!isValidData(email)) {
         errors.email = "email is required";
     } else if (!validateInput(email, 'email')) {
         errors.email = "invalid email";
@@ -39,7 +39,7 @@ const register = async (inputs) => {
         errors.email = "email already exists";
     }
 
-    if (!mobile_number || isEmptyString(mobile_number)) {
+    if (!isValidData(mobile_number)) {
         errors.mobile_number = "mobile number is required";
     } else if (!validateInput(mobile_number, 'mobile_number')) {
         errors.mobile_number = "invalid mobile number";
@@ -47,7 +47,7 @@ const register = async (inputs) => {
         errors.mobile_number = "mobile number already exists";
     }
 
-    if (!username || isEmptyString(username)) {
+    if (!isValidData(username)) {
         errors.username = "username is required";
     } else if (!validateInput(username, 'username')) {
         errors.username = "username should be between 5 to 10 alphabets";
@@ -55,23 +55,23 @@ const register = async (inputs) => {
         errors.username = "username already taken";
     }
 
-    if (!first_name || isEmptyString(first_name)) {
+    if (!isValidData(first_name)) {
         errors.first_name = "first name is required";
     } else if (!validateInput(first_name, 'name')) {
         errors.first_name = "invalid first name";
     }
 
-    if (!last_name || isEmptyString(last_name)) {
+    if (!isValidData(last_name)) {
         errors.last_name = "last name is required";
     } else if (!validateInput(last_name, 'name')) {
         errors.last_name = "invalid last name";
     }
 
-    if (!gender || (gender !== 'male' && gender !== 'female')) {
+    if (!isValidData(gender) || !inArray(gender, ['male', 'female'])) {
         errors.gender = "invalid gender";
     }
 
-    if (!password || isEmptyString(password)) {
+    if (!isValidData(password)) {
         errors.password = "password is required";
     } else if (!validatePassword(password)) {
         errors.password = "password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
@@ -90,7 +90,7 @@ const sendOtp = async (inputs, type) => {
     if (type === 'sign_up') {
         const data_exists = await findUserByEmailOrPhone(receiving_medium);
 
-        if (!receiving_medium || isEmptyString(receiving_medium)) {
+        if (!isValidData(receiving_medium)) {
             errors.receiving_medium = "field is required";
         } else if (data_exists) { // if data is in db
             errors.receiving_medium = `${resType} already taken`;
@@ -100,7 +100,7 @@ const sendOtp = async (inputs, type) => {
     } else if (type === 'forgot_password') {
         const data_exists = await findUserByEmailOrPhone(receiving_medium);
 
-        if (!receiving_medium || isEmptyString(receiving_medium)) {
+        if (!isValidData(receiving_medium)) {
             errors.receiving_medium = `Email/mobile number is required`;
         } else if (!data_exists) { // if the data is not in db
             errors.receiving_medium = `${resType} does not exist`;
@@ -117,7 +117,7 @@ const verifyOtp = async (inputs) => {
     const errors = {};
     const { code } = inputs;
 
-    if (!code || !validateInput(code, 'otp_code')) {
+    if (!isValidData(code) || !validateInput(code, 'otp_code')) {
         errors.code = "invalid OTP code";
     }
 
@@ -133,7 +133,7 @@ const signup = async (inputs) => {
 
     //if receiving medium is mobile number else email
     if(validateInput(receiving_medium, 'mobile_number')){
-        if (!email || isEmptyString(email)) {
+        if (!isValidData(email)) {
             errors.email = "email is required";
         } else if (!validateInput(email, 'email')) {
             errors.email = "invalid email";
@@ -141,7 +141,7 @@ const signup = async (inputs) => {
             errors.email = "email already exists";
         }
     } else {
-        if (!mobile_number || isEmptyString(mobile_number)) {
+        if (!isValidData(mobile_number)) {
             errors.mobile_number = "mobile number is required";
         } else if (!validateInput(mobile_number, 'mobile_number')) {
             errors.mobile_number = "invalid mobile number";
@@ -150,7 +150,7 @@ const signup = async (inputs) => {
         }
     }
 
-    if (!username || isEmptyString(username)) {
+    if (!isValidData(username)) {
         errors.username = "username is required";
     } else if (!validateInput(username, 'username')) {
         errors.username = "username should be between 5 to 10 alphabets";
@@ -158,23 +158,23 @@ const signup = async (inputs) => {
         errors.username = "username already taken";
     }
 
-    if (!first_name || isEmptyString(first_name)) {
+    if (!isValidData(first_name)) {
         errors.first_name = "first name is required";
     } else if (!validateInput(first_name, 'name')) {
         errors.first_name = "invalid first name";
     }
 
-    if (!last_name || isEmptyString(last_name)) {
+    if (!isValidData(last_name)) {
         errors.last_name = "last name is required";
     } else if (!validateInput(last_name, 'name')) {
         errors.last_name = "invalid last name";
     }
 
-    if (!gender || (gender !== 'male' && gender !== 'female')) {
+    if (!isValidData(gender) || !inArray(gender, ['male', 'female'])) {
         errors.gender = "invalid gender";
     }
 
-    if (!password || isEmptyString(password)) {
+    if (!isValidData(password)) {
         errors.password = "password is required";
     } else if (!validatePassword(password)) {
         errors.password = "password must be at least 8 characters, include uppercase, lowercase, digit, and special character";
